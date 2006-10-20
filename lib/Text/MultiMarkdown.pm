@@ -51,22 +51,6 @@ our ($g_document_format);
 my $g_empty_element_suffix = " />";     # Change to ">" for HTML output
 my $g_tab_width = 4;
 
-sub new { bless {} }
-
-sub markdown {
-    my ( $self, $text, $options ) = @_;
-    unless (ref $self) {
-        $options = $text;
-        $text = $self;
-    }
-    $options ||= {};
-    $g_document_format = $options->{document_format} || "";
-    $g_empty_element_suffix = $options->{empty_element_suffix}
-        if $options->{empty_element_suffix};
-    $g_tab_width = $options->{tab_width} if $options->{tab_width};
-    return Markdown($text);
-}
-
 #
 # Globals:
 #
@@ -126,6 +110,41 @@ my $g_temp_no_wikiwords = 0;
 # (see _ProcessListItems() for details):
 my $g_list_level = 0;
 
+
+sub new { bless {} }
+
+sub markdown {
+    my ( $self, $text, $options ) = @_;
+    unless (ref $self) {
+        $options = $text;
+        $text = $self;
+    }
+    $options ||= {};
+    $g_document_format = $options->{document_format} || "";
+    $g_empty_element_suffix = $options->{empty_element_suffix}
+        if $options->{empty_element_suffix};
+    $g_tab_width = $options->{tab_width} if $options->{tab_width};
+
+    # Clear the global hashes. If we don't clear these, you get conflicts
+    # from other articles when generating a page which contains more than
+    # one article (e.g. an index page that shows the N most recent
+    # articles):
+    %g_urls            = ();
+    %g_titles          = ();
+    %g_html_blocks     = ();
+    %g_metadata        = ();
+    %g_crossrefs       = ();
+    %g_footnotes       = ();
+    @g_used_footnotes  = ();
+    @g_used_references = ();
+
+    %g_urls        = %{$options->{urls}}        if $options->{urls};
+    %g_titles      = %{$options->{titles}}      if $options->{titles};
+    %g_html_blocks = %{$options->{html_blocks}} if $options->{html_blocks};
+
+    return Markdown($text);
+}
+
 sub Markdown {
 #
 # Main function. The order in which other subs are called here is
@@ -134,20 +153,6 @@ sub Markdown {
 # and <img> tags get encoded.
 #
     my $text = shift;
-
-    # Clear the global hashes. If we don't clear these, you get conflicts
-    # from other articles when generating a page which contains more than
-    # one article (e.g. an index page that shows the N most recent
-    # articles):
-    %g_urls = ();
-    %g_titles = ();
-    %g_html_blocks = ();
-    %g_metadata = ();
-    %g_crossrefs = ();
-    %g_footnotes = ();
-    @g_used_footnotes = ();
-    @g_used_references = ();
-
 
     # Standardize line endings:
     $text =~ s{\r\n}{\n}g;  # DOS to Unix
