@@ -29,7 +29,7 @@ use warnings;
 use Digest::MD5 qw(md5_hex);
 use base 'Exporter';
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 our @EXPORT_OK = qw/markdown/;
 
 our ($g_document_format);
@@ -2114,12 +2114,7 @@ you expected; (3) the output Markdown actually produced.
 
 =head1 VERSION HISTORY
 
-See the readme file for detailed release notes for this version.
-
-1.0.1 - 14 Dec 2004
-
-1.0 - 28 Aug 2004
-
+See the Changes file for detailed release notes for this version.
 
 =head1 AUTHOR
 

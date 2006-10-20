@@ -1,16 +1,16 @@
 ---
 name: Text-MultiMarkdown
-version: 1.0.0
-author: []
-abstract: Converts files in MultiMarkdown syntax to (X)HTML files
+version: 1.0.1
+author:
+abstract: "Converts files in MultiMarkdown syntax to (X)HTML files"
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-provides:
-  Text::MultiMarkdown:
-    file: lib/Text/MultiMarkdown.pm
-    version: 1.0.0
-generated_by: Module::Build version 0.2801
+generated_by: Module::Build version 0.2805
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2
+provides:
+  Text::MultiMarkdown:
+    file: lib/Text/MultiMarkdown.pm
+    version: 1.0.1
+resources:
+  license: http://dev.perl.org/licenses/
