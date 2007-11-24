@@ -7,3 +7,8 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - include patch from Uwe Voelker to allow setting of options in
           markdown(); also added a test case from Uwe. Thanks, Uwe!
           Also updated changelog references in POD somewhat.
+
+1.0.2   2007-11-24T14:00:00
+        - move to Module::Install and clean various things up, mostly to make
+          CPANTS happy.
+
