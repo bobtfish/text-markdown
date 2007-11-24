@@ -2056,7 +2056,7 @@ __END__
 
 =head1 NAME
 
-B<MultiMarkdown> - Convert MultiMarkdown syntax to (X)HTML
+Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
 
 =head1 SYNOPSIS
 
