@@ -29,7 +29,7 @@ use warnings;
 use Digest::MD5 qw(md5_hex);
 use base 'Exporter';
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 our @EXPORT_OK = qw/markdown/;
 
 our ($g_document_format);
@@ -2056,8 +2056,7 @@ __END__
 
 =head1 NAME
 
-B<MultiMarkdown>
-
+B<MultiMarkdown> - Convert MultiMarkdown syntax to (X)HTML
 
 =head1 SYNOPSIS
 
