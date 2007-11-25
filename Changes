@@ -12,3 +12,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - move to Module::Install and clean various things up, mostly to make
           CPANTS happy.
 
+1.0.3   2007-11-24T20:22:00
+        - way to keep me accountable, CPANTESTERS! Maybe I shouldn't have
+          Test::Pod::Coverage enabled unless it actually checks out. Added some
+          fairly useless stubbed METHODS to POD and moved POD around a bit.

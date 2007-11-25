@@ -1,35 +1,57 @@
-# MultiMarkdown -- A modification of John Gruber's original Markdown
-#   that adds new features and an output format that can more readily
-#   be converted into other document formats
-#
-# Original Code Copyright (c) 2004 John Gruber
-#   <http://daringfireball.net/projects/markdown/>
-#
-# MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney
-#   <http://fletcher.freeshell.org/>
-#
-# Modularized as Text::MultiMarkdown (c) 2006 Darren Kulp
-#   <http://kulp.ch>
-
-# Warning: this code is messy and does not adhere to any consistent set of code
-# guidelines; this is not because of the original quality of the code, which is
-# far above what I can pretend to be capable of creating, but because of the
-# various patching and diffing steps in between and the incomplete translation
-# of the original code into a module. I hope to fix many of the issues you may
-# find soon, but I would rather release too early than too late, especially
-# since I find the code quite usable at this point.
-# 
-# Darren Kulp, 2006-08-22
-
 package Text::MultiMarkdown;
 require 5.006_000;
 use strict;
 use warnings;
 
+=head1 NAME
+
+Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
+
+=head1 SYNOPSIS
+
+    use Text::MultiMarkdown 'markdown';
+    my $html = markdown($text);
+
+    use Text::MultiMarkdown 'markdown';
+    my $html = markdown( $text, {
+        empty_element_suffix => '>',
+        tab_width => 2
+    } );
+
+    use Text::MultiMarkdown;
+    my $m = Text::MultiMarkdown->new;
+    my $html = $m->markdown($text);
+
+    use Text::MultiMarkdown;
+    my $m = Text::MultiMarkdown->new;
+    my $html = $m->markdown( $text, {
+        empty_element_suffix => '>',
+        tab_width => 2
+    } );
+
+=head1 DESCRIPTION
+
+Markdown is a text-to-HTML filter; it translates an easy-to-read /
+easy-to-write structured text format into HTML. Markdown's text format
+is most similar to that of plain text email, and supports features such
+as headers, *emphasis*, code blocks, blockquotes, and links.
+
+Markdown's syntax is designed not as a generic markup language, but
+specifically to serve as a front-end to (X)HTML. You can  use span-level
+HTML tags anywhere in a Markdown document, and you can use block level
+HTML tags (like <div> and <table> as well).
+
+For more information about Markdown's syntax, see:
+
+    http://daringfireball.net/projects/markdown/
+
+=cut
+
+
 use Digest::MD5 qw(md5_hex);
 use base 'Exporter';
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 our @EXPORT_OK = qw/markdown/;
 
 our ($g_document_format);
@@ -111,7 +133,24 @@ my $g_temp_no_wikiwords = 0;
 my $g_list_level = 0;
 
 
-sub new { bless {} }
+=head1 METHODS
+
+=over 4
+
+=item new
+
+A very simple constructor. Takes no arguments.
+
+=cut
+
+sub new { bless {}, shift }
+
+=item markdown
+
+The main function as far as the outside world is concerned. See the SYNOPSIS
+for details on use.
+
+=cut
 
 sub markdown {
     my ( $self, $text, $options ) = @_;
@@ -144,6 +183,12 @@ sub markdown {
 
     return Markdown($text);
 }
+
+=item Markdown
+
+The main function (internal use only).
+
+=cut
 
 sub Markdown {
 #
@@ -216,7 +261,6 @@ sub Markdown {
     }
     
 }
-
 
 sub _StripLinkDefinitions {
 #
@@ -1515,6 +1559,12 @@ sub _PrintFootnotes{
     return $result;
 }
 
+=item Header2Label
+
+Internal use only.
+
+=cut
+
 sub Header2Label {
     my $header = shift;
     my $label = lc $header;
@@ -1523,6 +1573,12 @@ sub Header2Label {
         {};     # Strip illegal leading characters
     return $label;
 }
+
+=item xhtmlMetaData
+
+Internal use only.
+
+=cut
 
 sub xhtmlMetaData {
     # FIXME: Should not assume encoding
@@ -1547,6 +1603,12 @@ sub xhtmlMetaData {
     
     return $result;
 }
+
+=item textMetaData
+
+Internal use only.
+
+=cut
 
 sub textMetaData {
     my $result = "";
@@ -2052,49 +2114,17 @@ sub _GenerateImageCrossRefs {
 1;
 __END__
 
-=pod
+=back
 
-=head1 NAME
+=head1 NOTICE
 
-Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
-
-=head1 SYNOPSIS
-
-    use Text::MultiMarkdown 'markdown';
-    my $html = markdown($text);
-
-    use Text::MultiMarkdown 'markdown';
-    my $html = markdown( $text, {
-        empty_element_suffix => '>',
-        tab_width => 2
-    } );
-
-    use Text::MultiMarkdown;
-    my $m = Text::MultiMarkdown->new;
-    my $html = $m->markdown($text);
-
-    use Text::MultiMarkdown;
-    my $m = Text::MultiMarkdown->new;
-    my $html = $m->markdown( $text, {
-        empty_element_suffix => '>',
-        tab_width => 2
-    } );
-
-=head1 DESCRIPTION
-
-Markdown is a text-to-HTML filter; it translates an easy-to-read /
-easy-to-write structured text format into HTML. Markdown's text format
-is most similar to that of plain text email, and supports features such
-as headers, *emphasis*, code blocks, blockquotes, and links.
-
-Markdown's syntax is designed not as a generic markup language, but
-specifically to serve as a front-end to (X)HTML. You can  use span-level
-HTML tags anywhere in a Markdown document, and you can use block level
-HTML tags (like <div> and <table> as well).
-
-For more information about Markdown's syntax, see:
-
-    http://daringfireball.net/projects/markdown/
+Warning: this code is messy and does not adhere to any consistent set of code
+guidelines; this is not because of the original quality of the code, which is
+far above what I can pretend to be capable of creating, but because of the
+various patching and diffing steps in between and the incomplete translation of
+the original code into a module. I hope to fix many of the issues you may find
+soon, but I would rather release too early than too late, especially since I
+find the code quite usable at this point.
 
 =head1 BUGS
 
