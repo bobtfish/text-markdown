@@ -2,15 +2,6 @@ NAME
     MultiMarkdown
 
 SYNOPSIS
-        use Text::MultiMarkdown 'markdown';
-        my $html = markdown($text);
-
-        use Text::MultiMarkdown 'markdown';
-        my $html = markdown( $text, {
-            empty_element_suffix => '>',
-            tab_width => 2
-        } );
-
         use Text::MultiMarkdown;
         my $m = Text::MultiMarkdown->new;
         my $html = $m->markdown($text);
@@ -23,6 +14,10 @@ SYNOPSIS
             use_wiki_links => 1,
         } );
 
+CAVEAT
+    The Exporter version has currently been removed!! This will be re-instated 
+    before next release ;)
+
 DESCRIPTION
     Markdown is a text-to-HTML filter; it translates an easy-to-read /
     easy-to-write structured text format into HTML. Markdown's text format
@@ -34,9 +29,24 @@ DESCRIPTION
     HTML tags anywhere in a Markdown document, and you can use block level
     HTML tags (like <div> and <table> as well).
 
+SYNTAX
+
     For more information about Markdown's syntax, see:
 
         http://daringfireball.net/projects/markdown/
+
+    This module implements MultiMarkdown, which is an extension to Markdown..
+
+    This is documented at:
+
+        http://michelf.com/projects/php-markdown/extra/
+
+    and
+
+        http://fletcherpenney.net/MultiMarkdown/
+
+    This documentation is going to be moved/copied into this module for 
+    clearer reading in a future release..
 
 BUGS
     To file bug reports or feature requests (other than topics listed in the
@@ -46,7 +56,7 @@ BUGS
 
         fletcher@freeshell.org (for MultiMarkdown issues)
 
-        kulp@cpan.org (for Text::MultiMarkdown issues)
+        kulp@cpan.org, bobtfish@bobtfish.net (for Text::MultiMarkdown issues)
 
     Please include with your report: (1) the example input; (2) the output
     you expected; (3) the output Markdown actually produced.
@@ -65,8 +75,8 @@ AUTHOR
         http://fletcher.freeshell.org/
 
         CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
-        Riedel) by Darren Kulp
-        http://kulp.ch/
+        Riedel) by Darren Kulp & Tomas Doran
+        http://kulp.ch/ & http://www.bobtfish.net/
 
 COPYRIGHT AND LICENSE
     Original Code Copyright (c) 2003-2004 John Gruber
@@ -75,8 +85,8 @@ COPYRIGHT AND LICENSE
     MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney
     <http://fletcher.freeshell.org/> All rights reserved.
 
-    Text::MultiMarkdown changes Copyright (c) 2006 Darren Kulp
-    <http://kulp.ch>
+    Text::MultiMarkdown changes Copyright (c) 2006-2008 Darren Kulp
+    <http://kulp.ch> and Tomas Doran <bobtfish@bobtfish.net>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are

@@ -21,6 +21,11 @@ Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
         use_wiki_links => 1,
     } );
 
+=head1 CAVEAT
+
+The Exporter version has currently been removed!! This will be re-instated 
+before next release ;)
+
 =head1 DESCRIPTION
 
 Markdown is a text-to-HTML filter; it translates an easy-to-read /
@@ -33,9 +38,23 @@ specifically to serve as a front-end to (X)HTML. You can  use span-level
 HTML tags anywhere in a Markdown document, and you can use block level
 HTML tags (like <div> and <table> as well).
 
+=head1 SYNTAX
+
 For more information about Markdown's syntax, see:
 
     http://daringfireball.net/projects/markdown/
+    
+This module implements MultiMarkdown, which is an extension to Markdown..
+
+This is documented at:
+
+http://michelf.com/projects/php-markdown/extra/
+
+and
+
+http://fletcherpenney.net/MultiMarkdown/
+
+This documentation is going to be moved/copied into this module for clearer reading in a future release..
 
 =cut
 
@@ -2127,9 +2146,7 @@ Warning: this code is messy and does not adhere to any consistent set of code
 guidelines; this is not because of the original quality of the code, which is
 far above what I can pretend to be capable of creating, but because of the
 various patching and diffing steps in between and the incomplete translation of
-the original code into a module. I hope to fix many of the issues you may find
-soon, but I would rather release too early than too late, especially since I
-find the code quite usable at this point.
+the original code into a module. 
 
 =head1 BUGS
 
@@ -2140,11 +2157,10 @@ Caveats section above) please send email to:
 
     fletcher@freeshell.org (for MultiMarkdown issues)
 
-    kulp@cpan.org (for Text::MultiMarkdown issues)
+    kulp@cpan.org, bobtfish@bobtfish.net (for Text::MultiMarkdown issues)
 
 Please include with your report: (1) the example input; (2) the output
 you expected; (3) the output Markdown actually produced.
-
 
 =head1 VERSION HISTORY
 
@@ -2162,8 +2178,8 @@ See the Changes file for detailed release notes for this version.
     http://fletcher.freeshell.org/
 
     CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
-    Riedel) by Darren Kulp
-    http://kulp.ch/
+    Riedel) by Darren Kulp & Tomas Doran
+    http://kulp.ch/ & http://www.bobtfish.net/
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -2175,8 +2191,8 @@ MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney
 <http://fletcher.freeshell.org/>   
 All rights reserved.
 
-Text::MultiMarkdown changes Copyright (c) 2006 Darren Kulp
-<http://kulp.ch>
+Text::MultiMarkdown changes Copyright (c) 2006-2008 Darren Kulp
+<http://kulp.ch> and Tomas Doran <bobtfish@bobtfish.net>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
