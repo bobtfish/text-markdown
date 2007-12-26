@@ -1,0 +1,29 @@
+Todo pre 1.0.4:
+   . Test links
+   . Test embedded html
+   . Test document format
+   . Document document format
+   . Test Empty element suffix..
+   . Test Tab width
+   . Test use metadata / not use metadata
+   . Test 1.0.3 vs my test suite.
+   . Test Text::MutliMarkdown::ApacheHandler still works.
+   . Re-instate Exporter interface..
+
+Todo (Testing):
+   . blockquotes
+   . Images
+   . anchors?
+   . auto links (for urls and email addressen)
+   . italics
+   . Backslash escapes of markdown features (all of!)
+   . Metadata proper test
+   . Footnotes
+   . Attributes? (sub _DoAttributes )
+   . Citations?
+   . Bibliograqphy
+   
+General Todo:
+   . Remove global data (into instance data)
+   . Fully document metadata
+   . Document the markdown (and multimarkdown) syntaxes in the module
