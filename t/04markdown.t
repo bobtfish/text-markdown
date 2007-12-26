@@ -15,7 +15,7 @@ is( <<"EOF", $html1 );
 <p>Bar</p>
 EOF
 
-my $html2 = markdown(<<"EOF");
+my $html2 = $m->markdown(<<"EOF");
 Foo
 
 Bar
