@@ -19,7 +19,8 @@ SYNOPSIS
         my $m = Text::MultiMarkdown->new;
         my $html = $m->markdown( $text, {
             empty_element_suffix => '>',
-            tab_width => 2
+            tab_width => 2,
+            use_wiki_links => 1,
         } );
 
 DESCRIPTION
