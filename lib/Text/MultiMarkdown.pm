@@ -24,7 +24,7 @@ Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
 =head1 CAVEAT
 
 The Exporter version has currently been removed!! This will be re-instated 
-before next release ;)
+before next release (i.e. pre 1.0.4) ;)
 
 =head1 DESCRIPTION
 
