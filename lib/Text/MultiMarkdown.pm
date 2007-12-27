@@ -9,6 +9,16 @@ Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
 
 =head1 SYNOPSIS
 
+    use Text::MultiMarkdown 'markdown';
+    my $html = markdown($text);
+
+    use Text::MultiMarkdown 'markdown';
+    my $html = markdown( $text, {
+        empty_element_suffix => '>',
+        tab_width => 2,
+        use_wiki_links => 1,
+    } );
+
     use Text::MultiMarkdown;
     my $m = Text::MultiMarkdown->new;
     my $html = $m->markdown($text);
@@ -20,11 +30,8 @@ Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
         tab_width => 2,
         use_wiki_links => 1,
     } );
-
-=head1 CAVEAT
-
-The Exporter version has currently been removed!! This will be re-instated 
-before next release (i.e. pre 1.0.4) ;)
+    
+Note, the functional / exporter version is deprecated 
 
 =head1 DESCRIPTION
 
@@ -165,6 +172,19 @@ for details on use.
 
 sub markdown {
     my ( $self, $text, $options ) = @_;
+
+    # Detect functional mode, and create an instance for this run..
+    unless (ref $self) {
+        if ( $self ne __PACKAGE__ ) {
+            warn("FUNCTIONAL");
+            my $ob = __PACKAGE__->new();
+            return $ob->markdown($self, $text);
+        }
+        else {
+            die("Called as a class method. Fuck. DIE.");
+        }
+    }
+    
 
     $options ||= {};
     
