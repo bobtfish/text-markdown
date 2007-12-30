@@ -18,6 +18,7 @@ is($outstr, '<p>' . $instr . '</p>', 'exported markdown function works');
 
 {
     local $TODO = 'Broken here';
+    $outstr = '';
     lives_ok {
         $outstr = Text::MultiMarkdown->markdown($instr);
     } 'Lives (class method)';

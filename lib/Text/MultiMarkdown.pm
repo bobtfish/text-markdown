@@ -71,7 +71,6 @@ our $VERSION = '1.0.4';
 our @EXPORT_OK = qw/markdown/;
 
 ### FIXME: Make these symbols configurable ###
-# $g_base_url
 # $g_bibliography_title
 
 ## Disabled; causes problems under Perl 5.6.1:
@@ -122,8 +121,6 @@ my $g_bibliography_title = "Bibliography";
 
 $g_metadata_newline{default} = "\n";
 
-my $g_base_url = "";        # This is the base url to be used for WikiLinks
-
 =head1 METHODS
 
 =over 4
@@ -141,6 +138,8 @@ sub new {
     $p{use_metadata} = 1 unless exists $p{use_metadata};
     # Squash value to [01]
     $p{use_metadata} = $p{use_metadata} ? 1 : 0;
+    
+    $p{base_url} ||= ''; # This is the base url to be used for WikiLinks
     
     $p{tab_width} = 4 unless (defined $p{tab_width} and $p{tab_width} =~ m/^\d+$/);
     
@@ -174,7 +173,6 @@ sub markdown {
     # Detect functional mode, and create an instance for this run..
     unless (ref $self) {
         if ( $self ne __PACKAGE__ ) {
-            warn("FUNCTIONAL");
             my $ob = __PACKAGE__->new();
             return $ob->markdown($self, $text);
         }
@@ -1686,7 +1684,7 @@ sub _CreateWikiLink {
 
     $title =~ s/_/ /g;
         
-    return "[$title]($g_base_url$id)";
+    return "[$title]($self->{base_url}$id)";
 }
 
 sub _DoWikiLinks {
