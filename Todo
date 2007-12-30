@@ -1,14 +1,11 @@
 Todo pre 1.0.4:
    . Test links
-   . Test embedded html
    . Test document format
    . Document document format
    . Test Empty element suffix..
-   . Test Tab width
    . Test use metadata / not use metadata
    . Test 1.0.3 vs my test suite.
    . Test Text::MutliMarkdown::ApacheHandler still works.
-   . Re-instate Exporter interface..
 
 Todo (Testing):
    . blockquotes

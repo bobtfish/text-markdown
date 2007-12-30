@@ -24,5 +24,5 @@ is($outstr, '<p>' . $instr . '</p>', 'exported markdown function works');
 
     chomp($outstr);
 
-    is($outstr, '<p>' . $instr . '</p>', 'Text::Markdown->markdown() works');
+    is($outstr, '<p>' . $instr . '</p>', 'Text::Markdown->markdown() works (as class method)');
 };
