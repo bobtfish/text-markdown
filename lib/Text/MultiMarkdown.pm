@@ -30,8 +30,6 @@ Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
         tab_width => 2,
         use_wiki_links => 1,
     } );
-    
-Note, the functional / exporter version is deprecated 
 
 =head1 DESCRIPTION
 
