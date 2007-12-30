@@ -8,11 +8,12 @@ license			'bsd';
 all_from        'lib/Text/MultiMarkdown.pm';
 
 # Specific dependencies
-requires        'MIME::Base64'  => undef;
-requires        'List::Util'    => undef;
-requires        'Digest::MD5'   => undef;
-requires        'Scalar::Util'  => undef;
-build_requires  'Test::More'    => '0.42';
+requires        'MIME::Base64'    => undef;
+requires        'List::Util'      => undef;
+requires        'Digest::MD5'     => undef;
+requires        'Scalar::Util'    => undef;
+build_requires  'Test::More'      => '0.42';
+build_requires  'Text::Exception' => undef;
 
 auto_install;
 WriteAll;
