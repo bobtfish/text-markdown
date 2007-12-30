@@ -65,25 +65,22 @@ This documentation is going to be moved/copied into this module for clearer read
 
 
 use Digest::MD5 qw(md5_hex);
-use base 'Exporter';
+use Carp        qw(croak);
+use base        'Exporter';
 
-our $VERSION = '1.0.4';
-our @EXPORT_OK = qw/markdown/;
-
-### FIXME: Make these symbols configurable ###
-# $g_bibliography_title
+our $VERSION   = '1.0.4';
+our @EXPORT_OK = qw(markdown);
 
 ## Disabled; causes problems under Perl 5.6.1:
 # use utf8;
 # binmode( STDOUT, ":utf8" );  # c.f.: http://acis.openlib.org/dev/perl-unicode-struggle.html
 
-#
-# Globals:
-#
+### FIXME: Make these symbols configurable ###
+# $g_bibliography_title
 
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
-my $g_nested_brackets;
+my $g_nested_brackets; 
 $g_nested_brackets = qr{
     (?>                                 # Atomic matching
        [^\[\]]+                         # Anything other than brackets
@@ -101,8 +98,8 @@ foreach my $char (split //, '\\`*_{}[]()>#+-.!') {
     $g_escape_table{$char} = md5_hex($char);
 }
 
-
 # Global hashes, used by various utility routines
+# FIXME - to be moved into instance data!
 my %g_urls = ();
 my %g_titles= ();
 my %g_html_blocks = ();
@@ -119,6 +116,7 @@ my @g_used_references = ();
 my %g_references = ();
 my $g_bibliography_title = "Bibliography";
 
+# FIXME - If we're using metadata, newlines (in the metadata have to be \n). Make configurable.
 $g_metadata_newline{default} = "\n";
 
 =head1 METHODS
@@ -174,10 +172,11 @@ sub markdown {
     unless (ref $self) {
         if ( $self ne __PACKAGE__ ) {
             my $ob = __PACKAGE__->new();
+                                # $self is text, $text is options
             return $ob->markdown($self, $text);
         }
         else {
-            die("Called as a class method. Fuck. DIE.");
+            croak('Calling ' . $self . '->markdown (as a class method) is not supported.');
         }
     }
     
@@ -186,9 +185,13 @@ sub markdown {
     
     $self->{_metadata} = {};
     
-    local $self->{document_format} = exists $options->{document_format} ? $options->{document_format} : $self->{document_format};
+    # Localise all of these settings, so that if they're frobbed by options here (or metadata later), the change will not persist.
+    # FIXME - There should be a nicer way to do this...
+    local $self->{use_wiki_links}       = exists $options->{use_wiki_links}       ? $options->{use_wiki_links}       : $self->{use_wiki_links};
     local $self->{empty_element_suffix} = exists $options->{empty_element_suffix} ? $options->{empty_element_suffix} : $self->{empty_element_suffix};
-    local $self->{use_wiki_links} = exists $options->{use_wiki_links} ? $options->{use_wiki_links} : $self->{use_wiki_links};
+    local $self->{document_format}      = exists $options->{document_format}      ? $options->{document_format}      : $self->{document_format};
+    local $self->{use_metadata}         = exists $options->{use_metadata}         ? $options->{use_metadata}         : $self->{use_metadata};
+    
         
     if (exists $options->{tab_width}) {
         local $self->{tab_width} = $options->{tab_width};

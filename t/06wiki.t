@@ -26,7 +26,7 @@ is($m->markdown($page), $nohtmlwiki, 'use wikilinks does not toggle pref');
 is($m->markdown($page, { use_wiki_links => 1 }) => $htmlwiki, 
     'use_wiki_links pref in ->markdown produces same out as metadata');
 
-is($m->markdown($page,{ use_wiki_links => 0 }) => $nohtmlwiki,
+is($m->markdown($page, { use_wiki_links => 0 }) => $nohtmlwiki,
     'use_wiki_links = 0 pref in ->markdown produces same out as no metadata');
 
 $m = Text::MultiMarkdown->new(use_wiki_links => 1);
