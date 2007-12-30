@@ -14,7 +14,10 @@ lives_ok {
 
 chomp($outstr);
 
-is($outstr, '<p>' . $instr . '</p>', 'exported markdown function works');
+is(
+    $outstr => '<p>' . $instr . '</p>', 
+    'exported markdown function works'
+);
 
 {
     local $TODO = 'Broken here';

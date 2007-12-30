@@ -1,4 +1,5 @@
 Todo pre 1.0.4:
+   . Fix diffing in fulldoc test to not shell out.
    . Test links
    . Test document format
    . Document document format

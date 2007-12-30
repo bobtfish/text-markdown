@@ -103,7 +103,6 @@ foreach my $char (split //, '\\`*_{}[]()>#+-.!') {
 my %g_urls = ();
 my %g_titles= ();
 my %g_html_blocks = ();
-my %g_metadata = ();
 my %g_metadata_newline = ();
 my %g_crossrefs = ();
 my %g_footnotes = ();
@@ -184,7 +183,7 @@ sub markdown {
     $options ||= {};
     
     $self->{_metadata} = {};
-    
+        
     # Localise all of these settings, so that if they're frobbed by options here (or metadata later), the change will not persist.
     # FIXME - There should be a nicer way to do this...
     local $self->{use_wiki_links}       = exists $options->{use_wiki_links}       ? $options->{use_wiki_links}       : $self->{use_wiki_links};
@@ -204,7 +203,6 @@ sub markdown {
     %g_urls            = ();
     %g_titles          = ();
     %g_html_blocks     = ();
-    %g_metadata        = ();
     %g_crossrefs       = ();
     %g_footnotes       = ();
     @g_used_footnotes  = ();
@@ -1477,9 +1475,10 @@ sub _ParseMetaData { # FIXME - This is really really ugly!
                 $currentKey =~ s/  / /g;
                 $self->{_metadata}{lc($currentKey)} = $2;
                 if (lc($currentKey) eq "format") {
-                    $self->{document_format} = lc($g_metadata{$currentKey});
+                    $self->{document_format} = $self->{_metadata}{$currentKey};
                 }
                 if (lc($currentKey) eq "base url") {
+                    warn("BASE URL SET TO " . $self->{_metadata}{$currentKey});
                     $self->{base_url} = $self->{_metadata}{$currentKey};
                 }
                 if (lc($currentKey) eq "bibliography title") {
@@ -1623,13 +1622,13 @@ sub xhtmlMetaData {
 
     $result.= "<html>\n\t<head>\n";
     
-    foreach my $key (sort keys %g_metadata ) {
+    foreach my $key (sort keys %{$self->{_metadata}} ) {
         if (lc($key) eq "title") {
-            $result.= "\t\t<title>$g_metadata{$key}</title>\n";
+            $result.= "\t\t<title>$self->{_metadata}{$key}</title>\n";
         } elsif (lc($key) eq "css") {
-            $result.= qq[\t\t<link type="text/css" rel="stylesheet" href="$g_metadata{$key}"$self->{empty_element_suffix}\n];
+            $result.= qq[\t\t<link type="text/css" rel="stylesheet" href="$self->{_metadata}{$key}"$self->{empty_element_suffix}\n];
         } else {
-            $result.= qq[\t\t<meta name="$key" content="$g_metadata{$key}"$self->{empty_element_suffix}\n];
+            $result.= qq[\t\t<meta name="$key" content="$self->{_metadata}{$key}"$self->{empty_element_suffix}\n];
         }
     }
     $result.= "\t</head>\n";
@@ -1647,8 +1646,8 @@ sub textMetaData {
     my ($self) = @_;
     my $result = "";
     
-    foreach my $key (sort keys %g_metadata ) {
-        $result .= "$key: $g_metadata{$key}\n";
+    foreach my $key (sort keys %{$self->{_metadata}} ) {
+        $result .= "$key: $self->{_metadata}{$key}\n";
     }
     $result =~ s/\s*\n/<br \/>\n/g;
     
