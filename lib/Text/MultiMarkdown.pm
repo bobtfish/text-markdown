@@ -101,14 +101,14 @@ Metadata options supported are:
 
 =head1 METADATA
 
-Multimarkdown supports the concept of 'metadata', which allows you to specify a number of formatting options
-within the document itself. Metadata should be placed in the top few lines of a file, on value per line as colon seperated key/value pairs.
-The metadata should be seperated from the document with a blank line.
+MultiMarkdown supports the concept of 'metadata', which allows you to specify a number of formatting options
+within the document itself. Metadata should be placed in the top few lines of a file, on value per line as colon separated key/value pairs.
+The metadata should be separated from the document with a blank line.
 
 Most metadata keys are also supported as options to the constructor, or options
-to the markdown method itself. (Note, as metadata, keys contain space, whereas options the keys are underscore seperated.)
+to the markdown method itself. (Note, as metadata, keys contain space, whereas options the keys are underscore separated.)
 
-You can attach arbitary metadata to a document, which is output in HTML <META> tags if unknown, see t/11document_format.t for more info.
+You can attach arbitrary metadata to a document, which is output in HTML <META> tags if unknown, see t/11document_format.t for more info.
 
 A list of 'known' metadata keys, and their effects are listed below:
 
@@ -142,7 +142,7 @@ This option can be used to generate normal HTML output. By default, it is ' />',
 
 =item base url
 
-This is the base URL for refencing wiki pages. In this is not supplied, all wiki links are relative.
+This is the base URL for referencing wiki pages. In this is not supplied, all wiki links are relative.
 
 =back
 
