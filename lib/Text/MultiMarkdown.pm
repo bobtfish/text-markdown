@@ -16,7 +16,7 @@ Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
     my $html = markdown( $text, {
         empty_element_suffix => '>',
         tab_width => 2,
-        use_wiki_links => 1,
+        use_wikilinks => 1,
     } );
 
     use Text::MultiMarkdown;
@@ -24,12 +24,12 @@ Text::MultiMarkdown - Convert MultiMarkdown syntax to (X)HTML
     my $html = $m->markdown($text);
 
     use Text::MultiMarkdown;
-    my $m = Text::MultiMarkdown->new;
-    my $html = $m->markdown( $text, {
+    my $m = Text::MultiMarkdown->new(
         empty_element_suffix => '>',
         tab_width => 2,
-        use_wiki_links => 1,
-    } );
+        use_wikilinks => 1,
+    );
+    my $html = $m->markdown( $text );
 
 =head1 DESCRIPTION
 
@@ -61,8 +61,92 @@ http://fletcherpenney.net/MultiMarkdown/
 
 This documentation is going to be moved/copied into this module for clearer reading in a future release..
 
-=cut
+=head1 OPTIONS
 
+MultiMarkdown supports a number of options to it's processor which control the behavior of the output document.
+
+These options can be supplied to the constructor, on in a hash with the individual calls to the markdown method.
+See the synopsis for examples of both of the above styles.
+
+The options for the processor are:
+
+=over
+
+=item use_metadata
+
+Controls the metadata options below.
+
+=item strip_metadata
+
+Not implemented yet.
+
+=back
+
+A number of possible items of metadata can also be supplied as options. 
+Note that if the use_metadata is true then the metadata in the document will overwrite the settings on command line.
+
+Metadata options supported are:
+
+=over
+
+=item document_format
+
+=item use_wikilinks
+
+=item base_url
+
+=item empty_element_suffix
+
+=back
+
+=head1 METADATA
+
+Multimarkdown supports the concept of 'metadata', which allows you to specify a number of formatting options
+within the document itself. Metadata should be placed in the top few lines of a file, on value per line as colon seperated key/value pairs.
+The metadata should be seperated from the document with a blank line.
+
+Most metadata keys are also supported as options to the constructor, or options
+to the markdown method itself. (Note, as metadata, keys contain space, whereas options the keys are underscore seperated.)
+
+You can attach arbitary metadata to a document, which is output in HTML <META> tags if unknown, see t/11document_format.t for more info.
+
+A list of 'known' metadata keys, and their effects are listed below:
+
+=over
+
+=item document format
+
+If set to 'complete', MultiMarkdown will render an entire xHTML page, otherwise it will render a document fragment
+
+=over
+
+=item css
+
+Sets a CSS file for the file, if in 'complete' document format.
+
+=item title
+
+Sets the page title, if in 'complete' document format.
+
+=back
+
+=item use wikilinks
+
+If set to '1' or 'on', causes links that are WikiWords to automatically be processed into links.
+
+=item empty element suffix
+
+FIXME - does this work as metadata, or only as an option?
+
+This option can be used to generate normal HTML output. By default, it is ' />', which is xHTML, change to '>' for normal HTML.
+
+=item base url
+
+This is the base URL for refencing wiki pages. In this is not supplied, all wiki links are relative.
+
+=back
+
+=cut
 
 use Digest::MD5 qw(md5_hex);
 use Carp        qw(croak);
@@ -146,7 +230,7 @@ sub new {
     
     # For use with WikiWords and [[Wiki Links]]
     # NOTE: You can use \WikiWord to prevent a WikiWord from being treated as a link
-    $p{use_wiki_links} = $p{use_wiki_links} ? 1 : 0;
+    $p{use_wikilinks} = $p{use_wikilinks} ? 1 : 0;
     
     # Used to track when we're inside an ordered or unordered list
     # (see _ProcessListItems() for details):
@@ -186,7 +270,7 @@ sub markdown {
         
     # Localise all of these settings, so that if they're frobbed by options here (or metadata later), the change will not persist.
     # FIXME - There should be a nicer way to do this...
-    local $self->{use_wiki_links}       = exists $options->{use_wiki_links}       ? $options->{use_wiki_links}       : $self->{use_wiki_links};
+    local $self->{use_wikilinks}       = exists $options->{use_wikilinks}       ? $options->{use_wikilinks}       : $self->{use_wikilinks};
     local $self->{empty_element_suffix} = exists $options->{empty_element_suffix} ? $options->{empty_element_suffix} : $self->{empty_element_suffix};
     local $self->{document_format}      = exists $options->{document_format}      ? $options->{document_format}      : $self->{document_format};
     local $self->{use_metadata}         = exists $options->{use_metadata}         ? $options->{use_metadata}         : $self->{use_metadata};
@@ -815,7 +899,7 @@ sub _DoHeaders {
     my $label = "";
     
     # Don't do Wiki Links in Headers
-    local $self->{use_wiki_links} = 0;
+    local $self->{use_wikilinks} = 0;
     
     # Setext-style headers:
     #     Header 1
@@ -1478,7 +1562,6 @@ sub _ParseMetaData { # FIXME - This is really really ugly!
                     $self->{document_format} = $self->{_metadata}{$currentKey};
                 }
                 if (lc($currentKey) eq "base url") {
-                    warn("BASE URL SET TO " . $self->{_metadata}{$currentKey});
                     $self->{base_url} = $self->{_metadata}{$currentKey};
                 }
                 if (lc($currentKey) eq "bibliography title") {
@@ -1669,7 +1752,7 @@ sub _ConvertCopyright{
 
 sub _UseWikiLinks {
     my ($self) = @_;
-    if ($self->{use_wiki_links} or $self->{_metadata}{'use wikilinks'}) {
+    if ($self->{use_wikilinks} or $self->{_metadata}{'use wikilinks'}) {
         return 1;
     }
     return;

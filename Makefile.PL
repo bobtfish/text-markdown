@@ -13,7 +13,7 @@ requires        'List::Util'      => undef;
 requires        'Digest::MD5'     => undef;
 requires        'Scalar::Util'    => undef;
 build_requires  'Test::More'      => '0.42';
-build_requires  'Text::Exception' => undef;
+build_requires  'Test::Exception' => undef;
 
 auto_install;
 WriteAll;

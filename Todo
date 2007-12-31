@@ -1,26 +1,23 @@
 Todo pre 1.0.4:
    . Fix diffing in fulldoc test to not shell out.
    . Test links
-   . Test document format
-   . Document document format
+   . Document document format - started
    . Test Empty element suffix..
-   . Test 1.0.3 vs my test suite.
    . Test Text::MutliMarkdown::ApacheHandler still works.
 
-Todo (Testing):
+Todo pre 1.0.5
+   . Remove global data (into instance data)
+   . Implement strip_metadata option
    . blockquotes
    . Images
    . anchors?
    . auto links (for urls and email addressen)
    . italics
    . Backslash escapes of markdown features (all of!)
-   . Metadata proper test
    . Footnotes
    . Attributes? (sub _DoAttributes )
    . Citations?
    . Bibliograqphy
    
-General Todo:
-   . Remove global data (into instance data)
-   . Fully document metadata
+Todo pre 1.0.6:
    . Document the markdown (and multimarkdown) syntaxes in the module
