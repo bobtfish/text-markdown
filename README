@@ -10,7 +10,7 @@ SYNOPSIS
         my $html = markdown( $text, {
             empty_element_suffix => '>',
             tab_width => 2,
-            use_wiki_links => 1,
+            use_wikilinks => 1,
         } );
 
         use Text::MultiMarkdown;
@@ -22,7 +22,7 @@ SYNOPSIS
         my $html = $m->markdown( $text, {
             empty_element_suffix => '>',
             tab_width => 2,
-            use_wiki_links => 1,
+            use_wikilinks => 1,
         } );
 
 DESCRIPTION
