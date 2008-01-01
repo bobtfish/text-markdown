@@ -27,13 +27,16 @@ my $out = $m->markdown($markdown);
 is($out, $expected, 'Output matches expected');
 
 if ($out ne $expected) {
-    open(OUT, '>', "/tmp/markdowntest.$$.out");
-    open(EXP, '>', "/tmp/markdowntest.$$.exp");
-    print OUT $out;
-    print EXP $expected;
-    close(OUT);
-    close(EXP);
-    system("diff -u /tmp/markdowntest.$$.exp /tmp/markdowntest.$$.out");
+    eval {
+        require Text::Diff;
+    };
+    if (!$@) {
+        print "=" x 80 . "\nDIFFERENCES:\n";
+        print Text::Diff::diff(\$out => \$expected, { STYLE => "Unified" });
+    }
+    else {
+        warn("Install Text::Diff for more helpful failure message! ($@)");
+    }
 }
 
 __DATA__
@@ -66,6 +69,10 @@ A third paragraph
 
 Within a paragraph `code block`, followed by one which needs ``extra escapeing` `` &copy; t0m.
 & note ampersands and > or < are escaped properly in output
+
+[testlink]: http://www.test.com/ "Test dot Com website"
+
+[testlink2]: http://www.test2.com/
 
 __END__
 <h1 id="heading1">Heading 1</h1>

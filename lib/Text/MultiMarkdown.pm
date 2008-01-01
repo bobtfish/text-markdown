@@ -80,6 +80,10 @@ Controls the metadata options below.
 
 Not implemented yet.
 
+=item empty element suffix
+
+This option can be used to generate normal HTML output. By default, it is ' />', which is xHTML, change to '>' for normal HTML.
+
 =back
 
 A number of possible items of metadata can also be supplied as options. 
@@ -94,8 +98,6 @@ Metadata options supported are:
 =item use_wikilinks
 
 =item base_url
-
-=item empty_element_suffix
 
 =back
 
@@ -133,12 +135,6 @@ Sets the page title, if in 'complete' document format.
 =item use wikilinks
 
 If set to '1' or 'on', causes links that are WikiWords to automatically be processed into links.
-
-=item empty element suffix
-
-FIXME - does this work as metadata, or only as an option?
-
-This option can be used to generate normal HTML output. By default, it is ' />', which is xHTML, change to '>' for normal HTML.
 
 =item base url
 
@@ -270,12 +266,11 @@ sub markdown {
         
     # Localise all of these settings, so that if they're frobbed by options here (or metadata later), the change will not persist.
     # FIXME - There should be a nicer way to do this...
-    local $self->{use_wikilinks}       = exists $options->{use_wikilinks}       ? $options->{use_wikilinks}       : $self->{use_wikilinks};
+    local $self->{use_wikilinks}        = exists $options->{use_wikilinks}        ? $options->{use_wikilinks}        : $self->{use_wikilinks};
     local $self->{empty_element_suffix} = exists $options->{empty_element_suffix} ? $options->{empty_element_suffix} : $self->{empty_element_suffix};
     local $self->{document_format}      = exists $options->{document_format}      ? $options->{document_format}      : $self->{document_format};
     local $self->{use_metadata}         = exists $options->{use_metadata}         ? $options->{use_metadata}         : $self->{use_metadata};
     
-        
     if (exists $options->{tab_width}) {
         local $self->{tab_width} = $options->{tab_width};
     }    
@@ -1343,6 +1338,7 @@ sub _EncodeAmpsAndAngles {
 # Smart processing for ampersands and angle brackets that need to be encoded.
 
     my ($self, $text) = @_;
+    return '' if (!defined $text or !length $text);
 
     # Ampersand-encoding based entirely on Nat Irons's Amputator MT plugin:
     #   http://bumppo.net/projects/amputator/
@@ -1732,7 +1728,7 @@ sub textMetaData {
     foreach my $key (sort keys %{$self->{_metadata}} ) {
         $result .= "$key: $self->{_metadata}{$key}\n";
     }
-    $result =~ s/\s*\n/<br \/>\n/g;
+    $result =~ s/\s*\n/<br$self->{empty_element_suffix}\n/g;
     
     if ($result ne "") {
         $result.= "\n";

@@ -1,8 +1,5 @@
 Todo pre 1.0.4:
-   . Fix diffing in fulldoc test to not shell out.
    . Test links
-   . Document document format - started
-   . Test Empty element suffix..
    . Test Text::MutliMarkdown::ApacheHandler still works.
 
 Todo pre 1.0.5
