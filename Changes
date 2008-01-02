@@ -17,7 +17,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           Test::Pod::Coverage enabled unless it actually checks out. Added some
           fairly useless stubbed METHODS to POD and moved POD around a bit.
           
-1.0.4
+1.0.4   2008-01-02T02:03:50
         - Refactor so that the processor instance has the same set of        
           persistent options as on the ->markdown method itself.
         - Change all functions to be instance methods, moved a chunk of the 
