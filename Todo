@@ -1,7 +1,3 @@
-Todo pre 1.0.4:
-   . Test Text::MutliMarkdown::ApacheHandler still works.
-   . Check / tidy docs
-
 Todo pre 1.0.5
    . Remove global data (into instance data)
    . Implement strip_metadata option
