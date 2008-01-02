@@ -78,6 +78,12 @@ sub run_tests {
         my $processed = $m->markdown($input);
         $processed =~ s/\s+\z//; # trim trailing whitespace
     
+        # Un-comment for debugging if you have space diffs you can't see..
+        #$output =~ s/ /&nbsp;/g;
+        #$output =~ s/\t/&tab;/g;
+        #$processed =~ s/ /&nbsp;/g;
+        #$processed =~ s/\t/&tab;/g;
+        
         difftest($processed, $output, "Docs test: $test");
     }
 }
