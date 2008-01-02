@@ -4,7 +4,6 @@ use Test::More;
 use FindBin qw($Bin);
 use List::MoreUtils qw(uniq);
 use File::Slurp qw(slurp);
-use Text::MultiMarkdown;
 
 ### Generate difftest subroutine, pretty prints diffs if you have Text::Diff, use uses
 ### Test::More::is otherwise.
@@ -20,7 +19,7 @@ if (!$@) {
             return;
         }
         print "=" x 80 . "\nDIFFERENCES: + = processed version from .text, - = template from .html\n";
-        print Text::Diff::diff(\$expected => \$got, { STYLE => "Unified" });
+        print Text::Diff::diff(\$expected => \$got, { STYLE => "Unified" }) . "\n";
         fail($testname);
     };
 }
@@ -36,10 +35,12 @@ unless (caller) {
     my $docsdir = "$Bin/docs-multimarkdown";
     my @files = get_files($docsdir);
 
-    plan tests => scalar(@files);
+    plan tests => scalar(@files) + 1;
+
+    use_ok('Text::MultiMarkdown');
 
     my $m = Text::MultiMarkdown->new(
-        use_metadata => 0,
+        use_metadata => 0, # FIXME - this should not be required!
     );
 
     run_tests($m, $docsdir, @files);
