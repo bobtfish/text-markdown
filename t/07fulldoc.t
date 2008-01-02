@@ -32,7 +32,7 @@ if ($out ne $expected) {
     };
     if (!$@) {
         print "=" x 80 . "\nDIFFERENCES:\n";
-        print Text::Diff::diff(\$out => \$expected, { STYLE => "Unified" });
+        print Text::Diff::diff(\$expected => \$out,{ STYLE => "Unified" });
     }
     else {
         warn("Install Text::Diff for more helpful failure message! ($@)");
@@ -68,12 +68,45 @@ A third paragraph
   * Second list, item 2
 
 Within a paragraph `code block`, followed by one which needs ``extra escapeing` `` &copy; t0m.
-& note ampersands and > or < are escaped properly in output
+& note **ampersands** and > or < _are_ escaped __properly__ in output
 
 [testlink]: http://www.test.com/ "Test dot Com website"
 
 [testlink2]: http://www.test2.com/
 
+This paragraph has [a link] [testlink] and [another link] [testlink2].. This is [an example](http://example.com/ "Title") inline link.
+
+[Google]: http://google.com/
+
+Or, we could use <http://wuto-links.com/>. Or shortcut links like this: [Google][]
+
+> block quoted text
+>
+> in multiple paragraphs
+> and across multiple lines
+>
+> > and at
+>> multiple levels.
+
+    This is a code block here...
+    
+* * *
+
+*****
+
+- - -
+
+un*fucking*believable - \*this text is surrounded by literal asterisks\*, but the text before that should be bold according to the docs, but isn't FIXME!
+
+![Alt text](/path/to/img.jpg)
+
+![Alt text2](/path/to/img2.jpg "Optional title")
+
+[img]: url/to/image  "Optional title attribute"
+
+![Alt text][img]
+
+---------------------------------------
 __END__
 <h1 id="heading1">Heading 1</h1>
 
@@ -111,4 +144,39 @@ __END__
 </ul>
 
 <p>Within a paragraph <code>code block</code>, followed by one which needs <code>extra escapeing`</code> &#xA9; t0m.
-&amp; note ampersands and > or &lt; are escaped properly in output</p>
+&amp; note <strong>ampersands</strong> and > or &lt; <em>are</em> escaped <strong>properly</strong> in output</p>
+
+<p>This paragraph has <a href="http://www.test.com/" title="Test dot Com website">a link</a> and <a href="http://www.test2.com/">another link</a>.. This is <a href="http://example.com/" title="Title">an example</a> inline link.</p>
+
+<p>Or, we could use <a href="http://wuto-links.com/">http://wuto-links.com/</a>. Or shortcut links like this: <a href="http://google.com/">Google</a></p>
+
+<blockquote>
+  <p>block quoted text</p>
+  
+  <p>in multiple paragraphs
+  and across multiple lines</p>
+  
+  <blockquote>
+    <p>and at
+    multiple levels.</p>
+  </blockquote>
+</blockquote>
+
+<pre><code>This is a code block here...
+</code></pre>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<p>un*fucking*believable - *this text is surrounded by literal asterisks*, but the text before that should be bold according to the docs, but isn't FIXME!</p>
+
+<p><img id="" src="/path/to/img.jpg" alt="Alt text" title="" /></p>
+
+<p><img id="" src="/path/to/img2.jpg" alt="Alt text2" title="Optional title" /></p>
+
+<p><img id="alttext" src="url/to/image" alt="Alt text" title="Optional title attribute" /></p>
+
+<hr />

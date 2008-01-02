@@ -412,7 +412,7 @@ sub _StripLinkDefinitions {
                         (?:\n+|\Z)
                     }
                     {}mx) {
-        $g_urls{lc $1} = _EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
+        $g_urls{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
         if ($3) {
             $g_titles{lc $1} = $3;
             $g_titles{lc $1} =~ s/"/&quot;/g;
@@ -808,7 +808,7 @@ sub _DoImages {
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
             $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
             
-            my $label = Header2Label($alt_text);
+            my $label = $self->Header2Label($alt_text);
             $g_crossrefs{$label} = "#$label";
             if (! defined $g_titles{$link_id}) {
                 $g_titles{$link_id} = $alt_text;
@@ -821,7 +821,7 @@ sub _DoImages {
                 $title =~ s!  _ !$g_escape_table{'_'}!gx;
                 $result .=  " title=\"$title\"";
             }
-            $result .= _DoAttributes($link_id);
+            $result .= $self->_DoAttributes($link_id);
             $result .= $self->{empty_element_suffix};
             
         }
