@@ -20,3 +20,9 @@ Todo pre 1.0.5
    
 Todo pre 1.0.6:
    . Document the markdown (and multimarkdown) syntaxes in the module
+   . Make markdown / multimarkdown / stolen from the php version features 
+     configurable at instance create time.
+     
+Todo pre 1.0.7:
+   . Using configurable features, borg the Text::Markdown module, giving it a 
+     test suite and a maintainer. 
