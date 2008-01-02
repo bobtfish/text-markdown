@@ -104,7 +104,7 @@ un*fucking*believable - \*this text is surrounded by literal asterisks\*, but th
 
 [img]: url/to/image  "Optional title attribute"
 
-![Alt text][img]
+![Alt text for ref mode][img]
 
 ---------------------------------------
 __END__
@@ -173,10 +173,10 @@ __END__
 
 <p>un*fucking*believable - *this text is surrounded by literal asterisks*, but the text before that should be bold according to the docs, but isn't FIXME!</p>
 
-<p><img id="" src="/path/to/img.jpg" alt="Alt text" title="" /></p>
+<p><img id="alttext" src="/path/to/img.jpg" alt="Alt text" title="" /></p>
 
-<p><img id="" src="/path/to/img2.jpg" alt="Alt text2" title="Optional title" /></p>
+<p><img id="alttext2" src="/path/to/img2.jpg" alt="Alt text2" title="Optional title" /></p>
 
-<p><img id="alttext" src="url/to/image" alt="Alt text" title="Optional title attribute" /></p>
+<p><img id="alttextforrefmode" src="url/to/image" alt="Alt text for ref mode" title="Optional title attribute" /></p>
 
 <hr />
