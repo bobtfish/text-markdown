@@ -1,20 +1,22 @@
 Todo pre 1.0.4:
-   . Test links
    . Test Text::MutliMarkdown::ApacheHandler still works.
+   . Check / tidy docs
+   . Check for any functions not called as instance methods
 
 Todo pre 1.0.5
    . Remove global data (into instance data)
    . Implement strip_metadata option
-   . blockquotes
-   . Images
    . anchors?
-   . auto links (for urls and email addressen)
-   . italics
+   . auto links (email addressen)
    . Backslash escapes of markdown features (all of!)
    . Footnotes
    . Attributes? (sub _DoAttributes )
    . Citations?
    . Bibliograqphy
+   . Fix bold/italics within a word (in John Gruber's original Markdown docs)
+   . Add MultiMarkdown test suite         
+     (http://fletcherpenney.net/MultiMarkdown_Test_Suite), when / if I can 
+     download the file (have mailed the author)
    
 Todo pre 1.0.6:
    . Document the markdown (and multimarkdown) syntaxes in the module
