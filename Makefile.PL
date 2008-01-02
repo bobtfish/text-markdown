@@ -14,6 +14,8 @@ requires        'Digest::MD5'     => undef;
 requires        'Scalar::Util'    => undef;
 build_requires  'Test::More'      => '0.42';
 build_requires  'Test::Exception' => undef;
+build_requires  'List::MoreUtils' => undef;
+build_requires  'File::Slurp'     => undef;
 
 auto_install;
 WriteAll;
