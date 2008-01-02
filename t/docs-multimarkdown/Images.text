@@ -1,0 +1,17 @@
+This is a test of image features.
+
+And now a link to the first [image][], and the [second][another image].
+
+Here is an image:
+
+![image][]
+
+And another:
+
+![another image][another]
+
+And now a link to the first [image][], and the [second][another image].
+
+[image]: http://some.source.com/image.jpg "Image Title" width=500px height=50px
+
+[another]: http://some.source.com/image.jpg "Another Title" width="500px" height="50px"

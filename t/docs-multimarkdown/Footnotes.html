@@ -1,0 +1,27 @@
+<p>Here is some text containing a footnote.<a href="#somesamplefootnote" id="fsomesamplefootnote" class="footnote">1</a></p>
+
+<blockquote>
+  <p>And here is a footnote within a blockquote, should be labelled #2.<a href="#secondnote" id="fsecondnote" class="footnote">2</a></p>
+</blockquote>
+
+<p>And this is a codeblock, that should not be a footnote:</p>
+
+<pre><code>This is code.[^somesamplefootnote]
+</code></pre>
+
+<p>And this is a short footnote for testing.<a href="#shortnote" id="fshortnote" class="footnote">3</a></p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="somesamplefootnote"><p>Here is the text of the footnote itself. It also has a <a href="http://somelink.com">link</a>.<a href="#fsomesamplefootnote" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="secondnote"><p>Note # 2.<a href="#fsecondnote" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+<li id="shortnote"><p>Finis<a href="#fshortnote" class="reversefootnote">&#160;&#8617;</a></p></li>
+
+</ol>
+</div>
+
+</div>
