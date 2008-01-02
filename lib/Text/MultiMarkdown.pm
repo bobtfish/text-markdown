@@ -869,7 +869,7 @@ sub _DoImages {
         $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
         $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
 
-        my $label = Header2Label($alt_text);
+        my $label = $self->Header2Label($alt_text);
         $g_crossrefs{$label} = "#$label";
 #       $g_titles{$label} = $alt_text;          # FIXME - I think this line should not be here
             
@@ -1545,7 +1545,7 @@ sub _ParseMetaData { # FIXME - This is really really ugly!
     my ($self, $text) = @_;
     my $clean_text = "";
     
-    my ($inMetaData, $currentKey) = (1,'');
+    my ($inMetaData, $currentKey) = (1, '');
     
     foreach my $line ( split /\n/, $text ) {
         $line =~ /^$/ and $inMetaData = 0 and $clean_text .= $line and next;
@@ -1604,7 +1604,7 @@ sub _StripFootnoteDefinitions {
         my $footnote = "$2\n";
         $footnote =~ s/^[ ]{0,$self->{tab_width}}//gm;
     
-        $g_footnotes{Header2Label($id)} = $footnote;
+        $g_footnotes{$self->Header2Label($id)} = $footnote;
     }
     
     return $text;
@@ -1630,9 +1630,9 @@ sub _DoFootnotes {
         my $id = $self->Header2Label($1);
         
         if (defined $g_footnotes{$id} ) {
-#           $result = "<footnote>$g_footnotes{Header2Label($id)}</footnote>"
+#           $result = "<footnote>$g_footnotes{$self->Header2Label($id)}</footnote>"
             $g_footnote_counter++;
-            $result = "<a href=\"#$id\" name=\"f$id\" class=\"footnote\">$g_footnote_counter</a>";
+            $result = qq{<a href="#$id" name="f$id" class="footnote">$g_footnote_counter</a>};
             push (@g_used_footnotes,$id);
         }
         $result;
@@ -1656,12 +1656,12 @@ sub _PrintFootnotes {
     
     foreach my $id (@g_used_footnotes) {
         $footnote_counter++;
-        $result.="<div id=\"$id\"><p><a href=\"#f$id\" class=\"reversefootnote\">$footnote_counter.</a> $g_footnotes{$id}</div>\n\n";
+        $result .= qq[<div id="$id"><p><a href="#f$id" class="reversefootnote">$footnote_counter.</a> $g_footnotes{$id}</div>\n\n];
     }
     $result .= "</div>";
 
     if ($footnote_counter > 0) {
-        $result = "\n\n<div class=\"footnotes\">\n<hr$self->{empty_element_suffix}\n<p>Footnotes:</p>\n\n".$result;
+        $result = qq[\n\n<div class="footnotes">\n<hr$self->{empty_element_suffix}\n<p>Footnotes:</p>\n\n] . $result;
     } else {
         $result = "";
     }   
@@ -1697,7 +1697,7 @@ sub xhtmlMetaData {
 
     # This screws up xsltproc - make sure to use `-nonet -novalid` if you
     #   have difficulty
-     $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n};
+    $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n};
 
     $result.= "<html>\n\t<head>\n";
     
@@ -2105,26 +2105,26 @@ sub _DoMarkdownCitations {
                 push (@g_used_references,$id);
             }
             
-            $result = "<span class=\"markdowncitation\"> (<a href=\"#$id\">$count</a>";
+            $result = qq[<span class="markdowncitation"> (<a href="#$id">$count</a>];
             
             if ($anchor_text ne "") {
-                $result .=", <span class=\"locator\">$anchor_text</span>";
+                $result .= qq[, <span class="locator">$anchor_text</span>];
             }
             
             $result .= ")</span>";
         } else {
             # No reference exists
-            $result = "<span class=\"externalcitation\"> (<a id=\"$id\">$id</a>";
+            $result = qq[<span class="externalcitation"> (<a id="$id">$id</a>];
 
             if ($anchor_text ne "") {
-                $result .=", <span class=\"locator\">$anchor_text</span>";
+                $result .= qq[, <span class="locator">$anchor_text</span>];
             }
             
             $result .= ")</span>";
         }
         
         if ($self->Header2Label($anchor_text) eq "notcited"){
-            $result = "<span class=\"notcited\" id=\"$id\"/>";
+            $result = qq[<span class="notcited" id="$id"/>];
         }
         $result;
     }xsge;
@@ -2140,13 +2140,14 @@ sub _PrintMarkdownBibliography {
     
     foreach my $id (@g_used_references) {
         $citation_counter++;
-        $result.="<div id=\"$id\"><p>[$citation_counter] <span class=\"item\">$g_references{$id}</span></p></div>\n\n";
+        $result .= q|<div id="$id"><p>[$citation_counter] <span class="item">$g_references{$id}</span></p></div>\n\n|;
     }
     $result .= "</div>";
 
     if ($citation_counter > 0) {
-        $result = "\n\n<div class=\"bibliography\">\n<hr$self->{empty_element_suffix}\n<p>$g_bibliography_title</p>\n\n".$result;
-    } else {
+        $result = qq[\n\n<div class="bibliography">\n<hr$self->{empty_element_suffix}\n<p>$g_bibliography_title</p>\n\n] . $result;
+    } 
+    else {
         $result = "";
     }   
     
@@ -2185,7 +2186,7 @@ sub _GenerateImageCrossRefs {
 
         $alt_text =~ s/"/&quot;/g;
         if (defined $g_urls{$link_id}) {
-            my $label = Header2Label($alt_text);
+            my $label = $self->Header2Label($alt_text);
             $g_crossrefs{$label} = "#$label";
         }
         else {
@@ -2223,7 +2224,7 @@ sub _GenerateImageCrossRefs {
         my $alt_text    = $2;
 
         $alt_text =~ s/"/&quot;/g;
-        my $label = Header2Label($alt_text);
+        my $label = $self->Header2Label($alt_text);
         $g_crossrefs{$label} = "#$label";
         $whole_match;
     }xsge;
