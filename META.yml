@@ -16,4 +16,4 @@ requires:
   List::Util: 0
   MIME::Base64: 0
   Scalar::Util: 0
-version: 1.0.5
+version: 1.0.6
