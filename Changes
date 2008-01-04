@@ -25,3 +25,8 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - The test suite now tests a reasonable set of the Markdown and 
           MultiMarkdown syntaxes.
         - All known options and metadata keys have been documented.
+        
+1.0.5   2008-01-04T18:07:57
+        - Add Markdown and MultiMarkdown test suites.
+        - Fix a big bug introduced in 1.0.4 in citations
+        - Fix footnotes (and other small things) to match the test suite
