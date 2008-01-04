@@ -1,0 +1,32 @@
+
+Handle MultiMarkdown-style citations.
+
+
+This is a borrowed idea[p. 23][#Doe:1996].
+
+> This is a cited blockquote without a page reference.[][#Smith:2005].
+
+And a plain paragraph.
+
+
+And a code block that is not a citation:
+
+	This is not a citation[p. 5][#Doe:1996].
+
+
+And a work by Johnson that is not cited, but should be included in bibliography:
+[Not cited][#Johnson:1996]
+
+And multiple citations.[p. 3][#Doe:1996][p. 10][#Smith:2005]
+
+How about a citation within a footnote? [^footcite]
+
+[#Smith:2005]:	James Smith. Some interesting paper. *Some Journal*, 1(2): 101-123, 2005.
+
+[#Doe:1996]:	John Doe. *Some Book*. Blog Books, 1996.
+
+[#Johnson:1996]:	Bill Johnson. *Some Book*. Blog Books, 1996.
+
+[#James:1996]:	John James. *Some Book*. Blog Books, 1996.
+
+[^footcite]: As described previously. [p. 12][#Smith:2005]

@@ -1,0 +1,6 @@
+This is a formatted ![image][] and a [link][] with attributes.
+
+[image]: http://path.to/image "Image title" width=40px height=400px
+Some non-link text.
+[link]: http://path.to/link.html "Some Link" class=external
+        style="border: solid black 1px;"
