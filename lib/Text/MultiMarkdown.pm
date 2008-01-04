@@ -2141,7 +2141,7 @@ sub _PrintMarkdownBibliography {
     
     foreach my $id (@g_used_references) {
         $citation_counter++;
-        $result .= q|<div id="$id"><p>[$citation_counter] <span class="item">$g_references{$id}</span></p></div>\n\n|;
+        $result .= qq|<div id="$id"><p>[$citation_counter] <span class="item">$g_references{$id}</span></p></div>\n\n|;
     }
     $result .= "</div>";
 
