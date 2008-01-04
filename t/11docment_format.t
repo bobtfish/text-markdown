@@ -19,7 +19,7 @@ $outstr = qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://ww
 <html>\n\t<head>\n\t</head>\n<body>\n<p>A trivial block of text</p>\n</body>\n</html>};
 
 is( #3
-    $m->markdown($instr, {document_format => 'complete'}) => $outstr, 
+    $m->markdown($instr, {document_format => 'Complete'}) => $outstr, 
     'Markdown with complete xhtml doc'
 );
 
