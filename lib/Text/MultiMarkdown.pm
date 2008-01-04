@@ -188,7 +188,6 @@ my %g_crossrefs = ();
 my %g_footnotes = ();
 my %g_attributes = ();
 my @g_used_footnotes = ();
-my $g_footnote_counter = 0;
 
 my $g_citation_counter = 0;
 my @g_used_references = ();
@@ -694,7 +693,7 @@ sub _DoAnchors {
             my $url = $g_crossrefs{$label};
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
             $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
-            $result = "<a href=\"$url\"";
+            $result = qq[<a href="$url"];
             if ( defined $g_titles{$label} ) {
                 my $title = $g_titles{$label};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
@@ -1618,11 +1617,14 @@ sub _DoFootnotes {
     foreach my $label (sort keys %g_footnotes) {
         my $footnote = $self->_RunBlockGamut($g_footnotes{$label});
 
-        # strip leading <p> tag (it will be added later)
-        $footnote =~ s/^\<p\>//s;
+        # strip leading and trailing <p> tags (they will be added later)
+        $footnote =~ s/^<p>//s;
+        $footnote =~ s/<\/p>$//s;
         $footnote = $self->_DoMarkdownCitations($footnote);
         $g_footnotes{$label} = $footnote;
     }
+    
+    my $footnote_counter = 0;
     
     $text =~ s{
         \[\^(.*?)\]     # id = $1
@@ -1632,8 +1634,8 @@ sub _DoFootnotes {
         
         if (defined $g_footnotes{$id} ) {
 #           $result = "<footnote>$g_footnotes{$self->Header2Label($id)}</footnote>"
-            $g_footnote_counter++;
-            $result = qq{<a href="#$id" name="f$id" class="footnote">$g_footnote_counter</a>};
+            $footnote_counter++;
+            $result = qq{<a href="#$id" id="f$id" class="footnote">$footnote_counter</a>};
             push (@g_used_footnotes,$id);
         }
         $result;
@@ -1657,12 +1659,12 @@ sub _PrintFootnotes {
     
     foreach my $id (@g_used_footnotes) {
         $footnote_counter++;
-        $result .= qq[<div id="$id"><p><a href="#f$id" class="reversefootnote">$footnote_counter.</a> $g_footnotes{$id}</div>\n\n];
+        #$result .= qq[<div id="$id"><p><a href="#f$id" class="reversefootnote">$footnote_counter.</a> $g_footnotes{$id}</div>\n\n];
+        $result .= qq[<li id="$id"><p>$g_footnotes{$id}<a href="#f$id" class="reversefootnote">&#160;&#8617;</a></p></li>\n\n];
     }
-    $result .= "</div>";
 
     if ($footnote_counter > 0) {
-        $result = qq[\n\n<div class="footnotes">\n<hr$self->{empty_element_suffix}\n<p>Footnotes:</p>\n\n] . $result;
+        $result = qq[\n\n<div class="footnotes">\n<hr$self->{empty_element_suffix}\n<ol>\n\n] . $result . "</ol>\n</div>";
     } else {
         $result = "";
     }   
@@ -1922,19 +1924,23 @@ sub _DoTables {
                 if ($cell =~ /^\:/) {
                     $result .= qq[<col align="center"$self->{empty_element_suffix}\n];
                     push(@alignments,"center");
-                } else {
+                } 
+                else {
                     $result .= qq[<col align="right"$self->{empty_element_suffix}\n];
                     push(@alignments,"right");
                 }
-            } else {
+            } 
+            else {
                 if ($cell =~ /^\:/) {
                     $result .= qq[<col align="left"$self->{empty_element_suffix}\n];
                     push(@alignments,"left");
-                } else {
+                } 
+                else {
                     if (($cell =~ /^\./) || ($cell =~ /\.$/)) {
                         $result .= qq[<col align="char"$self->{empty_element_suffix}\n];
                         push(@alignments,"char");
-                    } else {
+                    } 
+                    else {
                         $result .= "<col$self->{empty_element_suffix}\n";
                         push(@alignments,"");
                     }
@@ -2115,7 +2121,8 @@ sub _DoMarkdownCitations {
             }
             
             $result .= ")</span>";
-        } else {
+        } 
+        else {
             # No reference exists
             $result = qq[<span class="externalcitation"> (<a id="$id">$id</a>];
 
