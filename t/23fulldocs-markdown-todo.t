@@ -8,7 +8,9 @@ require "$Bin/20fulldocs-multimarkdown.t";
 my $docsdir = "$Bin/docs-markdown-todo";
 my @files = get_files($docsdir);
 
-plan tests => scalar(@files);
+plan tests => scalar(@files) + 1;
+
+use_ok('Text::MultiMarkdown');
 
 my $m = Text::MultiMarkdown->new(
     use_metadata => 0,

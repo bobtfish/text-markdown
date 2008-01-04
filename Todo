@@ -9,15 +9,13 @@ Todo pre 1.0.5
    . Citations?
    . Bibliography
    . Fix bold/italics within a word (in John Gruber's original Markdown docs)
-   . Add MultiMarkdown test suite         
-     (http://fletcherpenney.net/MultiMarkdown_Test_Suite), when / if I can 
-     download the file (have mailed the author)
    . Do not be seeding the random number generator on each page generation.
    
 Todo pre 1.0.6:
    . Document the markdown (and multimarkdown) syntaxes in the module
    . Make markdown / multimarkdown / stolen from the php version features 
      configurable at instance create time.
+   , Make 21fulldocs-markdown.t pass without TODO.
      
 Todo pre 1.0.7:
    . Using configurable features, borg the Text::Markdown module, giving it a 
