@@ -148,7 +148,7 @@ use Digest::MD5 qw(md5_hex);
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.0.4';
+our $VERSION   = '1.0.5';
 our @EXPORT_OK = qw(markdown);
 
 ## Disabled; causes problems under Perl 5.6.1:
