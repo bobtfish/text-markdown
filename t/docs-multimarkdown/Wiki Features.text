@@ -1,0 +1,10 @@
+Use WikiLinks: true
+Base Url: http://some.url.com/path/to/wiki/
+
+This is a sample WikiWord, and a \WikiWord that is not a WikiWord.  And this is a [[Free Link]].
+
+	A WikiWord and an escaped \WikiWord in a code block.
+	
+And a `WikiWord in a code span`.
+
+And an escaped `\WikiWord` in a code span.

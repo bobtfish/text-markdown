@@ -1553,7 +1553,7 @@ sub _ParseMetaData { # FIXME - This is really really ugly!
             if ($line =~ /^([a-zA-Z0-9][0-9a-zA-Z _-]+?):\s*(.*)$/ ) {
                 $currentKey = $1;
                 $currentKey =~ s/  / /g;
-                $self->{_metadata}{lc($currentKey)} = $2;
+                $self->{_metadata}{$currentKey} = defined $2 ? $2 : '';
                 if (lc($currentKey) eq "format") {
                     $self->{document_format} = $self->{_metadata}{$currentKey};
                 }
@@ -1748,9 +1748,10 @@ sub _ConvertCopyright{
 
 sub _UseWikiLinks {
     my ($self) = @_;
-    if ($self->{use_wikilinks} or $self->{_metadata}{'use wikilinks'}) {
-        return 1;
-    }
+    return 1 if $self->{use_wikilinks};
+    my ($k) = grep { /use wikilinks/i } keys %{$self->{_metadata}};
+    return unless $k;
+    return 1 if $self->{_metadata}{$k};
     return;
 }
 
@@ -1764,8 +1765,8 @@ sub _CreateWikiLink {
         $id =~ s/_$//;
 
     $title =~ s/_/ /g;
-        
-    return "[$title]($self->{base_url}$id)";
+    
+    return "[$title](" . $self->{base_url} . "$id)";
 }
 
 sub _DoWikiLinks {
