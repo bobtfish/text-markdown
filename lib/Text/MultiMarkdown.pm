@@ -546,15 +546,16 @@ sub _RunBlockGamut {
 #
     my ($self, $text) = @_;
 
+    # Do headers first, as these populate cross-refs
+    $text = $self->_DoHeaders($text);
+    
     # Do tables first to populate the table id's for cross-refs
+    # (but after headers as the tables can contain cross-refs to other things, so we want the header cross-refs)
     # Escape <pre><code> so we don't get greedy with tables
     $text = $self->_DoTables($text);
     
     # And now, protect our tables
     $text = $self->_HashHTMLBlocks($text);
-
-
-    $text = $self->_DoHeaders($text);
 
     # Do Horizontal Rules:
     $text =~ s{^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$}{\n<hr$self->{empty_element_suffix}\n}gmx;
@@ -748,7 +749,7 @@ sub _DoAnchors {
         my $link_text   = $2;
         my $url         = $3;
         my $title       = $6;
-
+        
         $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
         $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
         $result = "<a href=\"$url\"";
@@ -1886,7 +1887,8 @@ sub _DoTables {
                 
                 $g_crossrefs{$table_id} = "#$table_id";
                 $g_titles{$table_id} = "$1";
-            } else {
+            } 
+            else {
                 $result .= "<caption>" . $self->_RunSpanGamut($1). "</caption>\n";
             }
         }
