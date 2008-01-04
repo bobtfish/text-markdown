@@ -1,22 +1,18 @@
-Todo pre 1.0.5
+Todo pre 1.0.6
    . Remove global data (into instance data)
    . Implement strip_metadata option
-   . anchors?
    . auto links (email addressen)
    . Backslash escapes of markdown features (all of!)
-   . Footnotes
-   . Attributes? (sub _DoAttributes )
-   . Citations?
-   . Bibliography
-   . Fix bold/italics within a word (in John Gruber's original Markdown docs)
    . Do not be seeding the random number generator on each page generation.
+   . Look at the failing test cases (especially the Lists one) and see if  
+     fixable.
    
-Todo pre 1.0.6:
+Todo pre 1.0.7:
    . Document the markdown (and multimarkdown) syntaxes in the module
    . Make markdown / multimarkdown / stolen from the php version features 
      configurable at instance create time.
    , Make 21fulldocs-markdown.t pass without TODO.
      
-Todo pre 1.0.7:
+Todo pre 1.0.8:
    . Using configurable features, borg the Text::Markdown module, giving it a 
      test suite and a maintainer. 

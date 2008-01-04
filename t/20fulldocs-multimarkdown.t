@@ -70,6 +70,8 @@ sub run_tests {
             $output = slurp("$docsdir/$test.html");
             $input  = slurp("$docsdir/$test.text");
         };
+        $input .= "\n\n";
+        $output .= "\n\n";
         if ($@) {
             fail("1 part of test file not found: $@");
             next;
