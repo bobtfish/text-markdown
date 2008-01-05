@@ -737,6 +737,7 @@ sub _DoAnchors {
         my $result;
         my $whole_match = $1;
         my $link_text   = $2;
+        #warn("Got match $1 text $2");
         my $link_id     = lc $3;
 
         if ($link_id eq "") {
@@ -822,6 +823,42 @@ sub _DoAnchors {
 
         $result;
     }xsge;
+    
+    #
+	# Last, handle reference-style shortcuts: [link text]
+	# These must come last in case you've also got [link test][1]
+	# or [link test](/foo)
+	#
+	$text =~ s{
+		(					# wrap whole match in $1
+		  \[
+		    ([^\[\]]+)		# link text = $2; can't contain '[' or ']'
+		  \]
+		)
+	}{
+		my $result;
+		my $whole_match = $1;
+		my $link_text   = $2;
+		(my $link_id = lc $2) =~ s{[ ]?\n}{ }g; # lower-case and turn embedded newlines into spaces
+
+		if (defined $self->{_urls}{$link_id}) {
+			my $url = $self->{_urls}{$link_id};
+			$url =~ s! \* !$g_escape_table{'*'}!gx;		# We've got to encode these to avoid
+			$url =~ s!  _ !$g_escape_table{'_'}!gx;		# conflicting with italics/bold.
+			$result = "<a href=\"$url\"";
+			if ( defined $self->{titles}{$link_id} ) {
+				my $title = $self->{titles}{$link_id};
+				$title =~ s! \* !$g_escape_table{'*'}!gx;
+				$title =~ s!  _ !$g_escape_table{'_'}!gx;
+				$result .=  qq{ title="$title"};
+			}
+			$result .= ">$link_text</a>";
+		}
+		else {
+			$result = $whole_match;
+		}
+		$result;
+	}xsge;
 
     return $text;
 }
