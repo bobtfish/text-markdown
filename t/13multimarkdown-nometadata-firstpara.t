@@ -6,7 +6,7 @@ my $m     = Text::MultiMarkdown->new;
 
 # A line of whitespace should cause metadata to be skipped..
 my $html1 = $m->markdown(<<"EOF");
-
+    
 Simple block on one line:
 
 <div>foo</div>
