@@ -145,6 +145,7 @@ This is the base URL for referencing wiki pages. In this is not supplied, all wi
 =cut
 
 use Digest::MD5 qw(md5_hex);
+use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
@@ -423,6 +424,17 @@ sub _StripLinkDefinitions {
     return $text;
 }
 
+sub _md5_utf8 {
+   # Internal function used to safely MD5sum chunks of the input, which might be Unicode in Perl's internal representation.
+   my $input = shift;
+   return unless defined $input;
+   if (Encode::is_utf8 $input) {
+       return md5_hex(Encode::encode('utf8', $input));
+    } 
+    else {
+        return md5_hex($input);
+    }
+}
 
 sub _HashHTMLBlocks {
     my ($self, $text) = @_;
@@ -474,7 +486,7 @@ sub _HashHTMLBlocks {
 
 			my ($tag, $remainder) = $extract_block->($cur_line . $text);
 			if ($tag) {
-				my $key = md5_hex($tag);
+				my $key = _md5_utf8($tag);
 				$self->{_html_blocks}{$key} = $tag;
 				push @chunks, "\n\n" . $key . "\n\n";
 				$text = $remainder;
@@ -514,7 +526,7 @@ sub _HashHTMLBlocks {
 					(?=\n{2,}|\Z)		# followed by a blank line or end of document
 				)
 			}{
-				my $key = md5_hex($1);
+				my $key = _md5_utf8($1);
 				$self->{_html_blocks}{$key} = $1;
 				"\n\n" . $key . "\n\n";
 			}egx;
@@ -537,7 +549,7 @@ sub _HashHTMLBlocks {
 					(?=\n{2,}|\Z)		# followed by a blank line or end of document
 				)
 			}{
-				my $key = md5_hex($1);
+				my $key = _md5_utf8($1);
 				$self->{_html_blocks}{$key} = $1;
 				"\n\n" . $key . "\n\n";
 			}egx;
@@ -560,7 +572,7 @@ sub _HashHTMLBlocks {
 					(?=\n{2,}|\Z)		# followed by a blank line or end of document
 				)
 			}{
-				my $key = md5_hex($1);
+				my $key = _md5_utf8($1);
 				$self->{_html_blocks}{$key} = $1;
 				"\n\n" . $key . "\n\n";
 			}egx;
@@ -1533,7 +1545,6 @@ sub _EncodeEmailAddress {
 
     my ($self, $addr) = @_;
 
-    srand; # FIXME - NOT SMART TO DO THIS MULTIPLE TIMES!!!
     my @encode = (
         sub { '&#' .                 ord(shift)   . ';' },
         sub { '&#x' . sprintf( "%X", ord(shift) ) . ';' },
