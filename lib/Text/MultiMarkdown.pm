@@ -155,9 +155,6 @@ our @EXPORT_OK = qw(markdown);
 # use utf8;
 # binmode( STDOUT, ":utf8" );  # c.f.: http://acis.openlib.org/dev/perl-unicode-struggle.html
 
-### FIXME: Make these symbols configurable ###
-# $g_bibliography_title
-
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
 my $g_nested_brackets; 
@@ -181,9 +178,6 @@ foreach my $char (split //, '\\`*_{}[]()>#+-.!') {
 # Global hashes, used by various utility routines
 # FIXME - to be moved into instance data!
 my %g_metadata_newline = ();
-
-my $g_citation_counter = 0;
-my $g_bibliography_title = "Bibliography";
 
 # FIXME - If we're using metadata, newlines (in the metadata have to be \n). Make configurable.
 $g_metadata_newline{default} = "\n";
@@ -218,9 +212,7 @@ sub new {
     # NOTE: You can use \WikiWord to prevent a WikiWord from being treated as a link
     $p{use_wikilinks} = $p{use_wikilinks} ? 1 : 0;
     
-    # Used to track when we're inside an ordered or unordered list
-    # (see _ProcessListItems() for details):
-    $p{_list_level} = 0;
+    $p{bibliography_title} ||= 'Bibliography'; # FIXME - Test and document, can also be in metadata!
     
     my $self = { %p };
     bless $self, ref($class) || $class;
@@ -278,6 +270,10 @@ sub markdown {
     $self->{_attributes}  = {}; # What is this used for again?
     $self->{_used_footnotes}  = []; # Why do we need 2 data structures for footnotes? FIXME
     $self->{_used_references} = []; # Ditto for references
+    $self->{_citation_counter} = 0;
+    # Used to track when we're inside an ordered or unordered list
+    # (see _ProcessListItems() for details)
+    $self->{_list_level} = 0;
 
     my $t =  $self->_Markdown($text);
 
@@ -2098,8 +2094,7 @@ sub _DoMarkdownCitations {
             }
     
             if (! defined $count) {
-                $g_citation_counter++;
-                $count = $g_citation_counter;
+                $count = ++$self->{_citation_counter};
                 push (@{ $self->{_used_references} }, $id);
             }
             
@@ -2144,7 +2139,7 @@ sub _PrintMarkdownBibliography {
     $result .= "</div>";
 
     if ($citation_counter > 0) {
-        $result = qq[\n\n<div class="bibliography">\n<hr$self->{empty_element_suffix}\n<p>$g_bibliography_title</p>\n\n] . $result;
+        $result = qq[\n\n<div class="bibliography">\n<hr$self->{empty_element_suffix}\n<p>$self->{bibliography_title}</p>\n\n] . $result;
     } 
     else {
         $result = "";
