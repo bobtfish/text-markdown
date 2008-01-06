@@ -180,18 +180,9 @@ foreach my $char (split //, '\\`*_{}[]()>#+-.!') {
 
 # Global hashes, used by various utility routines
 # FIXME - to be moved into instance data!
-my %g_urls = ();
-my %g_titles= ();
-my %g_html_blocks = ();
 my %g_metadata_newline = ();
-my %g_crossrefs = ();
-my %g_footnotes = ();
-my %g_attributes = ();
-my @g_used_footnotes = ();
 
 my $g_citation_counter = 0;
-my @g_used_references = ();
-my %g_references = ();
 my $g_bibliography_title = "Bibliography";
 
 # FIXME - If we're using metadata, newlines (in the metadata have to be \n). Make configurable.
@@ -278,17 +269,15 @@ sub markdown {
     # from other articles when generating a page which contains more than
     # one article (e.g. an index page that shows the N most recent
     # articles):
-    %g_urls            = ();
-    %g_titles          = ();
-    %g_html_blocks     = ();
-    %g_crossrefs       = ();
-    %g_footnotes       = ();
-    @g_used_footnotes  = ();
-    @g_used_references = ();
-
-    %g_urls        = %{$options->{urls}}        if $options->{urls};
-    %g_titles      = %{$options->{titles}}      if $options->{titles};
-    %g_html_blocks = %{$options->{html_blocks}} if $options->{html_blocks};
+    $self->{_urls}        = $options->{urls}        ? $options->{urls}        : {}; # FIXME - document and test passing this option.
+    $self->{_titles}      = $options->{titles}      ? $options->{titles}      : {}; # FIXME - ditto
+    $self->{_html_blocks} = $options->{html_blocks} ? $options->{html_blocks} : {}; # FIXME - ditto
+    $self->{_crossrefs}   = {};
+    $self->{_footnotes}   = {};
+    $self->{_references}  = {};
+    $self->{_attributes}  = {}; # What is this used for again?
+    $self->{_used_footnotes}  = []; # Why do we need 2 data structures for footnotes? FIXME
+    $self->{_used_references} = []; # Ditto for references
 
     my $t =  $self->_Markdown($text);
 
@@ -411,15 +400,15 @@ sub _StripLinkDefinitions {
                         (?:\n+|\Z)
                     }
                     {}mx) {
-        $g_urls{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
+        $self->{_urls}{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
         if ($3) {
-            $g_titles{lc $1} = $3;
-            $g_titles{lc $1} =~ s/"/&quot;/g;
+            $self->{_titles}{lc $1} = $3;
+            $self->{_titles}{lc $1} =~ s/"/&quot;/g;
         }
         
         # MultiMarkdown addition "
         if ($4) {
-            $g_attributes{lc $1} = $4;
+            $self->{_attributes}{lc $1} = $4;
         }
         # /addition
     }
@@ -464,7 +453,7 @@ sub _HashHTMLBlocks {
                 )
             }{
                 my $key = md5_hex($1);
-                $g_html_blocks{$key} = $1;
+                $self->{_html_blocks}{$key} = $1;
                 "\n\n" . $key . "\n\n";
             }egmx;
 
@@ -484,7 +473,7 @@ sub _HashHTMLBlocks {
                 )
             }{
                 my $key = md5_hex($1);
-                $g_html_blocks{$key} = $1;
+                $self->{_html_blocks}{$key} = $1;
                 "\n\n" . $key . "\n\n";
             }egmx;
     # Special case just for <hr />. It was easier to make a special case than
@@ -506,7 +495,7 @@ sub _HashHTMLBlocks {
                 )
             }{
                 my $key = md5_hex($1);
-                $g_html_blocks{$key} = $1;
+                $self->{_html_blocks}{$key} = $1;
                 "\n\n" . $key . "\n\n";
             }egx;
 
@@ -529,7 +518,7 @@ sub _HashHTMLBlocks {
                 )
             }{
                 my $key = md5_hex($1);
-                $g_html_blocks{$key} = $1;
+                $self->{_html_blocks}{$key} = $1;
                 "\n\n" . $key . "\n\n";
             }egx;
 
@@ -689,13 +678,13 @@ sub _DoAnchors {
 
         # Allow automatic cross-references to headers
         my $label = $self->Header2Label($link_id);
-        if (defined $g_crossrefs{$label}) {
-            my $url = $g_crossrefs{$label};
+        if (defined $self->{_crossrefs}{$label}) {
+            my $url = $self->{_crossrefs}{$label};
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
             $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
             $result = qq[<a href="$url"];
-            if ( defined $g_titles{$label} ) {
-                my $title = $g_titles{$label};
+            if ( defined $self->{_titles}{$label} ) {
+                my $title = $self->{_titles}{$label};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
                 $title =~ s!  _ !$g_escape_table{'_'}!gx;
                 $result .=  " title=\"$title\"";
@@ -703,13 +692,13 @@ sub _DoAnchors {
             $result .= $self->_DoAttributes($label);
             $result .= ">$link_text</a>";
         } 
-        elsif (defined $g_urls{$link_id}) {
-            my $url = $g_urls{$link_id};
+        elsif (defined $self->{_urls}{$link_id}) {
+            my $url = $self->{_urls}{$link_id};
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
             $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
             $result = "<a href=\"$url\"";
-            if ( defined $g_titles{$link_id} ) {
-                my $title = $g_titles{$link_id};
+            if ( defined $self->{_titles}{$link_id} ) {
+                my $title = $self->{_titles}{$link_id};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
                 $title =~ s!  _ !$g_escape_table{'_'}!gx;
                 $result .=  " title=\"$title\"";
@@ -803,20 +792,20 @@ sub _DoImages {
         }
 
         $alt_text =~ s/"/&quot;/g;
-        if (defined $g_urls{$link_id}) {
-            my $url = $g_urls{$link_id};
+        if (defined $self->{_urls}{$link_id}) {
+            my $url = $self->{_urls}{$link_id};
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
             $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
             
             my $label = $self->Header2Label($alt_text);
-            $g_crossrefs{$label} = "#$label";
-            if (! defined $g_titles{$link_id}) {
-                $g_titles{$link_id} = $alt_text;
+            $self->{_crossrefs}{$label} = "#$label";
+            if (! defined $self->{_titles}{$link_id}) {
+                $self->{_titles}{$link_id} = $alt_text;
             }
             
             $result = qq{<img id="$label" src="$url" alt="$alt_text"};
-            if (defined $g_titles{$link_id}) {
-                my $title = $g_titles{$link_id};
+            if (defined $self->{_titles}{$link_id}) {
+                my $title = $self->{_titles}{$link_id};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
                 $title =~ s!  _ !$g_escape_table{'_'}!gx;
                 $result .=  " title=\"$title\"";
@@ -870,8 +859,8 @@ sub _DoImages {
         $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
 
         my $label = $self->Header2Label($alt_text);
-        $g_crossrefs{$label} = "#$label";
-#       $g_titles{$label} = $alt_text;          # FIXME - I think this line should not be here
+        $self->{_crossrefs}{$label} = "#$label";
+#       $self->{_titles}{$label} = $alt_text;          # FIXME - I think this line should not be here
             
         $result = qq{<img id="$label" src="$url" alt="$alt_text"};
         if (defined $title) {
@@ -907,8 +896,8 @@ sub _DoHeaders {
         $label = $self->Header2Label($1);
         $header = $self->_RunSpanGamut($1);
         
-        $g_crossrefs{$label} = "#$label";
-        $g_titles{$label} = $header;
+        $self->{_crossrefs}{$label} = "#$label";
+        $self->{_titles}{$label} = $header;
         
         "<h1 id=\"$label\">"  .  $self->_RunSpanGamut($1)  .  "</h1>\n\n";
     }egmx;
@@ -917,8 +906,8 @@ sub _DoHeaders {
         $label = $self->Header2Label($1);
         $header = $self->_RunSpanGamut($1);
         
-        $g_crossrefs{$label} = "#$label";
-        $g_titles{$label} = $header;
+        $self->{_crossrefs}{$label} = "#$label";
+        $self->{_titles}{$label} = $header;
         
         "<h2 id=\"$label\">"  .  $self->_RunSpanGamut($1)  .  "</h2>\n\n";
     }egmx;
@@ -943,8 +932,8 @@ sub _DoHeaders {
             $label = $self->Header2Label($2);
             $header = $self->_RunSpanGamut($2);
             
-            $g_crossrefs{$label} = "#$label";
-            $g_titles{$label} = $header;
+            $self->{_crossrefs}{$label} = "#$label";
+            $self->{_titles}{$label} = $header;
             "<h$h_level id=\"$label\">"  .  $header  .  "</h$h_level>\n\n";
         }egmx;
 
@@ -1314,7 +1303,7 @@ sub _FormParagraphs {
     # Wrap <p> tags.
     #
     foreach (@grafs) {
-        unless (defined( $g_html_blocks{$_} )) {
+        unless (defined( $self->{_html_blocks}{$_} )) {
             $_ = $self->_RunSpanGamut($_);
             s/^([ \t]*)/<p>/;
             $_ .= "</p>";
@@ -1325,8 +1314,8 @@ sub _FormParagraphs {
     # Unhashify HTML blocks
     #
     foreach (@grafs) {
-        if (defined( $g_html_blocks{$_} )) {
-            $_ = $g_html_blocks{$_};
+        if (defined( $self->{_html_blocks}{$_} )) {
+            $_ = $self->{_html_blocks}{$_};
         }
     }
 
@@ -1604,7 +1593,7 @@ sub _StripFootnoteDefinitions {
         my $footnote = "$2\n";
         $footnote =~ s/^[ ]{0,$self->{tab_width}}//gm;
     
-        $g_footnotes{$self->Header2Label($id)} = $footnote;
+        $self->{_footnotes}{$self->Header2Label($id)} = $footnote;
     }
     
     return $text;
@@ -1614,14 +1603,14 @@ sub _DoFootnotes {
     my ($self, $text) = @_;
     
     # First, run routines that get skipped in footnotes
-    foreach my $label (sort keys %g_footnotes) {
-        my $footnote = $self->_RunBlockGamut($g_footnotes{$label});
+    foreach my $label (sort keys %{ $self->{_footnotes} }) {
+        my $footnote = $self->_RunBlockGamut($self->{_footnotes}{$label});
 
         # strip leading and trailing <p> tags (they will be added later)
         $footnote =~ s/^<p>//s;
         $footnote =~ s/<\/p>$//s;
         $footnote = $self->_DoMarkdownCitations($footnote);
-        $g_footnotes{$label} = $footnote;
+        $self->{_footnotes}{$label} = $footnote;
     }
     
     my $footnote_counter = 0;
@@ -1632,11 +1621,11 @@ sub _DoFootnotes {
         my $result;
         my $id = $self->Header2Label($1);
         
-        if (defined $g_footnotes{$id} ) {
-#           $result = "<footnote>$g_footnotes{$self->Header2Label($id)}</footnote>"
+        if (defined $self->{_footnotes}{$id} ) {
+#           $result = "<footnote>$self->{_footnotes}{$self->Header2Label($id)}</footnote>"
             $footnote_counter++;
             $result = qq{<a href="#$id" id="f$id" class="footnote">$footnote_counter</a>};
-            push (@g_used_footnotes,$id);
+            push (@{ $self->{_used_footnotes} }, $id);
         }
         $result;
     }xsge;
@@ -1657,10 +1646,10 @@ sub _PrintFootnotes {
     my $footnote_counter = 0;
     my $result;
     
-    foreach my $id (@g_used_footnotes) {
+    foreach my $id (@{ $self->{_used_footnotes} }) {
         $footnote_counter++;
-        #$result .= qq[<div id="$id"><p><a href="#f$id" class="reversefootnote">$footnote_counter.</a> $g_footnotes{$id}</div>\n\n];
-        $result .= qq[<li id="$id"><p>$g_footnotes{$id}<a href="#f$id" class="reversefootnote">&#160;&#8617;</a></p></li>\n\n];
+        #$result .= qq[<div id="$id"><p><a href="#f$id" class="reversefootnote">$footnote_counter.</a> $self->{_footnotes}{$id}</div>\n\n];
+        $result .= qq[<li id="$id"><p>$self->{_footnotes}{$id}<a href="#f$id" class="reversefootnote">&#160;&#8617;</a></p></li>\n\n];
     }
 
     if ($footnote_counter > 0) {
@@ -1887,8 +1876,8 @@ sub _DoTables {
                 my $table_id = $self->Header2Label($3);
                 $result .= qq{<caption id="$table_id">} . $self->_RunSpanGamut($1). "</caption>\n";
                 
-                $g_crossrefs{$table_id} = "#$table_id";
-                $g_titles{$table_id} = "$1";
+                $self->{_crossrefs}{$table_id} = "#$table_id";
+                $self->{_titles}{$table_id} = "$1";
             } 
             else {
                 $result .= "<caption>" . $self->_RunSpanGamut($1). "</caption>\n";
@@ -2043,11 +2032,11 @@ sub _DoAttributes {
     my ($self, $id) = @_;
     my $result = "";
     
-    if (defined $g_attributes{$id}) {
-        while ($g_attributes{$id} =~ s/(\S+)="(.*?)"//) {
+    if (defined $self->{_attributes}{$id}) {
+        while ($self->{_attributes}{$id} =~ s/(\S+)="(.*?)"//) {
             $result .= " $1=\"$2\"";
         }
-        while ($g_attributes{$id} =~ /(\S+)=(\S+)/g) {
+        while ($self->{_attributes}{$id} =~ /(\S+)=(\S+)/g) {
             $result .= " $1=\"$2\"";
         }
     }
@@ -2079,7 +2068,7 @@ sub _StripMarkdownReferences {
         $reference =~ s/^\<p\>//s;
         $reference =~ s/\<\/p\>\s*$//s;
         
-        $g_references{$id} = $reference;
+        $self->{_references}{$id} = $reference;
     }
     
     return $text;
@@ -2099,11 +2088,11 @@ sub _DoMarkdownCitations {
         my $id = $2;
         my $count;
         
-        if (defined $g_references{$id} ) {
+        if (defined $self->{_references}{$id} ) {
             my $citation_counter=0;
             
             # See if citation has been used before
-            foreach my $old_id (@g_used_references) {
+            foreach my $old_id (@{ $self->{_used_references} }) {
                 $citation_counter++;
                 $count = $citation_counter if ($old_id eq $id);
             }
@@ -2111,7 +2100,7 @@ sub _DoMarkdownCitations {
             if (! defined $count) {
                 $g_citation_counter++;
                 $count = $g_citation_counter;
-                push (@g_used_references,$id);
+                push (@{ $self->{_used_references} }, $id);
             }
             
             $result = qq[<span class="markdowncitation"> (<a href="#$id">$count</a>];
@@ -2148,9 +2137,9 @@ sub _PrintMarkdownBibliography {
     my $citation_counter = 0;
     my $result;
     
-    foreach my $id (@g_used_references) {
+    foreach my $id (@{ $self->{_used_references} }) {
         $citation_counter++;
-        $result .= qq|<div id="$id"><p>[$citation_counter] <span class="item">$g_references{$id}</span></p></div>\n\n|;
+        $result .= qq|<div id="$id"><p>[$citation_counter] <span class="item">$self->{_references}{$id}</span></p></div>\n\n|;
     }
     $result .= "</div>";
 
@@ -2195,9 +2184,9 @@ sub _GenerateImageCrossRefs {
         }
 
         $alt_text =~ s/"/&quot;/g;
-        if (defined $g_urls{$link_id}) {
+        if (defined $self->{_urls}{$link_id}) {
             my $label = $self->Header2Label($alt_text);
-            $g_crossrefs{$label} = "#$label";
+            $self->{_crossrefs}{$label} = "#$label";
         }
         else {
             # If there's no such link ID, leave intact:
@@ -2235,7 +2224,7 @@ sub _GenerateImageCrossRefs {
 
         $alt_text =~ s/"/&quot;/g;
         my $label = $self->Header2Label($alt_text);
-        $g_crossrefs{$label} = "#$label";
+        $self->{_crossrefs}{$label} = "#$label";
         $whole_match;
     }xsge;
 
