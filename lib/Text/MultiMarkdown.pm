@@ -208,9 +208,14 @@ sub new {
     
     $p{empty_element_suffix} ||= ' />'; # Change to ">" for HTML output
     
+    #$p{heading_ids} = defined $p{heading_ids} ? $p{heading_ids} : 1;
+    
     # For use with WikiWords and [[Wiki Links]]
     # NOTE: You can use \WikiWord to prevent a WikiWord from being treated as a link
     $p{use_wikilinks} = $p{use_wikilinks} ? 1 : 0;
+    
+    $p{heading_ids} = defined $p{heading_ids} ? $p{heading_ids} : 1;
+    $p{img_ids}     = defined $p{img_ids}     ? $p{img_ids}     : 1;
     
     $p{bibliography_title} ||= 'Bibliography'; # FIXME - Test and document, can also be in metadata!
     
@@ -799,7 +804,8 @@ sub _DoImages {
                 $self->{_titles}{$link_id} = $alt_text;
             }
             
-            $result = qq{<img id="$label" src="$url" alt="$alt_text"};
+            $label = $self->{img_ids} ? q{ id="} . $label . q{"} : '';
+            $result = qq{<img$label src="$url" alt="$alt_text"};
             if (defined $self->{_titles}{$link_id}) {
                 my $title = $self->{_titles}{$link_id};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
@@ -889,23 +895,23 @@ sub _DoHeaders {
     #     --------
     #
     $text =~ s{ ^(.+)[ \t]*\n=+[ \t]*\n+ }{
-        $label = $self->Header2Label($1);
+        $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
         $self->{_crossrefs}{$label} = "#$label";
         $self->{_titles}{$label} = $header;
         
-        "<h1 id=\"$label\">"  .  $self->_RunSpanGamut($1)  .  "</h1>\n\n";
+        "<h1$label>"  .  $self->_RunSpanGamut($1)  .  "</h1>\n\n";
     }egmx;
 
     $text =~ s{ ^(.+)[ \t]*\n-+[ \t]*\n+ }{
-        $label = $self->Header2Label($1);
+        $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
         $self->{_crossrefs}{$label} = "#$label";
         $self->{_titles}{$label} = $header;
         
-        "<h2 id=\"$label\">"  .  $self->_RunSpanGamut($1)  .  "</h2>\n\n";
+        "<h2$label>"  .  $self->_RunSpanGamut($1)  .  "</h2>\n\n";
     }egmx;
 
 
@@ -916,6 +922,7 @@ sub _DoHeaders {
     #   ...
     #   ###### Header 6
     #
+    my $l;
     $text =~ s{
             ^(\#{1,6})  # $1 = string of #'s
             [ \t]*
@@ -930,7 +937,8 @@ sub _DoHeaders {
             
             $self->{_crossrefs}{$label} = "#$label";
             $self->{_titles}{$label} = $header;
-            "<h$h_level id=\"$label\">"  .  $header  .  "</h$h_level>\n\n";
+            $l = $self->{heading_ids} ? $h_level . ' id="' . $label . '"' : $h_level;
+            "<h$l>"  .  $header  .  "</h$h_level>\n\n";
         }egmx;
 
     return $text;

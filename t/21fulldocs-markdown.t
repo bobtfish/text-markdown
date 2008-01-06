@@ -15,9 +15,10 @@ use_ok('Text::MultiMarkdown');
 my $m = Text::MultiMarkdown->new(
     use_metadata => 0,
     heading_ids  => 0, # Remove MultiMarkdown behavior change in <hX> tags.
+    img_ids      => 0, # Remove MultiMarkdown behavior change in <img> tags.
 );
 
 {
-    local $TODO = 'heading_ids setting has not been implemented yet';
+    local $TODO = 'I have many bugs!';
     run_tests($m, $docsdir, @files);
 };
