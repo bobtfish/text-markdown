@@ -1,11 +1,7 @@
 Todo pre 1.0.6
    . Implement strip_metadata option.
    . Document img_ids and heading_ids options.
-   . Tests: auto links (email addressen)
-   . Tests: Backslash escapes of markdown features (all of!)
    . Do not be seeding the random number generator on each page generation.
-   . Look at the failing test cases (especially the Lists one) and see if  
-     fixable easily.
    . Document other metadata / global options (e.g. bibliography title)
    . Look at (and fix if needed) Text::Markdown's RT#27482.
    . http://code.google.com/p/python-markdown2/wiki/TestingNotes <- Steal 

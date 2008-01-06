@@ -9,7 +9,7 @@ Foo
 Bar
 EOF
 
-is( <<"EOF", $html1 );
+is( $html1, <<"EOF" );
 <p>Foo</p>
 
 <p>Bar</p>
@@ -21,7 +21,7 @@ Foo
 Bar
 EOF
 
-is( <<"EOF", $html2 );
+is( $html2, <<"EOF" );
 <p>Foo</p>
 
 <p>Bar</p>
