@@ -1,9 +1,8 @@
 Todo pre 1.0.6
-   . Implement strip_metadata option.
-   . Document img_ids and heading_ids options.
    . Document other metadata / global options (e.g. bibliography title)
 
 Todo pre 1.0.7
+   . Implement strip_metadata option.
    . This is the release where I pull in all the other ideas and tests I can
      URLs to look at are:
        . http://code.google.com/p/python-markdown2/wiki/TestingNotes <- Steal 

@@ -84,6 +84,24 @@ Not implemented yet.
 
 This option can be used to generate normal HTML output. By default, it is ' />', which is xHTML, change to '>' for normal HTML.
 
+=item img_ids
+
+Controls if <img> tags generated have an id attribute. Defaults to true. 
+Turn off for compatibility with the original markdown.
+
+=item heading_ids
+
+Controls if <hX> tags generated have an id attribute. Defaults to true. 
+Turn off for compatibility with the original markdown.
+
+=item bibliography_title
+
+The title of the generated bibliography, defaults to 'Bibliography'.
+
+=item tab_width
+
+Controls indent width in the generated markup, defaults to 4
+
 =back
 
 A number of possible items of metadata can also be supplied as options. 
