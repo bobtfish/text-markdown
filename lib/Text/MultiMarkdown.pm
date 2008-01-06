@@ -628,7 +628,7 @@ sub _RunSpanGamut {
     my ($self, $text) = @_;
 
     $text = $self->_DoCodeSpans($text);
-
+	$text = $self->_EscapeSpecialCharsWithinTagAttributes($text);
     $text = $self->_EscapeSpecialChars($text);
 
     # Process anchor and image tags. Images must come first,
@@ -687,6 +687,30 @@ sub _EscapeSpecialChars {
         }
     }
     return $text;
+}
+
+sub _EscapeSpecialCharsWithinTagAttributes {
+#
+# Within tags -- meaning between < and > -- encode [\ ` * _] so they
+# don't conflict with their use in Markdown for code, italics and strong.
+# We're replacing each such character with its corresponding MD5 checksum
+# value; this is likely overkill, but it should prevent us from colliding
+# with the escape values by accident.
+#
+	my ($self, $text) = @_;
+	my $tokens ||= $self->_TokenizeHTML($text);
+	$text = '';   # rebuild $text from the tokens
+
+	foreach my $cur_token (@$tokens) {
+		if ($cur_token->[0] eq "tag") {
+			$cur_token->[1] =~  s! \\ !$g_escape_table{'\\'}!gx;
+			$cur_token->[1] =~  s{ (?<=.)</?code>(?=.)  }{$g_escape_table{'`'}}gx;
+			$cur_token->[1] =~  s! \* !$g_escape_table{'*'}!gx;
+			$cur_token->[1] =~  s! _  !$g_escape_table{'_'}!gx;
+		}
+		$text .= $cur_token->[1];
+	}
+	return $text;
 }
 
 
@@ -768,12 +792,13 @@ sub _DoAnchors {
           \]
           \(            # literal paren
             [ \t]*
-            <?(.*?)>?   # href = $3
+            ($g_nested_parens)   # href = $3
             [ \t]*
             (           # $4
               (['"])    # quote char = $5
               (.*?)     # Title = $6
               \5        # matching quote
+              [ \t]*	# ignore any spaces/tabs between closing quote and )
             )?          # title is optional
           \)
         )
@@ -786,6 +811,7 @@ sub _DoAnchors {
         
         $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
         $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
+        $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
         $result = "<a href=\"$url\"";
 
         if (defined $title) {
