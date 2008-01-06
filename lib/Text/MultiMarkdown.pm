@@ -422,109 +422,145 @@ sub _HashHTMLBlocks {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
 
-    # Hashify HTML blocks:
-    # We only want to do this for block-level HTML tags, such as headers,
-    # lists, and tables. That's because we still want to wrap <p>s around
-    # "paragraphs" that are wrapped in non-block-level tags, such as anchors,
-    # phrase emphasis, and spans. The list of tags we're looking for is
-    # hard-coded:
-    my $block_tags_a = qr/p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del/;
-    my $block_tags_b = qr/p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math/;
+	# Hashify HTML blocks:
+	# We only want to do this for block-level HTML tags, such as headers,
+	# lists, and tables. That's because we still want to wrap <p>s around
+	# "paragraphs" that are wrapped in non-block-level tags, such as anchors,
+	# phrase emphasis, and spans. The list of tags we're looking for is
+	# hard-coded:
+	my $block_tags = qr{
+		  (?:
+			p         |  div     |  h[1-6]  |  blockquote  |  pre       |  table  |
+			dl        |  ol      |  ul      |  script      |  noscript  |  form   |
+			fieldset  |  iframe  |  math    |  ins         |  del
+		  )
+		}x;
 
-    # First, look for nested blocks, e.g.:
-    #   <div>
-    #       <div>
-    #       tags for inner block must be indented.
-    #       </div>
-    #   </div>
-    #
-    # The outermost tags must start at the left margin for this to match, and
-    # the inner nested divs must be indented.
-    # We need to do this before the next, more liberal match, because the next
-    # match will start at the first `<div>` and stop at the first `</div>`.
-    $text =~ s{
-                (                       # save in $1
-                    ^                   # start of line  (with /m)
-                    <($block_tags_a)    # start tag = $2
-                    \b                  # word break
-                    (.*\n)*?            # any number of lines, minimally matching
-                    </\2>               # the matching end tag
-                    [ \t]*              # trailing spaces/tabs
-                    (?=\n+|\Z)  # followed by a newline or end of document
-                )
-            }{
-                my $key = md5_hex($1);
-                $self->{_html_blocks}{$key} = $1;
-                "\n\n" . $key . "\n\n";
-            }egmx;
+	my $tag_attrs = qr{
+						(?:				# Match one attr name/value pair
+							\s+				# There needs to be at least some whitespace
+											# before each attribute name.
+							[\w.:_-]+		# Attribute name
+							\s*=\s*
+							(?:
+								".+?"		# "Attribute value"
+							 |
+								'.+?'		# 'Attribute value'
+							)
+						)*				# Zero or more
+					}x;
 
+	my $empty_tag = qr{< \w+ $tag_attrs \s* />}xms;
+	my $open_tag =  qr{< $block_tags $tag_attrs \s* >}xms;
+	my $close_tag = undef;	# let Text::Balanced handle this
 
-    #
-    # Now match more liberally, simply from `\n<tag>` to `</tag>\n`
-    #
-    $text =~ s{
-                (                       # save in $1
-                    ^                   # start of line  (with /m)
-                    <($block_tags_b)    # start tag = $2
-                    \b                  # word break
-                    (.*\n)*?            # any number of lines, minimally matching
-                    .*</\2>             # the matching end tag
-                    [ \t]*              # trailing spaces/tabs
-                    (?=\n+|\Z)  # followed by a newline or end of document
-                )
-            }{
-                my $key = md5_hex($1);
-                $self->{_html_blocks}{$key} = $1;
-                "\n\n" . $key . "\n\n";
-            }egmx;
-    # Special case just for <hr />. It was easier to make a special case than
-    # to make the other regex more complicated. 
-    $text =~ s{
-                (?:
-                    (?<=\n\n)       # Starting after a blank line
-                    |               # or
-                    \A\n?           # the beginning of the doc
-                )
-                (                       # save in $1
-                    [ ]{0,$less_than_tab}
-                    <(hr)               # start tag = $2
-                    \b                  # word break
-                    ([^<>])*?           # 
-                    /?>                 # the matching end tag
-                    [ \t]*
-                    (?=\n{2,}|\Z)       # followed by a blank line or end of document
-                )
-            }{
-                my $key = md5_hex($1);
-                $self->{_html_blocks}{$key} = $1;
-                "\n\n" . $key . "\n\n";
-            }egx;
+	use Text::Balanced qw(gen_extract_tagged);
+	my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
 
-    # Special case for standalone HTML comments:
-    $text =~ s{
-                (?:
-                    (?<=\n\n)       # Starting after a blank line
-                    |               # or
-                    \A\n?           # the beginning of the doc
-                )
-                (                       # save in $1
-                    [ ]{0,$less_than_tab}
-                    (?s:
-                        <!
-                        (--.*?--\s*)+
-                        >
-                    )
-                    [ \t]*
-                    (?=\n{2,}|\Z)       # followed by a blank line or end of document
-                )
-            }{
-                my $key = md5_hex($1);
-                $self->{_html_blocks}{$key} = $1;
-                "\n\n" . $key . "\n\n";
-            }egx;
+	my @chunks;
+	## TO-DO: the 0,3 on the next line ought to respect the
+	## tabwidth, or else, we should mandate 4-space tabwidth and
+	## be done with it:
+	while ($text =~ s{^(([ ]{0,3}<)?.*\n)}{}m) {
+		my $cur_line = $1;
+		if (defined $2) {
+			# current line could be start of code block
+
+			my ($tag, $remainder) = $extract_block->($cur_line . $text);
+			if ($tag) {
+				my $key = md5_hex($tag);
+				$self->{_html_blocks}{$key} = $tag;
+				push @chunks, "\n\n" . $key . "\n\n";
+				$text = $remainder;
+			}
+			else {
+				# No tag match, so toss $cur_line into @chunks
+				push @chunks, $cur_line;
+			}
+		}
+		else {
+			# current line could NOT be start of code block
+			push @chunks, $cur_line;
+		}
+
+	}
+	push @chunks, $text; # Whatever is left.
+
+	$text = join '', @chunks;
 
 
-    return $text;
+
+	# Special case just for <hr />. It was easier to make a special case than
+	# to make the other regex more complicated.	
+	$text =~ s{
+				(?:
+					(?<=\n\n)		# Starting after a blank line
+					|				# or
+					\A\n?			# the beginning of the doc
+				)
+				(						# save in $1
+					[ ]{0,$less_than_tab}
+					<(hr)				# start tag = $2
+					\b					# word break
+					([^<>])*?			# 
+					/?>					# the matching end tag
+					[ \t]*
+					(?=\n{2,}|\Z)		# followed by a blank line or end of document
+				)
+			}{
+				my $key = md5_hex($1);
+				$self->{_html_blocks}{$key} = $1;
+				"\n\n" . $key . "\n\n";
+			}egx;
+
+	# Special case for standalone HTML comments:
+	$text =~ s{
+				(?:
+					(?<=\n\n)		# Starting after a blank line
+					|				# or
+					\A\n?			# the beginning of the doc
+				)
+				(						# save in $1
+					[ ]{0,$less_than_tab}
+					(?s:
+						<!
+						(--.*?--\s*)+
+						>
+					)
+					[ \t]*
+					(?=\n{2,}|\Z)		# followed by a blank line or end of document
+				)
+			}{
+				my $key = md5_hex($1);
+				$self->{_html_blocks}{$key} = $1;
+				"\n\n" . $key . "\n\n";
+			}egx;
+
+	# PHP and ASP-style processor instructions (<?…?> and <%…%>)
+	$text =~ s{
+				(?:
+					(?<=\n\n)		# Starting after a blank line
+					|				# or
+					\A\n?			# the beginning of the doc
+				)
+				(						# save in $1
+					[ ]{0,$less_than_tab}
+					(?s:
+						<([?%])			# $2
+						.*?
+						\2>
+					)
+					[ \t]*
+					(?=\n{2,}|\Z)		# followed by a blank line or end of document
+				)
+			}{
+				my $key = md5_hex($1);
+				$self->{_html_blocks}{$key} = $1;
+				"\n\n" . $key . "\n\n";
+			}egx;
+
+
+	return $text;
 }
 
 
