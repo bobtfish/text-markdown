@@ -1,6 +1,8 @@
 abstract: Convert MultiMarkdown syntax to (X)HTML
 author: Darren M. Kulp <kulp@cpan.org>
 build_requires: 
+  File::Slurp: 0
+  List::MoreUtils: 0
   Test::Exception: 0
   Test::More: 0.42
 distribution_type: module
@@ -16,4 +18,5 @@ requires:
   List::Util: 0
   MIME::Base64: 0
   Scalar::Util: 0
+  Text::Balanced: 0
 version: 1.0.6
