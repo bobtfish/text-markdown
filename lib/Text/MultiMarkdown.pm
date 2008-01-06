@@ -324,9 +324,6 @@ sub _Markdown {
     # match consecutive blank lines with /\n+/ instead of something
     # contorted like /[ \t]*\n+/ .
     $text =~ s/^[ \t]+$//mg;
-
-    # Strip leading blank lines
-    $text =~ s/^\n+//s;
     
     # Strip out MetaData
     $text = $self->_ParseMetaData($text) if $self->{use_metadata};
@@ -1621,7 +1618,7 @@ sub _ParseMetaData { # FIXME - This is really really ugly!
     my ($inMetaData, $currentKey) = (1, '');
     
     foreach my $line ( split /\n/, $text ) {
-        $line =~ /^$/ and $inMetaData = 0 and $clean_text .= $line and next;
+        $line =~ /^\s*$/ and $inMetaData = 0 and $clean_text .= $line and next;
         if ($inMetaData) {
             if ($line =~ /^([a-zA-Z0-9][0-9a-zA-Z _-]+?):\s*(.*)$/ ) {
                 $currentKey = $1;
