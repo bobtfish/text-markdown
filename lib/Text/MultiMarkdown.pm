@@ -157,7 +157,7 @@ our @EXPORT_OK = qw(markdown);
 
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
-my $g_nested_brackets; 
+my ($g_nested_brackets, $g_nested_parens); 
 $g_nested_brackets = qr{
     (?>                                 # Atomic matching
        [^\[\]]+                         # Anything other than brackets
@@ -167,7 +167,16 @@ $g_nested_brackets = qr{
        \]
     )*
 }x;
-
+# Doesn't allow for whitespace, because we're using it to match URLs:
+$g_nested_parens = qr{
+	(?> 								# Atomic matching
+	   [^()\s]+							# Anything other than parens or whitespace
+	 | 
+	   \(
+		 (??{ $g_nested_parens })		# Recursive set of nested brackets
+	   \)
+	)*
+}x;
 
 # Table of hash values for escaped characters:
 my %g_escape_table;
@@ -738,7 +747,7 @@ sub _DoAnchors {
                 my $title = $self->{_titles}{$link_id};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
                 $title =~ s!  _ !$g_escape_table{'_'}!gx;
-                $result .=  " title=\"$title\"";
+                $result .=  qq{ title="$title"};
             }
             $result .= $self->_DoAttributes($label);
             $result .= ">$link_text</a>";
@@ -836,17 +845,17 @@ sub _DoImages {
             
             my $label = $self->Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
-            if (! defined $self->{_titles}{$link_id}) {
-                $self->{_titles}{$link_id} = $alt_text;
-            }
+            #if (! defined $self->{_titles}{$link_id}) {
+            #    $self->{_titles}{$link_id} = $alt_text;
+            #}
             
-            $label = $self->{img_ids} ? q{ id="} . $label . q{"} : '';
+            $label = $self->{img_ids} ? qq{ id="$label"} : '';
             $result = qq{<img$label src="$url" alt="$alt_text"};
-            if (defined $self->{_titles}{$link_id}) {
+            if (length $link_id && defined $self->{_titles}{$link_id}) {
                 my $title = $self->{_titles}{$link_id};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
                 $title =~ s!  _ !$g_escape_table{'_'}!gx;
-                $result .=  " title=\"$title\"";
+                $result .=  qq{ title="$title"};
             }
             $result .= $self->_DoAttributes($link_id);
             $result .= $self->{empty_element_suffix};
@@ -871,7 +880,7 @@ sub _DoImages {
           \]
           \(            # literal paren
             [ \t]*
-            <?(\S+?)>?  # src url = $3
+            ($g_nested_parens)  # src url - href = $3
             [ \t]*
             (           # $4
               (['"])    # quote char = $5
@@ -895,19 +904,21 @@ sub _DoImages {
         $title    =~ s/"/&quot;/g;
         $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
         $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
+        $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
 
         my $label = $self->Header2Label($alt_text);
         $self->{_crossrefs}{$label} = "#$label";
 #       $self->{_titles}{$label} = $alt_text;          # FIXME - I think this line should not be here
-            
-        $result = qq{<img id="$label" src="$url" alt="$alt_text"};
+
+        $label = $self->{img_ids} ? qq{ id="$label"} : '';
+        $result = qq{<img$label src="$url" alt="$alt_text"};
         if (defined $title) {
             $title =~ s! \* !$g_escape_table{'*'}!gx;
             $title =~ s!  _ !$g_escape_table{'_'}!gx;
             $result .=  qq{ title="$title"};
         }
         $result .= $self->{empty_element_suffix};
-
+        
         $result;
     }xsge;
 
@@ -934,8 +945,10 @@ sub _DoHeaders {
         $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
-        $self->{_crossrefs}{$label} = "#$label";
-        $self->{_titles}{$label} = $header;
+        if ($label ne '') {
+            $self->{_crossrefs}{$label} = "#$label";
+            $self->{_titles}{$label} = $header;
+        }
         
         "<h1$label>"  .  $self->_RunSpanGamut($1)  .  "</h1>\n\n";
     }egmx;
@@ -944,8 +957,10 @@ sub _DoHeaders {
         $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
-        $self->{_crossrefs}{$label} = "#$label";
-        $self->{_titles}{$label} = $header;
+        if ($label ne '') {
+            $self->{_crossrefs}{$label} = "#$label";
+            $self->{_titles}{$label} = $header;
+        }
         
         "<h2$label>"  .  $self->_RunSpanGamut($1)  .  "</h2>\n\n";
     }egmx;
@@ -968,11 +983,13 @@ sub _DoHeaders {
             \n+
         }{
             my $h_level = length($1);
-            $label = $self->Header2Label($2);
             $header = $self->_RunSpanGamut($2);
             
-            $self->{_crossrefs}{$label} = "#$label";
-            $self->{_titles}{$label} = $header;
+            if ($self->{heading_ids}) {
+                $label = $self->Header2Label($2);
+                $self->{_crossrefs}{$label} = "#$label";
+                $self->{_titles}{$label} = $header;
+            }
             $l = $self->{heading_ids} ? $h_level . ' id="' . $label . '"' : $h_level;
             "<h$l>"  .  $header  .  "</h$h_level>\n\n";
         }egmx;
@@ -1143,30 +1160,30 @@ sub _DoCodeBlocks {
 
     my ($self, $text) = @_;
 
-    $text =~ s{
-            (?:\n\n|\A)
-            (               # $1 = the code block -- one or more lines, starting with a space/tab
-              (?:
-                (?:[ ]{$self->{tab_width}} | \t)  # Lines must start with a tab or a tab-width of spaces
-                .*\n+
-              )+
-            )
-            ((?=^[ ]{0,$self->{tab_width}}\S)|\Z) # Lookahead for non-space at line-start, or end of doc
-        }{
-            my $codeblock = $1;
-            my $result; # return value
+ 	$text =~ s{
+		(?:\n\n|\A)
+		(	            # $1 = the code block -- one or more lines, starting with a space/tab
+		  (?:
+		    (?:[ ]{$self->{tab_width}} | \t)  # Lines must start with a tab or a tab-width of spaces
+		    .*\n+
+		  )+
+		)
+		((?=^[ ]{0,$self->{tab_width}}\S)|\Z)	# Lookahead for non-space at line-start, or end of doc
+	}{
+    	my $codeblock = $1;
+    	my $result; # return value
 
-            $codeblock = $self->_EncodeCode($self->_Outdent($codeblock));
-            $codeblock = $self->_Detab($codeblock);
-            $codeblock =~ s/\A\n+//; # trim leading newlines
-            $codeblock =~ s/\s+\z//; # trim trailing whitespace
+    	$codeblock = $self->_EncodeCode($self->_Outdent($codeblock));
+    	$codeblock = $self->_Detab($codeblock);
+    	$codeblock =~ s/\A\n+//; # trim leading newlines
+    	$codeblock =~ s/\n+\z//; # trim trailing newlines
 
-            $result = "\n\n<pre><code>" . $codeblock . "\n</code></pre>\n\n";
+    	$result = "\n\n<pre><code>" . $codeblock . "\n</code></pre>\n\n";
 
-            $result;
-        }egmx;
+    	$result;
+	}egmx;
 
-    return $text;
+	return $text;
 }
 
 
@@ -1198,19 +1215,20 @@ sub _DoCodeSpans {
 
     my ($self, $text) = @_;
 
-    $text =~ s@
-            (`+)        # $1 = Opening run of `
-            (.+?)       # $2 = The code block
-            (?<!`)
-            \1          # Matching closer
-            (?!`)
-        @
-            my $c = "$2";
-            $c =~ s/^[ \t]*//g; # leading whitespace
-            $c =~ s/[ \t]*$//g; # trailing whitespace
-            $c = $self->_EncodeCode($c);
-            "<code>$c</code>";
-        @egsx;
+	$text =~ s@
+			(?<!\\)		# Character before opening ` can't be a backslash
+			(`+)		# $1 = Opening run of `
+			(.+?)		# $2 = The code block
+			(?<!`)
+			\1			# Matching closer
+			(?!`)
+		@
+ 			my $c = "$2";
+ 			$c =~ s/^[ \t]*//g; # leading whitespace
+ 			$c =~ s/[ \t]*$//g; # trailing whitespace
+ 			$c = $self->_EncodeCode($c);
+			"<code>$c</code>";
+		@egsx;
 
     return $text;
 }
