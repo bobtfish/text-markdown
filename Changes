@@ -31,7 +31,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Fix a big bug introduced in 1.0.4 in citations
         - Fix footnotes (and other small things) to match the test suite
         
-1.0.6
+1.0.6   2008-01-06T13:36:00
         - Merge latest Markdown test suite I can find, and make it all pass, 
           pulling in code from Markdown 1.0.2b8. Things fixed:
             - Inline HTML

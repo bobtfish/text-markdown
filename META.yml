@@ -19,4 +19,4 @@ requires:
   MIME::Base64: 0
   Scalar::Util: 0
   Text::Balanced: 0
-version: 1.0.6
+version: 1.0.7
