@@ -1,29 +1,30 @@
 Todo pre 1.0.6
    . Implement strip_metadata option.
    . Document img_ids and heading_ids options.
-   . Do not be seeding the random number generator on each page generation.
    . Document other metadata / global options (e.g. bibliography title)
-   . Look at (and fix if needed) Text::Markdown's RT#27482.
-   . http://code.google.com/p/python-markdown2/wiki/TestingNotes <- Steal 
-     these tests ;)
-   . http://code.google.com/p/python-markdown2/wiki/Extras <- Have a look at
-     these..
-   . http://six.pairlist.net/pipermail/markdown-discuss/2007-October/000837.html
-      Yet more tests!
-   . http://daringfireball.net/projects/downloads/MarkdownTest_1.0_2007-05-09.tgz
-       And more!
-   . http://six.pairlist.net/pipermail/markdown-discuss/2007-February/000543.html
-       Look at regex speedups!
-   . http://six.pairlist.net/pipermail/markdown-discuss/2006-December/000383.html
+
+Todo pre 1.0.7
+   . This is the release where I pull in all the other ideas and tests I can
+     URLs to look at are:
+       . http://code.google.com/p/python-markdown2/wiki/TestingNotes <- Steal 
+         these tests ;)
+       . http://code.google.com/p/python-markdown2/wiki/Extras <- Have a look at
+         these..
+       . http://six.pairlist.net/pipermail/markdown-discuss/2007-October/000837.html
+          Yet more tests!
+       . http://daringfireball.net/projects/downloads/MarkdownTest_1.0_2007-05-09.tgz
+           And more!
+       . http://six.pairlist.net/pipermail/markdown-discuss/2007-February/000543.html
+           Look at regex speedups!
+       . http://six.pairlist.net/pipermail/markdown-discuss/2006-December/000383.html
    
-Todo pre 1.0.7:
+Todo pre 1.0.8:
    . Document the markdown (and multimarkdown) syntaxes in the module
    . Make markdown / multimarkdown / stolen from the php version features 
      configurable at instance create time. (There should be an elegant way to 
      do this, but I can't think of it offhand).
-   . Make 21fulldocs-markdown.t pass without TODO.
      
-Todo pre 1.0.8:
+Todo pre 1.0.9:
    . Using configurable features, borg the Text::Markdown module, giving it a 
      test suite and a maintainer.
      
