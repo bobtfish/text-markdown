@@ -30,3 +30,18 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Add Markdown and MultiMarkdown test suites.
         - Fix a big bug introduced in 1.0.4 in citations
         - Fix footnotes (and other small things) to match the test suite
+        
+1.0.6
+        - Merge latest Markdown test suite I can find, and make it all pass, 
+          pulling in code from Markdown 1.0.2b8. Things fixed:
+            - Inline HTML
+            - Lists
+            - Metadata skipping by leading line breaks
+            - 3rd form of links
+        - Implement features to suppress id attributes in <img> and <hX> tags 
+          to be able to act more like original Markdown - now almost ready to
+          steal Text::Markdown (would want to turn off tables / citations and
+          bibliography for that)
+        - Move almost all the global variables into instance data.
+        - Fix unicode issues from CPAN.org's RT#27482
+        - Remove call to srand, it's not smart to do this more than once.
