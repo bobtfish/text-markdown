@@ -15,6 +15,7 @@ no_index:
     - t
 requires: 
   Digest::MD5: 0
+  Encode: 0
   List::Util: 0
   MIME::Base64: 0
   Scalar::Util: 0

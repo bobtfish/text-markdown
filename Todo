@@ -1,7 +1,4 @@
-Todo pre 1.0.6
-   . Document other metadata / global options (e.g. bibliography title)
-
-Todo pre 1.0.7
+Todo pre 1.0.8
    . Implement strip_metadata option.
    . This is the release where I pull in all the other ideas and tests I can
      URLs to look at are:
@@ -17,13 +14,13 @@ Todo pre 1.0.7
            Look at regex speedups!
        . http://six.pairlist.net/pipermail/markdown-discuss/2006-December/000383.html
    
-Todo pre 1.0.8:
+Todo pre 1.0.9:
    . Document the markdown (and multimarkdown) syntaxes in the module
    . Make markdown / multimarkdown / stolen from the php version features 
      configurable at instance create time. (There should be an elegant way to 
      do this, but I can't think of it offhand).
      
-Todo pre 1.0.9:
+Todo pre 1.0.10:
    . Using configurable features, borg the Text::Markdown module, giving it a 
      test suite and a maintainer.
      

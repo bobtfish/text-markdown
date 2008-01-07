@@ -45,3 +45,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Move almost all the global variables into instance data.
         - Fix unicode issues from CPAN.org's RT#27482
         - Remove call to srand, it's not smart to do this more than once.
+        
+1.0.7   2008-01-07T16:31:00
+        - Encode isn't in core in all perls, add it to Makefile.PL
+
