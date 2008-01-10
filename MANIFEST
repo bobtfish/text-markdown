@@ -1,15 +1,4 @@
 Changes
-inc/Module/AutoInstall.pm
-inc/Module/Install.pm
-inc/Module/Install/AutoInstall.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Text/MultiMarkdown.pm
 License.text
 Makefile.PL
@@ -20,5 +9,128 @@ Readme.text
 t/01use.t
 t/02pod.t
 t/03podcoverage.t
+t/03podspelling.t
 t/04markdown.t
 t/05options.t
+t/06wiki.t
+t/07fulldoc.t
+t/08exporter.t
+t/09base_url.t
+t/10use_metadata.t
+t/11docment_format.t
+t/12empty_element_suffix.t
+t/13multimarkdown-nometadata-firstpara.t
+t/20fulldocs-multimarkdown.t
+t/21fulldocs-markdown.t
+t/22fulldocs-multimarkdown-todo.t
+t/23fulldocs-markdown-todo.t
+t/24unicode.t
+t/docs-markdown/Amps and angle encoding.html
+t/docs-markdown/Amps and angle encoding.text
+t/docs-markdown/Auto links.html
+t/docs-markdown/Auto links.text
+t/docs-markdown/Backslash escapes.html
+t/docs-markdown/Backslash escapes.text
+t/docs-markdown/Blockquotes with code blocks.html
+t/docs-markdown/Blockquotes with code blocks.text
+t/docs-markdown/Code Blocks.html
+t/docs-markdown/Code Blocks.text
+t/docs-markdown/Code Spans.html
+t/docs-markdown/Code Spans.text
+t/docs-markdown/Hard-wrapped paragraphs with list-like lines.html
+t/docs-markdown/Hard-wrapped paragraphs with list-like lines.text
+t/docs-markdown/Horizontal rules.html
+t/docs-markdown/Horizontal rules.text
+t/docs-markdown/Images.html
+t/docs-markdown/Images.text
+t/docs-markdown/Inline HTML (Advanced).html
+t/docs-markdown/Inline HTML (Advanced).text
+t/docs-markdown/Inline HTML (Simple).html
+t/docs-markdown/Inline HTML (Simple).text
+t/docs-markdown/Inline HTML comments.html
+t/docs-markdown/Inline HTML comments.text
+t/docs-markdown/Links, inline style.html
+t/docs-markdown/Links, inline style.text
+t/docs-markdown/Links, reference style.html
+t/docs-markdown/Links, reference style.text
+t/docs-markdown/Links, shortcut references.html
+t/docs-markdown/Links, shortcut references.text
+t/docs-markdown/Literal quotes in titles.html
+t/docs-markdown/Literal quotes in titles.text
+t/docs-markdown/Markdown Documentation - Basics.html
+t/docs-markdown/Markdown Documentation - Basics.text
+t/docs-markdown/Markdown Documentation - Syntax.html
+t/docs-markdown/Markdown Documentation - Syntax.text
+t/docs-markdown/Nested blockquotes.html
+t/docs-markdown/Nested blockquotes.text
+t/docs-markdown/Ordered and unordered lists.html
+t/docs-markdown/Ordered and unordered lists.text
+t/docs-markdown/Strong and em together.html
+t/docs-markdown/Strong and em together.text
+t/docs-markdown/Tabs.html
+t/docs-markdown/Tabs.text
+t/docs-multimarkdown-todo/Amps and angle encoding.html
+t/docs-multimarkdown-todo/Amps and angle encoding.text
+t/docs-multimarkdown-todo/Email Obfuscation.html
+t/docs-multimarkdown-todo/Email Obfuscation.text
+t/docs-multimarkdown-todo/Tidyness.html
+t/docs-multimarkdown-todo/Tidyness.text
+t/docs-multimarkdown/Amps and angle encoding.html
+t/docs-multimarkdown/Amps and angle encoding.text
+t/docs-multimarkdown/Auto links.html
+t/docs-multimarkdown/Auto links.text
+t/docs-multimarkdown/Backslash escapes.html
+t/docs-multimarkdown/Backslash escapes.text
+t/docs-multimarkdown/Blockquotes with code blocks.html
+t/docs-multimarkdown/Blockquotes with code blocks.text
+t/docs-multimarkdown/Citations.html
+t/docs-multimarkdown/Citations.text
+t/docs-multimarkdown/Cross-References.html
+t/docs-multimarkdown/Cross-References.text
+t/docs-multimarkdown/Footnotes.html
+t/docs-multimarkdown/Footnotes.text
+t/docs-multimarkdown/Hard-wrapped paragraphs with list-like lines.html
+t/docs-multimarkdown/Hard-wrapped paragraphs with list-like lines.text
+t/docs-multimarkdown/Horizontal rules.html
+t/docs-multimarkdown/Horizontal rules.text
+t/docs-multimarkdown/Images.html
+t/docs-multimarkdown/Images.text
+t/docs-multimarkdown/Inline HTML (Advanced).html
+t/docs-multimarkdown/Inline HTML (Advanced).text
+t/docs-multimarkdown/Inline HTML (Simple).html
+t/docs-multimarkdown/Inline HTML (Simple).text
+t/docs-multimarkdown/Inline HTML comments.html
+t/docs-multimarkdown/Inline HTML comments.text
+t/docs-multimarkdown/Link Attributes.html
+t/docs-multimarkdown/Link Attributes.text
+t/docs-multimarkdown/Links, inline style.html
+t/docs-multimarkdown/Links, inline style.text
+t/docs-multimarkdown/Links, reference style.html
+t/docs-multimarkdown/Links, reference style.text
+t/docs-multimarkdown/Lists.html
+t/docs-multimarkdown/Lists.text
+t/docs-multimarkdown/Literal quotes in titles.html
+t/docs-multimarkdown/Literal quotes in titles.text
+t/docs-multimarkdown/Markdown Documentation - Basics.html
+t/docs-multimarkdown/Markdown Documentation - Basics.text
+t/docs-multimarkdown/Markdown Documentation - Syntax.html
+t/docs-multimarkdown/Markdown Documentation - Syntax.text
+t/docs-multimarkdown/Metadata (Complete).html
+t/docs-multimarkdown/Metadata (Complete).text
+t/docs-multimarkdown/Metadata (Snippet).html
+t/docs-multimarkdown/Metadata (Snippet).text
+t/docs-multimarkdown/Nested blockquotes.html
+t/docs-multimarkdown/Nested blockquotes.text
+t/docs-multimarkdown/Ordered and unordered lists.html
+t/docs-multimarkdown/Ordered and unordered lists.text
+t/docs-multimarkdown/Special Characters.html
+t/docs-multimarkdown/Special Characters.text
+t/docs-multimarkdown/Strong and em together.html
+t/docs-multimarkdown/Strong and em together.text
+t/docs-multimarkdown/Tables.html
+t/docs-multimarkdown/Tables.text
+t/docs-multimarkdown/Tabs.html
+t/docs-multimarkdown/Tabs.text
+t/docs-multimarkdown/Wiki Features.html
+t/docs-multimarkdown/Wiki Features.text
+Todo
