@@ -1,8 +1,23 @@
 Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 lib/Text/MultiMarkdown.pm
 License.text
+Makefile
+Makefile.old
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.bak
+MANIFEST.skip
 META.yml
 README
 Readme.text
@@ -20,117 +35,284 @@ t/10use_metadata.t
 t/11docment_format.t
 t/12empty_element_suffix.t
 t/13multimarkdown-nometadata-firstpara.t
+t/14unicode.t
 t/20fulldocs-multimarkdown.t
 t/21fulldocs-markdown.t
 t/22fulldocs-multimarkdown-todo.t
 t/23fulldocs-markdown-todo.t
-t/24unicode.t
-t/docs-markdown/Amps and angle encoding.html
-t/docs-markdown/Amps and angle encoding.text
-t/docs-markdown/Auto links.html
-t/docs-markdown/Auto links.text
-t/docs-markdown/Backslash escapes.html
-t/docs-markdown/Backslash escapes.text
-t/docs-markdown/Blockquotes with code blocks.html
-t/docs-markdown/Blockquotes with code blocks.text
-t/docs-markdown/Code Blocks.html
-t/docs-markdown/Code Blocks.text
-t/docs-markdown/Code Spans.html
-t/docs-markdown/Code Spans.text
-t/docs-markdown/Hard-wrapped paragraphs with list-like lines.html
-t/docs-markdown/Hard-wrapped paragraphs with list-like lines.text
-t/docs-markdown/Horizontal rules.html
-t/docs-markdown/Horizontal rules.text
+t/24fulldocs-pythonmarkdown2-tm.t
+t/26fulldocs-php-markdown.t
+t/27fulldocs-php-markdown-fails.t
+t/28fulldocs-php-markdown-extra.t
+t/docs-markdown/Amps_and_angle_encoding.html
+t/docs-markdown/Amps_and_angle_encoding.text
+t/docs-markdown/Auto_links.html
+t/docs-markdown/Auto_links.text
+t/docs-markdown/Backslash_escapes.html
+t/docs-markdown/Backslash_escapes.text
+t/docs-markdown/Blockquotes_with_code_blocks.html
+t/docs-markdown/Blockquotes_with_code_blocks.text
+t/docs-markdown/Code_Blocks.html
+t/docs-markdown/Code_Blocks.text
+t/docs-markdown/Code_Spans.html
+t/docs-markdown/Code_Spans.text
+t/docs-markdown/Hard-wrapped_paragraphs_with_list-like_lines.html
+t/docs-markdown/Hard-wrapped_paragraphs_with_list-like_lines.text
+t/docs-markdown/Horizontal_rules.html
+t/docs-markdown/Horizontal_rules.text
 t/docs-markdown/Images.html
 t/docs-markdown/Images.text
-t/docs-markdown/Inline HTML (Advanced).html
-t/docs-markdown/Inline HTML (Advanced).text
-t/docs-markdown/Inline HTML (Simple).html
-t/docs-markdown/Inline HTML (Simple).text
-t/docs-markdown/Inline HTML comments.html
-t/docs-markdown/Inline HTML comments.text
-t/docs-markdown/Links, inline style.html
-t/docs-markdown/Links, inline style.text
-t/docs-markdown/Links, reference style.html
-t/docs-markdown/Links, reference style.text
-t/docs-markdown/Links, shortcut references.html
-t/docs-markdown/Links, shortcut references.text
-t/docs-markdown/Literal quotes in titles.html
-t/docs-markdown/Literal quotes in titles.text
-t/docs-markdown/Markdown Documentation - Basics.html
-t/docs-markdown/Markdown Documentation - Basics.text
-t/docs-markdown/Markdown Documentation - Syntax.html
-t/docs-markdown/Markdown Documentation - Syntax.text
-t/docs-markdown/Nested blockquotes.html
-t/docs-markdown/Nested blockquotes.text
-t/docs-markdown/Ordered and unordered lists.html
-t/docs-markdown/Ordered and unordered lists.text
-t/docs-markdown/Strong and em together.html
-t/docs-markdown/Strong and em together.text
+t/docs-markdown/Inline_HTML_(Advanced).html
+t/docs-markdown/Inline_HTML_(Advanced).text
+t/docs-markdown/Inline_HTML_(Simple).html
+t/docs-markdown/Inline_HTML_(Simple).text
+t/docs-markdown/Inline_HTML_comments.html
+t/docs-markdown/Inline_HTML_comments.text
+t/docs-markdown/Links_inline_style.html
+t/docs-markdown/Links_inline_style.text
+t/docs-markdown/Links_reference_style.html
+t/docs-markdown/Links_reference_style.text
+t/docs-markdown/Links_shortcut_references.html
+t/docs-markdown/Links_shortcut_references.text
+t/docs-markdown/Literal_quotes_in_titles.html
+t/docs-markdown/Literal_quotes_in_titles.text
+t/docs-markdown/Markdown_Documentation_-_Basics.html
+t/docs-markdown/Markdown_Documentation_-_Basics.text
+t/docs-markdown/Markdown_Documentation_-_Syntax.html
+t/docs-markdown/Markdown_Documentation_-_Syntax.text
+t/docs-markdown/Nested_blockquotes.html
+t/docs-markdown/Nested_blockquotes.text
+t/docs-markdown/Ordered_and_unordered_lists.html
+t/docs-markdown/Ordered_and_unordered_lists.text
+t/docs-markdown/Strong_and_em_together.html
+t/docs-markdown/Strong_and_em_together.text
 t/docs-markdown/Tabs.html
 t/docs-markdown/Tabs.text
-t/docs-multimarkdown-todo/Amps and angle encoding.html
-t/docs-multimarkdown-todo/Amps and angle encoding.text
-t/docs-multimarkdown-todo/Email Obfuscation.html
-t/docs-multimarkdown-todo/Email Obfuscation.text
+t/docs-multimarkdown-todo/Amps_and_angle_encoding.html
+t/docs-multimarkdown-todo/Amps_and_angle_encoding.text
+t/docs-multimarkdown-todo/Email_Obfuscation.html
+t/docs-multimarkdown-todo/Email_Obfuscation.text
 t/docs-multimarkdown-todo/Tidyness.html
 t/docs-multimarkdown-todo/Tidyness.text
-t/docs-multimarkdown/Amps and angle encoding.html
-t/docs-multimarkdown/Amps and angle encoding.text
-t/docs-multimarkdown/Auto links.html
-t/docs-multimarkdown/Auto links.text
-t/docs-multimarkdown/Backslash escapes.html
-t/docs-multimarkdown/Backslash escapes.text
-t/docs-multimarkdown/Blockquotes with code blocks.html
-t/docs-multimarkdown/Blockquotes with code blocks.text
+t/docs-multimarkdown/Amps_and_angle_encoding.html
+t/docs-multimarkdown/Amps_and_angle_encoding.text
+t/docs-multimarkdown/Amps_and_angles_encoding-advanced.html
+t/docs-multimarkdown/Amps_and_angles_encoding-advanced.text
+t/docs-multimarkdown/Auto_links.html
+t/docs-multimarkdown/Auto_links.text
+t/docs-multimarkdown/Backslash_escapes.html
+t/docs-multimarkdown/Backslash_escapes.text
+t/docs-multimarkdown/Blockquotes_with_code_blocks.html
+t/docs-multimarkdown/Blockquotes_with_code_blocks.text
 t/docs-multimarkdown/Citations.html
 t/docs-multimarkdown/Citations.text
 t/docs-multimarkdown/Cross-References.html
 t/docs-multimarkdown/Cross-References.text
 t/docs-multimarkdown/Footnotes.html
 t/docs-multimarkdown/Footnotes.text
-t/docs-multimarkdown/Hard-wrapped paragraphs with list-like lines.html
-t/docs-multimarkdown/Hard-wrapped paragraphs with list-like lines.text
-t/docs-multimarkdown/Horizontal rules.html
-t/docs-multimarkdown/Horizontal rules.text
+t/docs-multimarkdown/Hard-wrapped_paragraphs_with_list-like_lines.html
+t/docs-multimarkdown/Hard-wrapped_paragraphs_with_list-like_lines.text
+t/docs-multimarkdown/Horizontal_rules.html
+t/docs-multimarkdown/Horizontal_rules.text
 t/docs-multimarkdown/Images.html
 t/docs-multimarkdown/Images.text
-t/docs-multimarkdown/Inline HTML (Advanced).html
-t/docs-multimarkdown/Inline HTML (Advanced).text
-t/docs-multimarkdown/Inline HTML (Simple).html
-t/docs-multimarkdown/Inline HTML (Simple).text
-t/docs-multimarkdown/Inline HTML comments.html
-t/docs-multimarkdown/Inline HTML comments.text
-t/docs-multimarkdown/Link Attributes.html
-t/docs-multimarkdown/Link Attributes.text
-t/docs-multimarkdown/Links, inline style.html
-t/docs-multimarkdown/Links, inline style.text
-t/docs-multimarkdown/Links, reference style.html
-t/docs-multimarkdown/Links, reference style.text
+t/docs-multimarkdown/Inline_HTML_(Advanced).html
+t/docs-multimarkdown/Inline_HTML_(Advanced).text
+t/docs-multimarkdown/Inline_HTML_(Simple).html
+t/docs-multimarkdown/Inline_HTML_(Simple).text
+t/docs-multimarkdown/Inline_HTML_comments.html
+t/docs-multimarkdown/Inline_HTML_comments.text
+t/docs-multimarkdown/Link_Attributes.html
+t/docs-multimarkdown/Link_Attributes.text
+t/docs-multimarkdown/Links_inline_style.html
+t/docs-multimarkdown/Links_inline_style.text
+t/docs-multimarkdown/Links_reference_style.html
+t/docs-multimarkdown/Links_reference_style.text
 t/docs-multimarkdown/Lists.html
 t/docs-multimarkdown/Lists.text
-t/docs-multimarkdown/Literal quotes in titles.html
-t/docs-multimarkdown/Literal quotes in titles.text
-t/docs-multimarkdown/Markdown Documentation - Basics.html
-t/docs-multimarkdown/Markdown Documentation - Basics.text
-t/docs-multimarkdown/Markdown Documentation - Syntax.html
-t/docs-multimarkdown/Markdown Documentation - Syntax.text
-t/docs-multimarkdown/Metadata (Complete).html
-t/docs-multimarkdown/Metadata (Complete).text
-t/docs-multimarkdown/Metadata (Snippet).html
-t/docs-multimarkdown/Metadata (Snippet).text
-t/docs-multimarkdown/Nested blockquotes.html
-t/docs-multimarkdown/Nested blockquotes.text
-t/docs-multimarkdown/Ordered and unordered lists.html
-t/docs-multimarkdown/Ordered and unordered lists.text
-t/docs-multimarkdown/Special Characters.html
-t/docs-multimarkdown/Special Characters.text
-t/docs-multimarkdown/Strong and em together.html
-t/docs-multimarkdown/Strong and em together.text
+t/docs-multimarkdown/Literal_quotes_in_titles.html
+t/docs-multimarkdown/Literal_quotes_in_titles.text
+t/docs-multimarkdown/Markdown_Documentation_-_Basics.html
+t/docs-multimarkdown/Markdown_Documentation_-_Basics.text
+t/docs-multimarkdown/Markdown_Documentation_-_Syntax.html
+t/docs-multimarkdown/Markdown_Documentation_-_Syntax.text
+t/docs-multimarkdown/Metadata_(Complete).html
+t/docs-multimarkdown/Metadata_(Complete).text
+t/docs-multimarkdown/Metadata_(Snippet).html
+t/docs-multimarkdown/Metadata_(Snippet).text
+t/docs-multimarkdown/Nested_blockquotes.html
+t/docs-multimarkdown/Nested_blockquotes.text
+t/docs-multimarkdown/Ordered_and_unordered_lists.html
+t/docs-multimarkdown/Ordered_and_unordered_lists.text
+t/docs-multimarkdown/Special_Characters.html
+t/docs-multimarkdown/Special_Characters.text
+t/docs-multimarkdown/Strong_and_em_together.html
+t/docs-multimarkdown/Strong_and_em_together.text
 t/docs-multimarkdown/Tables.html
 t/docs-multimarkdown/Tables.text
 t/docs-multimarkdown/Tabs.html
 t/docs-multimarkdown/Tabs.text
-t/docs-multimarkdown/Wiki Features.html
-t/docs-multimarkdown/Wiki Features.text
+t/docs-multimarkdown/Wiki_Features.html
+t/docs-multimarkdown/Wiki_Features.text
+t/docs-php-markdown-extra/Abbr.html
+t/docs-php-markdown-extra/Abbr.text
+t/docs-php-markdown-extra/Definition_Lists.html
+t/docs-php-markdown-extra/Definition_Lists.text
+t/docs-php-markdown-extra/Emphasis.html
+t/docs-php-markdown-extra/Emphasis.text
+t/docs-php-markdown-extra/Footnotes.html
+t/docs-php-markdown-extra/Footnotes.text
+t/docs-php-markdown-extra/Inline_HTML_with_Markdown_content.html
+t/docs-php-markdown-extra/Inline_HTML_with_Markdown_content.text
+t/docs-php-markdown-extra/Tables.html
+t/docs-php-markdown-extra/Tables.text
+t/docs-php-markdown-todo/Email_auto_links.html
+t/docs-php-markdown-todo/Email_auto_links.text
+t/docs-php-markdown-todo/Emphasis.html
+t/docs-php-markdown-todo/Emphasis.tags
+t/docs-php-markdown-todo/Emphasis.text
+t/docs-php-markdown-todo/Inline_HTML_(Span).html
+t/docs-php-markdown-todo/Inline_HTML_(Span).tags
+t/docs-php-markdown-todo/Inline_HTML_(Span).text
+t/docs-php-markdown-todo/Nesting.html
+t/docs-php-markdown-todo/Nesting.tags
+t/docs-php-markdown-todo/Nesting.text
+t/docs-php-markdown-todo/Parens_in_URL.html
+t/docs-php-markdown-todo/Parens_in_URL.text
+t/docs-php-markdown/Backslash_escapes.html
+t/docs-php-markdown/Backslash_escapes.text
+t/docs-php-markdown/Code_block_in_a_list_item.html
+t/docs-php-markdown/Code_block_in_a_list_item.text
+t/docs-php-markdown/Code_Spans.html
+t/docs-php-markdown/Code_Spans.text
+t/docs-php-markdown/Headers.html
+t/docs-php-markdown/Headers.text
+t/docs-php-markdown/Images_(Untitled).html
+t/docs-php-markdown/Images_(Untitled).text
+t/docs-php-markdown/Inline_HTML_(Simple).html
+t/docs-php-markdown/Inline_HTML_(Simple).text
+t/docs-php-markdown/Inline_HTML_comments.html
+t/docs-php-markdown/Inline_HTML_comments.text
+t/docs-php-markdown/Ins_&_del.html
+t/docs-php-markdown/Ins_&_del.text
+t/docs-php-markdown/Links_inline_style.html
+t/docs-php-markdown/Links_inline_style.text
+t/docs-php-markdown/PHP-Specific_Bugs.html
+t/docs-php-markdown/PHP-Specific_Bugs.text
+t/docs-php-markdown/Tight_blocks.html
+t/docs-php-markdown/Tight_blocks.text
+t/docs-pythonmarkdown2-tm-cases-pass/auto_link.html
+t/docs-pythonmarkdown2-tm-cases-pass/auto_link.text
+t/docs-pythonmarkdown2-tm-cases-pass/auto_link_safe_mode.html
+t/docs-pythonmarkdown2-tm-cases-pass/auto_link_safe_mode.opts
+t/docs-pythonmarkdown2-tm-cases-pass/auto_link_safe_mode.tags
+t/docs-pythonmarkdown2-tm-cases-pass/auto_link_safe_mode.text
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode.html
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode.opts
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode.tags
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode.text
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode_escape.html
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode_escape.opts
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode_escape.tags
+t/docs-pythonmarkdown2-tm-cases-pass/basic_safe_mode_escape.text
+t/docs-pythonmarkdown2-tm-cases-pass/blockquote.html
+t/docs-pythonmarkdown2-tm-cases-pass/blockquote.text
+t/docs-pythonmarkdown2-tm-cases-pass/blockquote_with_pre.html
+t/docs-pythonmarkdown2-tm-cases-pass/blockquote_with_pre.text
+t/docs-pythonmarkdown2-tm-cases-pass/code_block_with_tabs.html
+t/docs-pythonmarkdown2-tm-cases-pass/code_block_with_tabs.tags
+t/docs-pythonmarkdown2-tm-cases-pass/code_block_with_tabs.text
+t/docs-pythonmarkdown2-tm-cases-pass/code_safe_emphasis.html
+t/docs-pythonmarkdown2-tm-cases-pass/code_safe_emphasis.opts
+t/docs-pythonmarkdown2-tm-cases-pass/code_safe_emphasis.tags
+t/docs-pythonmarkdown2-tm-cases-pass/code_safe_emphasis.text
+t/docs-pythonmarkdown2-tm-cases-pass/codeblock.html
+t/docs-pythonmarkdown2-tm-cases-pass/codeblock.text
+t/docs-pythonmarkdown2-tm-cases-pass/codespans.html
+t/docs-pythonmarkdown2-tm-cases-pass/codespans.text
+t/docs-pythonmarkdown2-tm-cases-pass/codespans_safe_mode.html
+t/docs-pythonmarkdown2-tm-cases-pass/codespans_safe_mode.opts
+t/docs-pythonmarkdown2-tm-cases-pass/codespans_safe_mode.tags
+t/docs-pythonmarkdown2-tm-cases-pass/codespans_safe_mode.text
+t/docs-pythonmarkdown2-tm-cases-pass/emacs_head_vars.html
+t/docs-pythonmarkdown2-tm-cases-pass/emacs_head_vars.tags
+t/docs-pythonmarkdown2-tm-cases-pass/emacs_head_vars.text
+t/docs-pythonmarkdown2-tm-cases-pass/emacs_tail_vars.html
+t/docs-pythonmarkdown2-tm-cases-pass/emacs_tail_vars.tags
+t/docs-pythonmarkdown2-tm-cases-pass/emacs_tail_vars.text
+t/docs-pythonmarkdown2-tm-cases-pass/emphasis.html
+t/docs-pythonmarkdown2-tm-cases-pass/emphasis.text
+t/docs-pythonmarkdown2-tm-cases-pass/escapes.html
+t/docs-pythonmarkdown2-tm-cases-pass/escapes.text
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes.html
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes.opts
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes.text
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_letters.html
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_letters.opts
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_letters.tags
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_letters.text
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_markup.html
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_markup.opts
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_markup.tags
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_markup.text
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_safe_mode_escape.html
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_safe_mode_escape.opts
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_safe_mode_escape.tags
+t/docs-pythonmarkdown2-tm-cases-pass/footnotes_safe_mode_escape.text
+t/docs-pythonmarkdown2-tm-cases-pass/header.html
+t/docs-pythonmarkdown2-tm-cases-pass/header.text
+t/docs-pythonmarkdown2-tm-cases-pass/hr.html
+t/docs-pythonmarkdown2-tm-cases-pass/hr.text
+t/docs-pythonmarkdown2-tm-cases-pass/img_in_link.html
+t/docs-pythonmarkdown2-tm-cases-pass/img_in_link.text
+t/docs-pythonmarkdown2-tm-cases-pass/inline_links.html
+t/docs-pythonmarkdown2-tm-cases-pass/inline_links.text
+t/docs-pythonmarkdown2-tm-cases-pass/issue2_safe_mode_borks_markup.html
+t/docs-pythonmarkdown2-tm-cases-pass/issue2_safe_mode_borks_markup.opts
+t/docs-pythonmarkdown2-tm-cases-pass/issue2_safe_mode_borks_markup.tags
+t/docs-pythonmarkdown2-tm-cases-pass/issue2_safe_mode_borks_markup.text
+t/docs-pythonmarkdown2-tm-cases-pass/link_defn_alt_title_delims.html
+t/docs-pythonmarkdown2-tm-cases-pass/link_defn_alt_title_delims.text
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns.html
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns.opts
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns.text
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_double_hit.html
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_double_hit.opts
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_double_hit.tags
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_double_hit.text
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_edge_cases.html
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_edge_cases.opts
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_edge_cases.tags
+t/docs-pythonmarkdown2-tm-cases-pass/link_patterns_edge_cases.text
+t/docs-pythonmarkdown2-tm-cases-pass/lists.html
+t/docs-pythonmarkdown2-tm-cases-pass/lists.text
+t/docs-pythonmarkdown2-tm-cases-pass/mismatched_footnotes.html
+t/docs-pythonmarkdown2-tm-cases-pass/mismatched_footnotes.opts
+t/docs-pythonmarkdown2-tm-cases-pass/mismatched_footnotes.text
+t/docs-pythonmarkdown2-tm-cases-pass/missing_link_defn.html
+t/docs-pythonmarkdown2-tm-cases-pass/missing_link_defn.text
+t/docs-pythonmarkdown2-tm-cases-pass/nested_list.html
+t/docs-pythonmarkdown2-tm-cases-pass/nested_list.text
+t/docs-pythonmarkdown2-tm-cases-pass/nested_list_safe_mode.html
+t/docs-pythonmarkdown2-tm-cases-pass/nested_list_safe_mode.opts
+t/docs-pythonmarkdown2-tm-cases-pass/nested_list_safe_mode.tags
+t/docs-pythonmarkdown2-tm-cases-pass/nested_list_safe_mode.text
+t/docs-pythonmarkdown2-tm-cases-pass/parens_in_url_4.html
+t/docs-pythonmarkdown2-tm-cases-pass/parens_in_url_4.tags
+t/docs-pythonmarkdown2-tm-cases-pass/parens_in_url_4.text
+t/docs-pythonmarkdown2-tm-cases-pass/raw_html.html
+t/docs-pythonmarkdown2-tm-cases-pass/raw_html.text
+t/docs-pythonmarkdown2-tm-cases-pass/ref_links.html
+t/docs-pythonmarkdown2-tm-cases-pass/ref_links.text
+t/docs-pythonmarkdown2-tm-cases-pass/sublist-para.html
+t/docs-pythonmarkdown2-tm-cases-pass/sublist-para.tags
+t/docs-pythonmarkdown2-tm-cases-pass/sublist-para.text
+t/docs-pythonmarkdown2-tm-cases-pass/syntax_color.html
+t/docs-pythonmarkdown2-tm-cases-pass/syntax_color.opts
+t/docs-pythonmarkdown2-tm-cases-pass/syntax_color.tags
+t/docs-pythonmarkdown2-tm-cases-pass/syntax_color.text
+t/docs-pythonmarkdown2-tm-cases-pass/tricky_anchors.html
+t/docs-pythonmarkdown2-tm-cases-pass/tricky_anchors.text
+t/docs-pythonmarkdown2-tm-cases-pass/underline_in_autolink.html
+t/docs-pythonmarkdown2-tm-cases-pass/underline_in_autolink.text
 Todo
