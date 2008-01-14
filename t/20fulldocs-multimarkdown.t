@@ -14,6 +14,8 @@ eval {
 if (!$@) {
     *difftest = sub {
         my ($got, $expected, $testname) = @_;
+        $got .= "\n";
+        $expected .= "\n";
         if ($got eq $expected) {
             pass($testname);
             return;

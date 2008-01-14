@@ -173,7 +173,7 @@ __END__
 
 <p>un*fucking*believable - *this text is surrounded by literal asterisks*, but the text before that should be bold according to the docs, but isn't FIXME!</p>
 
-<p><img id="alttext" src="/path/to/img.jpg" alt="Alt text" title="" /></p>
+<p><img id="alttext" src="/path/to/img.jpg" alt="Alt text" /></p>
 
 <p><img id="alttext2" src="/path/to/img2.jpg" alt="Alt text2" title="Optional title" /></p>
 

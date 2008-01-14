@@ -2,17 +2,10 @@ Todo pre 1.0.8
    . Implement strip_metadata option.
    . This is the release where I pull in all the other ideas and tests I can
      URLs to look at are:
-       . http://code.google.com/p/python-markdown2/wiki/TestingNotes <- Steal 
-         these tests ;)
        . http://code.google.com/p/python-markdown2/wiki/Extras <- Have a look at
          these..
-       . http://six.pairlist.net/pipermail/markdown-discuss/2007-October/000837.html
-          Yet more tests!
-       . http://daringfireball.net/projects/downloads/MarkdownTest_1.0_2007-05-09.tgz
-           And more!
        . http://six.pairlist.net/pipermail/markdown-discuss/2007-February/000543.html
            Look at regex speedups!
-       . http://six.pairlist.net/pipermail/markdown-discuss/2006-December/000383.html
    
 Todo pre 1.0.9:
    . Document the markdown (and multimarkdown) syntaxes in the module

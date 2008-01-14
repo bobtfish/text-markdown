@@ -941,7 +941,7 @@ sub _DoImages {
             
             $label = $self->{img_ids} ? qq{ id="$label"} : '';
             $result = qq{<img$label src="$url" alt="$alt_text"};
-            if (length $link_id && defined $self->{_titles}{$link_id}) {
+            if (length $link_id && defined $self->{_titles}{$link_id} && length $self->{_titles}{$link_id}) {
                 my $title = $self->{_titles}{$link_id};
                 $title =~ s! \* !$g_escape_table{'*'}!gx;
                 $title =~ s!  _ !$g_escape_table{'_'}!gx;
@@ -1002,7 +1002,7 @@ sub _DoImages {
 
         $label = $self->{img_ids} ? qq{ id="$label"} : '';
         $result = qq{<img$label src="$url" alt="$alt_text"};
-        if (defined $title) {
+        if (defined $title && length $title) {
             $title =~ s! \* !$g_escape_table{'*'}!gx;
             $title =~ s!  _ !$g_escape_table{'_'}!gx;
             $result .=  qq{ title="$title"};
