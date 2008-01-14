@@ -54,4 +54,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Do not emit title attribute in <img> tags unless we have contents 
           for it. This was a 'feature' of original Markdown where I've decided 
           to go with what php-markdown does (tests updated).
-        - Added php-markdown tests.
+        - Added php-markdown tests (most/all of the regular tests pass except 
+          the email obfu one).
+        - Added php-markdown extra tests (all fail).
+        - Added python markdown tests (mostly pass).

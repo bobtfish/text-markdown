@@ -1,21 +1,22 @@
 Todo pre 1.0.8
-   . Implement strip_metadata option.
-   . This is the release where I pull in all the other ideas and tests I can
-     URLs to look at are:
-       . http://code.google.com/p/python-markdown2/wiki/Extras <- Have a look at
-         these..
-       . http://six.pairlist.net/pipermail/markdown-discuss/2007-February/000543.html
-           Look at regex speedups!
-   
+    . Implement strip_metadata option.
+    . Integrate maruku (ruby port) test cases.
+    . Make all the tests pass again..
+
 Todo pre 1.0.9:
-   . Document the markdown (and multimarkdown) syntaxes in the module
-   . Make markdown / multimarkdown / stolen from the php version features 
-     configurable at instance create time. (There should be an elegant way to 
-     do this, but I can't think of it offhand).
-     
+    . Make markdown / multimarkdown / stolen from the php version features 
+      configurable at instance create time. (There should be an elegant way to 
+      do this, but I can't think of it offhand).
+    . Using configurable features, borg the Text::Markdown module, giving it a 
+      test suite and a maintainer.
+
 Todo pre 1.0.10:
-   . Using configurable features, borg the Text::Markdown module, giving it a 
-     test suite and a maintainer.
+   . Have a look at extra features in 
+     http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
+     we consider useful on the roadmap.
+   . Have a look at the php markdown extra tests to see if we want to steal 
+     any of those features.
+   . Document the markdown (and multimarkdown) syntaxes in the module
      
 Todo pre 1.1:
    . Build a parse tree when parsing (which can be returned), rather than just 
