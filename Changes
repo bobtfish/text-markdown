@@ -49,3 +49,9 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 1.0.7   2008-01-07T16:31:00
         - Encode isn't in core in all perls, add it to Makefile.PL
 
+1.0.8  2008-01-??T??:??:??
+        - Do not encode amps or angle brackets in HTML comments + test case. 
+        - Do not emit title attribute in <img> tags unless we have contents 
+          for it. This was a 'feature' of original Markdown where I've decided 
+          to go with what php-markdown does (tests updated).
+        - Added php-markdown tests.
