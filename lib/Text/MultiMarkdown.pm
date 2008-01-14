@@ -1488,6 +1488,18 @@ sub _EncodeAmpsAndAngles {
 #   $text =~ s{>(?![a-z/?\$!])}{&gt;}gi;
 #   Causes problems...
 
+    # Remove encoding inside comments
+    $text =~ s{
+        (?<=<!--) # Begin comment
+        (.*?)     # Anything inside
+        (?=-->)   # End comments
+    }{
+        my $t = $1;
+        $t =~ s/&amp;/&/g;
+        $t =~ s/&lt;/</g;
+        $t;
+    }egsx;
+
     return $text;
 }
 
