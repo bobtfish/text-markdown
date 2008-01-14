@@ -78,7 +78,7 @@ Controls the metadata options below.
 
 =item strip_metadata
 
-Not implemented yet.
+If true, any metadata in the input document is removed from the output document (note - does not take effect in complete document format).
 
 =item empty element suffix
 
@@ -285,6 +285,7 @@ sub markdown {
     local $self->{empty_element_suffix} = exists $options->{empty_element_suffix} ? $options->{empty_element_suffix} : $self->{empty_element_suffix};
     local $self->{document_format}      = exists $options->{document_format}      ? $options->{document_format}      : $self->{document_format};
     local $self->{use_metadata}         = exists $options->{use_metadata}         ? $options->{use_metadata}         : $self->{use_metadata};
+    local $self->{strip_metadata}       = exists $options->{strip_metadata}       ? $options->{strip_metadata}       : $self->{strip_metadata};
     
     if (exists $options->{tab_width}) {
         local $self->{tab_width} = $options->{tab_width};
@@ -345,7 +346,7 @@ sub _Markdown {
     $text =~ s/^[ \t]+$//mg;
     
     # Strip out MetaData
-    $text = $self->_ParseMetaData($text) if $self->{use_metadata};
+    $text = $self->_ParseMetaData($text) if ($self->{use_metadata} || $self->{strip_metadata});
 
     # And recheck for leading blank lines
     $text =~ s/^\n+//s;
@@ -767,7 +768,6 @@ sub _DoAnchors {
         my $result;
         my $whole_match = $1;
         my $link_text   = $2;
-        #warn("Got match $1 text $2");
         my $link_id     = lc $3;
 
         if ($link_id eq "") {
@@ -1699,6 +1699,7 @@ sub _ParseMetaData { # FIXME - This is really really ugly!
     foreach my $line ( split /\n/, $text ) {
         $line =~ /^\s*$/ and $inMetaData = 0 and $clean_text .= $line and next;
         if ($inMetaData) {
+            next unless $self->{use_metadata}; # We can come in here as use_metadata => 0, strip_metadata => 1
             if ($line =~ /^([a-zA-Z0-9][0-9a-zA-Z _-]+?):\s*(.*)$/ ) {
                 $currentKey = $1;
                 $currentKey =~ s/  / /g;
@@ -1856,9 +1857,11 @@ sub xhtmlMetaData {
     foreach my $key (sort keys %{$self->{_metadata}} ) {
         if (lc($key) eq "title") {
             $result.= "\t\t<title>$self->{_metadata}{$key}</title>\n";
-        } elsif (lc($key) eq "css") {
+        } 
+        elsif (lc($key) eq "css") {
             $result.= qq[\t\t<link type="text/css" rel="stylesheet" href="$self->{_metadata}{$key}"$self->{empty_element_suffix}\n];
-        } else {
+        } 
+        else {
             $result.= qq[\t\t<meta name="$key" content="$self->{_metadata}{$key}"$self->{empty_element_suffix}\n];
         }
     }
@@ -1877,6 +1880,8 @@ sub textMetaData {
     my ($self) = @_;
     my $result = "";
     
+    return $result if $self->{strip_metadata};
+
     foreach my $key (sort keys %{$self->{_metadata}} ) {
         $result .= "$key: $self->{_metadata}{$key}\n";
     }
