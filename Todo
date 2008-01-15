@@ -1,6 +1,4 @@
 Todo pre 1.0.8
-    . Implement strip_metadata option.
-    . Integrate maruku (ruby port) test cases.
     . Make all the tests pass again..
 
 Todo pre 1.0.9:
@@ -14,6 +12,8 @@ Todo pre 1.0.10:
    . Have a look at extra features in 
      http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
      we consider useful on the roadmap.
+   . Integrate maruku (ruby port) test cases properly, and go looking for 
+     more.
    . Have a look at the php markdown extra tests to see if we want to steal 
      any of those features.
    . Document the markdown (and multimarkdown) syntaxes in the module
