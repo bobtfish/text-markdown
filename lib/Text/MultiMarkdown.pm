@@ -1763,6 +1763,8 @@ sub _StripFootnoteDefinitions {
 sub _DoFootnotes {
     my ($self, $text) = @_;
     
+    return '' unless length $text;
+    
     # First, run routines that get skipped in footnotes
     foreach my $label (sort keys %{ $self->{_footnotes} }) {
         my $footnote = $self->_RunBlockGamut($self->{_footnotes}{$label});
@@ -1783,7 +1785,6 @@ sub _DoFootnotes {
         my $id = $self->Header2Label($1);
         
         if (defined $self->{_footnotes}{$id} ) {
-#           $result = "<footnote>$self->{_footnotes}{$self->Header2Label($id)}</footnote>"
             $footnote_counter++;
             $result = qq{<a href="#$id" id="f$id" class="footnote">$footnote_counter</a>};
             push (@{ $self->{_used_footnotes} }, $id);
