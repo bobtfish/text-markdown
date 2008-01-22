@@ -60,3 +60,6 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Added python markdown tests (mostly pass, but marked broken).
         - Add a way of stopping inline HTML blocks from suppressing markdown    
           processing. Feature request from #catalyst-dev 
+
+1.0.9  2008-01-22T20:28:00
+        - Ship non-broken dist at CPAN (oops, rushing!)

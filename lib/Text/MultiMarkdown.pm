@@ -171,7 +171,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.0.8';
+our $VERSION   = '1.0.9';
 our @EXPORT_OK = qw(markdown);
 
 ## Disabled; causes problems under Perl 5.6.1:
