@@ -1,12 +1,14 @@
-Todo pre 1.0.8
-    . Make all the tests pass again..
-
 Todo pre 1.0.9:
     . Make markdown / multimarkdown / stolen from the php version features 
       configurable at instance create time. (There should be an elegant way to 
       do this, but I can't think of it offhand).
     . Using configurable features, borg the Text::Markdown module, giving it a 
       test suite and a maintainer.
+    . Fix bugs with multi-line code spans reported by #catalyst-dev
+    . Fix bug with block level HTML elements not being picked up if they're 
+      indented (see TODO test in t/15inlinehtmldoesnoturnoffmarkdown.t)
+    . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
+      feature on breaks things.
 
 Todo pre 1.0.10:
    . Have a look at extra features in 

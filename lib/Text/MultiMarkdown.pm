@@ -102,6 +102,10 @@ The title of the generated bibliography, defaults to 'Bibliography'.
 
 Controls indent width in the generated markup, defaults to 4
 
+=item markdown_in_html_blocks
+
+Controls if Markdown is processed when inside HTML blocks. Defaults to 0.
+
 =back
 
 A number of possible items of metadata can also be supplied as options. 
@@ -242,6 +246,9 @@ sub new {
     # NOTE: You can use \WikiWord to prevent a WikiWord from being treated as a link
     $p{use_wikilinks} = $p{use_wikilinks} ? 1 : 0;
     
+    # Is markdown processed in HTML blocks? See t/15inlinehtmldonotturnoffmarkdown.t
+    $p{markdown_in_html_blocks} = $p{markdown_in_html_blocks} ? 1 : 0;
+    
     $p{heading_ids} = defined $p{heading_ids} ? $p{heading_ids} : 1;
     $p{img_ids}     = defined $p{img_ids}     ? $p{img_ids}     : 1;
     
@@ -281,12 +288,13 @@ sub markdown {
         
     # Localise all of these settings, so that if they're frobbed by options here (or metadata later), the change will not persist.
     # FIXME - There should be a nicer way to do this...
-    local $self->{use_wikilinks}        = exists $options->{use_wikilinks}        ? $options->{use_wikilinks}        : $self->{use_wikilinks};
-    local $self->{empty_element_suffix} = exists $options->{empty_element_suffix} ? $options->{empty_element_suffix} : $self->{empty_element_suffix};
-    local $self->{document_format}      = exists $options->{document_format}      ? $options->{document_format}      : $self->{document_format};
-    local $self->{use_metadata}         = exists $options->{use_metadata}         ? $options->{use_metadata}         : $self->{use_metadata};
-    local $self->{strip_metadata}       = exists $options->{strip_metadata}       ? $options->{strip_metadata}       : $self->{strip_metadata};
-    
+    local $self->{use_wikilinks}            = exists $options->{use_wikilinks}          ? $options->{use_wikilinks}          : $self->{use_wikilinks};
+    local $self->{empty_element_suffix}     = exists $options->{empty_element_suffix}   ? $options->{empty_element_suffix}   : $self->{empty_element_suffix};
+    local $self->{document_format}          = exists $options->{document_format}        ? $options->{document_format}        : $self->{document_format};
+    local $self->{use_metadata}             = exists $options->{use_metadata}           ? $options->{use_metadata}           : $self->{use_metadata};
+    local $self->{strip_metadata}           = exists $options->{strip_metadata}         ? $options->{strip_metadata}         : $self->{strip_metadata};
+    local $self->{markdown_in_html_blocks}  = exists $options->{markdown_in_html_blocks}? $options->{markdown_in_html_blocks}: $self->{markdown_in_html_blocks};
+
     if (exists $options->{tab_width}) {
         local $self->{tab_width} = $options->{tab_width};
     }    
@@ -352,7 +360,7 @@ sub _Markdown {
     $text =~ s/^\n+//s;
 
     # Turn block-level HTML blocks into hash entries
-    $text = $self->_HashHTMLBlocks($text);
+    $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     # Strip link definitions, store in hashes.
     $text = $self->_StripFootnoteDefinitions($text);
@@ -595,7 +603,6 @@ sub _HashHTMLBlocks {
 				$self->{_html_blocks}{$key} = $1;
 				"\n\n" . $key . "\n\n";
 			}egx;
-
 
 	return $text;
 }
