@@ -12,6 +12,9 @@ my $html1 = $m->markdown(<<"EOF");
 Heading
 =======
 
+ * List item 1
+ * List item 2
+
 </div>
 EOF
 
@@ -20,11 +23,13 @@ is( $html1, <<"EOF" );
 
 <h1>Heading</h1>
 
+<ul>
+<li>List item 1</li>
+<li>List item 2</li>
+</ul>
 </div>
 EOF
 
-{
-    local $TODO = 'I would expect this to work, but it doesnt - bug!';
     my $html2 = $m->markdown(<<"EOF");
  <div>
 
@@ -33,12 +38,10 @@ Heading
 
  </div>
 EOF
-    is( $html1, <<"EOF" );
+    is( $html2, <<"EOF" );
 <div>
 
 <h1>Heading</h1>
 
-</div>
+ </div>
 EOF
-
-};
