@@ -63,3 +63,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 
 1.0.9  2008-01-22T20:28:00
         - Ship non-broken dist at CPAN (oops, rushing!)
+
+1.0.10 2008-01-23T15:40:00
+        - Fix bug with links procsiing in HTML blocks.
+        

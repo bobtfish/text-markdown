@@ -1,3 +1,4 @@
+Makefile.PL
 Changes
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
@@ -12,7 +13,6 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Text/MultiMarkdown.pm
 License.text
-Makefile.PL
 MANIFEST			This list of files
 MANIFEST.skip
 META.yml
@@ -34,6 +34,7 @@ t/12empty_element_suffix.t
 t/13multimarkdown-nometadata-firstpara.t
 t/14unicode.t
 t/15inlinehtmldoenoturnoffmarkdown.t
+t/16blockquotemultiline.t
 t/20fulldocs-multimarkdown.t
 t/21fulldocs-markdown.t
 t/22fulldocs-multimarkdown-todo.t

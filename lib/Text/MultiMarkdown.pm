@@ -171,7 +171,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.0.9';
+our $VERSION   = '1.0.10';
 our @EXPORT_OK = qw(markdown);
 
 ## Disabled; causes problems under Perl 5.6.1:
@@ -624,7 +624,7 @@ sub _RunBlockGamut {
     $text = $self->_DoTables($text);
     
     # And now, protect our tables
-    $text = $self->_HashHTMLBlocks($text);
+    $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     # Do Horizontal Rules:
     $text =~ s{^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$}{\n<hr$self->{empty_element_suffix}\n}gmx;

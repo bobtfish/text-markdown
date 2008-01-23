@@ -1,12 +1,10 @@
-Todo pre 1.0.9:
+Todo pre 1.0.11:
     . Make markdown / multimarkdown / stolen from the php version features 
       configurable at instance create time. (There should be an elegant way to 
       do this, but I can't think of it offhand).
     . Using configurable features, borg the Text::Markdown module, giving it a 
       test suite and a maintainer.
-    . Fix bugs with multi-line code spans reported by #catalyst-dev
-    . Fix bug with block level HTML elements not being picked up if they're 
-      indented (see TODO test in t/15inlinehtmldoesnoturnoffmarkdown.t)
+    . Fix bugs with multi-line code spans reported by #catalyst-dev (t/16)
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
 
