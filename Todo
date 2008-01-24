@@ -6,8 +6,6 @@ Todo pre 1.0.12:
       do this, but I can't think of it offhand).
     . Using configurable features, borg the Text::Markdown module, giving it a 
       test suite and a maintainer.
-    . Work out why multi line (indent) code blocks don't work for 
-      #catalyst-dev (http://catwiki.toeat.com/fromtrac/amazonxsl)
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
 
