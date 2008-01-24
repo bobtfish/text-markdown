@@ -171,7 +171,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.0.11';
+our $VERSION   = '1.0.12';
 our @EXPORT_OK = qw(markdown);
 
 ## Disabled; causes problems under Perl 5.6.1:
@@ -1123,7 +1123,7 @@ sub _DoLists {
               (?=\S)
               (?!                       # Negative lookahead for another list item marker
                 [ \t]*
-                ${marker_any}[ \t]+
+                \3[ \t]+                # FIXME - makes perl crap itself, This used to be ${marker_any}[ \t]+
               )
           )
         )
@@ -1157,7 +1157,9 @@ sub _DoLists {
                 # Turn double returns into triple returns, so that we can make a
                 # paragraph for the last item in a list, if necessary:
                 $list =~ s/\n{2,}/\n\n\n/g;
-                my $result = $self->_ProcessListItems($list, $marker_any);
+                my $result = ( $list_type eq 'ul' ) ?
+                    $self->_ProcessListItems($list, $marker_ul)
+                  : $self->_ProcessListItems($list, $marker_ol);
                 $result = "<$list_type>\n" . $result . "</$list_type>\n";
                 $result;
             }egmx;
@@ -1172,7 +1174,9 @@ sub _DoLists {
                 # Turn double returns into triple returns, so that we can make a
                 # paragraph for the last item in a list, if necessary:
                 $list =~ s/\n{2,}/\n\n\n/g;
-                my $result = $self->_ProcessListItems($list, $marker_any);
+                my $result = ( $list_type eq 'ul' ) ?
+                    $self->_ProcessListItems($list, $marker_ul)
+                  : $self->_ProcessListItems($list, $marker_ol);
                 $result = "<$list_type>\n" . $result . "</$list_type>\n";
                 $result;
             }egmx;

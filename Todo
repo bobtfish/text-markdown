@@ -1,4 +1,8 @@
 Todo pre 1.0.12:
+    . Stop perl shitting itself due to regex backreference when doing lists 
+      (see FIXME in code)
+
+Todo pre 1.0.13:
     . Perl 5.8.0 appears to have started hating MultiMarkdown (see CPANTS 
       fails), be fixing this.
     . Make markdown / multimarkdown / stolen from the php version features 
@@ -9,7 +13,7 @@ Todo pre 1.0.12:
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
 
-Todo pre 1.0.10:
+Todo pre 1.0.14:
    . Have a look at extra features in 
      http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
      we consider useful on the roadmap.
