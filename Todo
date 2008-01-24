@@ -1,10 +1,13 @@
-Todo pre 1.0.11:
+Todo pre 1.0.12:
+    . Perl 5.8.0 appears to have started hating MultiMarkdown (see CPANTS 
+      fails), be fixing this.
     . Make markdown / multimarkdown / stolen from the php version features 
       configurable at instance create time. (There should be an elegant way to 
       do this, but I can't think of it offhand).
     . Using configurable features, borg the Text::Markdown module, giving it a 
       test suite and a maintainer.
-    . Fix bugs with multi-line code spans reported by #catalyst-dev (t/16)
+    . Work out why multi line (indent) code blocks don't work for 
+      #catalyst-dev (http://catwiki.toeat.com/fromtrac/amazonxsl)
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
 
