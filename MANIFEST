@@ -1,13 +1,12 @@
-Makefile.PL
 Changes
 inc/Module/AutoInstall.pm
+inc/Module/Install/Makefile.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Include.pm
-inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
@@ -18,6 +17,7 @@ MANIFEST.skip
 META.yml
 README
 Readme.text
+Makefile.PL
 t/01use.t
 t/02pod.t
 t/03podcoverage.t
@@ -34,7 +34,7 @@ t/12empty_element_suffix.t
 t/13multimarkdown-nometadata-firstpara.t
 t/14unicode.t
 t/15inlinehtmldoenoturnoffmarkdown.t
-t/16blockquotemultiline.t
+t/17olulreportedonlist.t
 t/20fulldocs-multimarkdown.t
 t/21fulldocs-markdown.t
 t/22fulldocs-multimarkdown-todo.t

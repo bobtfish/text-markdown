@@ -71,3 +71,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Fix syntax error in one of the tests. Note to self - just fixing 
           that warning in the test case, then shipping without retesting, NOT 
           SMART!
+          
+1.0.12 2008-01-??T??:??:??
+        - Fix bug in ul/ol formatting when there is no separating block. 
+          Fix and test contributed by Kztk Matsuda, thanks!
