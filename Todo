@@ -1,6 +1,8 @@
 Todo pre 1.0.12:
     . Stop perl shitting itself due to regex backreference when doing lists 
       (see FIXME in code)
+      See also: http://public.activestate.com/cgi-bin/perlbrowse?patch_num=26334&show_patch=Show+Patch
+     . Stop test fails against perl 5.10 (aghhh!)
 
 Todo pre 1.0.13:
     . Perl 5.8.0 appears to have started hating MultiMarkdown (see CPANTS 
