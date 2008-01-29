@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use_ok('Text::MultiMarkdown', 'markdown');
 
@@ -30,10 +30,9 @@ my $html2 = $m->markdown(<<"EOF");
 - ## Heading 2
 EOF
 
-is( $html2, <<"EOF" );
+is( $html2, <<'EOF' );
 <ul>
 <li><h1>Heading 1</h1></li>
 <li><h2>Heading 2</h2></li>
 </ul>
 EOF
-s
