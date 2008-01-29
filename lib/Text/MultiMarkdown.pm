@@ -1094,106 +1094,153 @@ sub _DoHeaders {
     return $text;
 }
 
-
-sub _DoLists {
-#
-# Form HTML ordered (numbered) and unordered (bulleted) lists.
-#
-    my ($self, $text) = @_;
-    my $less_than_tab = $self->{tab_width} - 1;
-
+{
     # Re-usable patterns to match list item bullets and number markers:
     my $marker_ul  = qr/[*+-]/;
     my $marker_ol  = qr/\d+[.]/;
-    my $marker_any = qr/(?:$marker_ul|$marker_ol)/;
+    
+    sub _ProcessListLikeLine {
+        my ($self, %p) = @_;
+        my $list_type = ($p{marker} =~ m/$marker_ul/) ? "ul" : "ol";
+        chomp($p{contents});
+        if (0 == $self->{_list_level}) {
+            $self->{_list_level}++;
+            $self->{_list_current} = {   
+                mode        => 'tight', 
+                type        => $list_type, 
+                spacelevel  => $p{space}, 
+                items       => [$p{contents}],
+            };
+        }
+        else {
+            # Different type of list, close last list, start a new one - don't change level.
+            if ($list_type ne $self->{_list_current}->{type}) {
+                push(@{$self->{_out_lines}}, $self->{_list_current});
+                $self->{_list_current} = {   
+                    mode        => 'tight', 
+                    type        => $list_type, 
+                    spacelevel  => $p{space}, 
+                    items       => [$p{contents}], 
+                };
+            }
+            # Same type of list, append next item.
+            else {
+                push(@{$self->{_list_current}->{items}}, $p{contents});
+            }
+        }
+    }
 
-    # Re-usable pattern to match any entirel ul or ol list:
-    my $whole_list = qr{
-        (                               # $1 = whole list
-          (                             # $2
-            [ ]{0,$less_than_tab}
-            (${marker_any})             # $3 = first list item marker
-            [ \t]+
-          )
-          (?s:.+?)
-          (                             # $4
-              \z
-            |
-              \n{2,}
-              (?=\S)
-              (?!                       # Negative lookahead for another list item marker
-                [ \t]*
-                \3[ \t]+                # FIXME - makes perl crap itself, This used to be ${marker_any}[ \t]+
-              )
-          )
-        )
-    }mx;
+    sub _ProcessNotListLikeLine {
+        my ( $self, $line ) = @_;
+        if ($self->{_list_level} > 0) {
+            # Is this indented correctly to be a continuation?
+            # Push line onto last list item if so..
+            # FIXME - We assume it's a continuation if there is any leading whitespace.
+            $line =~ s/^(\s*)(.*)/$2/;
+            my $indent = length $1;
+            my $content_length = length $line;
+            if (0 == $content_length) {
+                $self->{_list_current}->{items}[$#{$self->{_list_current}->{items}}] .= "\n";
+            } 
+            elsif ( 0 == $indent ) { # List block over.
+                push(@{$self->{_out_lines}}, $self->{_list_current});
+                $self->{_list_current} = undef;
+                $self->{_list_level} = 0;
+            }
+            else { # Is indented, continuation
+                $self->{_list_current}->{items}[$#{$self->{_list_current}->{items}}] .= "\n" . $line;
+            } 
+        }
+        else {
+            if ($line =~ /^\s*$/) {
+                $self->{_list_level} = 0 if (-1 == $self->{_list_level}); 
+            }
+            else {
+                $self->{_list_level} = -1 if (0 == $self->{_list_level});
+            }
+            push(@{$self->{_out_lines}}, $line);
+        }
+    }
 
-    # We use a different prefix before nested lists than top-level lists.
-    # See extended comment in _ProcessListItems().
+    sub _DoLists {
     #
-    # Note: There's a bit of duplication here. My original implementation
-    # created a scalar regex pattern as the conditional result of the test on
-    # $self->{_list_level}, and then only ran the $text =~ s{...}{...}egmx
-    # substitution once, using the scalar as the pattern. This worked,
-    # everywhere except when running under MT on my hosting account at Pair
-    # Networks. There, this caused all rebuilds to be killed by the reaper (or
-    # perhaps they crashed, but that seems incredibly unlikely given that the
-    # same script on the same server ran fine *except* under MT. I've spent
-    # more time trying to figure out why this is happening than I'd like to
-    # admit. My only guess, backed up by the fact that this workaround works,
-    # is that Perl optimizes the substition when it can figure out that the
-    # pattern will never change, and when this optimization isn't on, we run
-    # afoul of the reaper. Thus, the slightly redundant code to that uses two
-    # static s/// patterns rather than one conditional pattern.
+    # Form HTML ordered (numbered) and unordered (bulleted) lists.
+    #
+        my ($self, $text) = @_;
 
-    if ($self->{_list_level}) {
-        $text =~ s{
-                ^
-                $whole_list
-            }{
-                my $list = $1;
-                my $list_type = ($3 =~ m/$marker_ul/) ? "ul" : "ol";
-                # Turn double returns into triple returns, so that we can make a
-                # paragraph for the last item in a list, if necessary:
-                $list =~ s/\n{2,}/\n\n\n/g;
-                my $result = ( $list_type eq 'ul' ) ?
-                    $self->_ProcessListItems($list, $marker_ul)
-                  : $self->_ProcessListItems($list, $marker_ol);
-                $result = "<$list_type>\n" . $result . "</$list_type>\n";
-                $result;
-            }egmx;
+        my @in_lines = split /\n/, $text;
+        $self->{_out_lines} = [];
+    
+        $self->{_list_level} = 0; # -1 indicates inside a text block
+        $self->{_list_current} = undef;
+    
+        foreach my $line (@in_lines) {
+            if ( my ($startspace, $marker, $postspace, $contents) = 
+                    $line =~ m/^([ ]{0,})($marker_ul|$marker_ol)(\s+)(.+)/
+            ) {
+                $self->_ProcessListLikeLine(
+                    marker   => $marker,
+                    contents => $contents,
+                    space    => length($startspace . $marker . $postspace),
+                );
+            } # We don't find a list item marker... Deal with continuations on a new line
+            else { # by appending to the current item. A blank line forces change of item...
+                $self->_ProcessNotListLikeLine($line);
+            }
+        }
+        if ($self->{_list_current}) {
+            push(@{$self->{_out_lines}}, $self->{_list_current});
+        }
+    
+        use Data::Dumper;
+        warn Dumper $self->{_out_lines};
+    
+        my $out;
+        foreach my $line (@{$self->{_out_lines}}) {
+            if (ref $line) {
+                $out .= sprintf("<%s>\n%s\n</%s>\n\n", 
+                    $line->{type}, 
+                    join("\n", 
+                        map { 
+                            if ( 'loose' eq $line->{mode} ) {
+                                "<li>" . $self->_RunBlockGamut($_) . "</li>";
+                            }
+                            else {
+                                "<li>" . $self->_RunSpanGamut($_) . "</li>";
+                            }
+                        }
+                        @{ $line->{items} } 
+                    ), 
+                    $line->{type}
+                );
+            } 
+            else {
+                $out .= $line . "\n";
+            }
+        }
+    
+        $out =~ s/\n\n$/\n/;
+        return $out;
     }
-    else {
-        $text =~ s{
-                (?:(?<=\n\n)|\A\n?)
-                $whole_list
-            }{
-                my $list = $1;
-                my $list_type = ($3 =~ m/$marker_ul/) ? "ul" : "ol";
-                # Turn double returns into triple returns, so that we can make a
-                # paragraph for the last item in a list, if necessary:
-                $list =~ s/\n{2,}/\n\n\n/g;
-                my $result = ( $list_type eq 'ul' ) ?
-                    $self->_ProcessListItems($list, $marker_ul)
-                  : $self->_ProcessListItems($list, $marker_ol);
-                $result = "<$list_type>\n" . $result . "</$list_type>\n";
-                $result;
-            }egmx;
-    }
-
-
-    return $text;
 }
 
-
-sub _ProcessListItems {
-#
-#   Process the contents of a single ordered or unordered list, splitting it
-#   into individual list items.
-#
-
-    my ($self, $list_str, $marker_any) = @_;
+        # We use a different prefix before nested lists than top-level lists.
+        # See extended comment in _ProcessListItems().
+        #
+        # Note: There's a bit of duplication here. My original implementation
+        # created a scalar regex pattern as the conditional result of the test on
+        # $self->{_list_level}, and then only ran the $text =~ s{...}{...}egmx
+        # substitution once, using the scalar as the pattern. This worked,
+        # everywhere except when running under MT on my hosting account at Pair
+        # Networks. There, this caused all rebuilds to be killed by the reaper (or
+        # perhaps they crashed, but that seems incredibly unlikely given that the
+        # same script on the same server ran fine *except* under MT. I've spent
+        # more time trying to figure out why this is happening than I'd like to
+        # admit. My only guess, backed up by the fact that this workaround works,
+        # is that Perl optimizes the substition when it can figure out that the
+        # pattern will never change, and when this optimization isn't on, we run
+        # afoul of the reaper. Thus, the slightly redundant code to that uses two
+        # static s/// patterns rather than one conditional pattern.
 
 
     # The $self->{_list_level} global keeps track of when we're inside a list.
@@ -1217,40 +1264,6 @@ sub _ProcessListItems {
     # change the syntax rules such that sub-lists must start with a
     # starting cardinal number; e.g. "1." or "a.".
 
-    $self->{_list_level}++;
-
-    # trim trailing blank lines:
-    $list_str =~ s/\n{2,}\z/\n/;
-
-
-    $list_str =~ s{
-        (\n)?                           # leading line = $1
-        (^[ \t]*)                       # leading whitespace = $2
-        ($marker_any) [ \t]+            # list marker = $3
-        ((?s:.+?)                       # list item text   = $4
-        (\n{1,2}))
-        (?= \n* (\z | \2 ($marker_any) [ \t]+))
-    }{
-        my $item = $4;
-        my $leading_line = $1;
-        my $leading_space = $2;
-
-        if ($leading_line or ($item =~ m/\n{2,}/)) {
-            $item = $self->_RunBlockGamut($self->_Outdent($item));
-        }
-        else {
-            # Recursion for sub-lists:
-            $item = $self->_DoLists($self->_Outdent($item));
-            chomp $item;
-            $item = $self->_RunSpanGamut($item);
-        }
-
-        "<li>" . $item . "</li>\n";
-    }egmx;
-
-    $self->{_list_level}--;
-    return $list_str;
-}
 
 
 
