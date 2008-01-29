@@ -1098,98 +1098,154 @@ sub _DoHeaders {
     # Re-usable patterns to match list item bullets and number markers:
     my $marker_ul  = qr/[*+-]/;
     my $marker_ol  = qr/\d+[.]/;
+
+    sub _shift_line {
+        my ($self) = @_;
+        return shift(@{ $self->{_in_lines} });
+    }
     
-    sub _ProcessListLikeLine {
-        my ($self, %p) = @_;
-        my $list_type = ($p{marker} =~ m/$marker_ul/) ? "ul" : "ol";
-        chomp($p{contents});
-        if (0 == $self->{_list_level}) {
-            $self->{_list_level}++;
-            $self->{_list_current} = {   
-                mode        => 'tight', 
-                type        => $list_type, 
-                spacelevel  => $p{space}, 
-                items       => [$p{contents}],
-            };
-        }
-        else {
-            # Different type of list, close last list, start a new one - don't change level.
-            if ($list_type ne $self->{_list_current}->{type}) {
-                push(@{$self->{_out_lines}}, $self->{_list_current});
-                $self->{_list_current} = {   
-                    mode        => 'tight', 
-                    type        => $list_type, 
-                    spacelevel  => $p{space}, 
-                    items       => [$p{contents}], 
-                };
-            }
-            # Same type of list, append next item.
-            else {
-                push(@{$self->{_list_current}->{items}}, $p{contents});
-            }
+    sub _unshift_line {
+        my ($self, @lines) = @_;
+        return unshift(@{ $self->{_in_lines} }, @lines);
+    }
+    
+    sub _stack_line {
+        my ($self, $line) = @_;
+        push( @{$self->{_stacked_lines}}, $line);
+    }
+    
+    sub _unstack_line {
+        my ($self) = @_;
+        return shift(@{$self->{_stacked_lines}});
+    }
+    
+    sub _out_line {
+        my ($self, $line) = @_;
+        push( @{ $self->{_out_lines} }, $line);
+    }
+    
+    sub _in_list {
+        my ($self) = @_;
+        return 1 if $self->{_list_current};
+    }
+    
+    sub _parseline_forlist {
+        my ($self, $line) = @_;
+        warn("PARSE LINE $line");
+        my %p;
+        return unless ($p{prespace}, $p{marker}, $p{postspace}, $p{contents}) = $line =~ m/^([ ]{0,})($marker_ul|$marker_ol)(\s+)(.+)/;
+        $p{type} = ($p{marker} =~ m/$marker_ul/) ? 'ul' : 'ol';
+        return \%p;
+    }
+    
+    sub _current_list_absorblinestack {
+        my ($self) = @_;
+        while (defined(my $l = $self->_unstack_line)) {
+            warn("Throwing away stacked line $l");
         }
     }
-
-    sub _ProcessNotListLikeLine {
-        my ( $self, $line ) = @_;
-        if ($self->{_list_level} > 0) {
-            # Is this indented correctly to be a continuation?
-            # Push line onto last list item if so..
-            # FIXME - We assume it's a continuation if there is any leading whitespace.
-            $line =~ s/^(\s*)(.*)/$2/;
-            my $indent = length $1;
-            my $content_length = length $line;
-            if (0 == $content_length) {
-                $self->{_list_current}->{items}[$#{$self->{_list_current}->{items}}] .= "\n";
-            } 
-            elsif ( 0 == $indent ) { # List block over.
-                push(@{$self->{_out_lines}}, $self->{_list_current});
-                $self->{_list_current} = undef;
-                $self->{_list_level} = 0;
-            }
-            else { # Is indented, continuation
-                $self->{_list_current}->{items}[$#{$self->{_list_current}->{items}}] .= "\n" . $line;
-            } 
+    
+    sub _list_current_finish {
+        my ($self) = @_;
+        if ($self->{_list_current}) {
+            $self->_current_list_absorblinestack;
+            $self->_out_line($self->{_list_current});
         }
-        else {
-            if ($line =~ /^\s*$/) {
-                $self->{_list_level} = 0 if (-1 == $self->{_list_level}); 
-            }
-            else {
-                $self->{_list_level} = -1 if (0 == $self->{_list_level});
-            }
-            push(@{$self->{_out_lines}}, $line);
-        }
+        $self->{_list_current} = undef;
+    }
+    use Data::Dumper;
+    sub _list_current_fromline {
+        my ($self, $line) = @_;
+        warn("CURRENT LINE IS " . Dumper($line));
+        confess("Already a current list") if $self->{_list_current};
+        my $list = {
+            feature  => 'list',
+            type     => delete($line->{type}),
+            contents => [ $line ],
+        };
+        warn("CREATED LIST" . Dumper($list));
+        $self->{_list_current} = $list;
+    }
+    
+    sub _list_current_additem {
+        my ($self, $line) = @_;
+        confess("No current list") unless $self->{_list_current};
+        confess("Current list is a different type!") unless ($self->{_list_current}->{type} eq $line->{type});
+        delete($line->{type});
+        push( @{ $self->{_list_current}->{contents} }, $line );
     }
 
     sub _DoLists {
-    #
     # Form HTML ordered (numbered) and unordered (bulleted) lists.
-    #
         my ($self, $text) = @_;
 
-        my @in_lines = split /\n/, $text;
+        $self->{_in_lines} = [ split /\n/, $text ];
         $self->{_out_lines} = [];
+        $self->{_stacked_lines} = []; 
     
-        $self->{_list_level} = 0; # -1 indicates inside a text block
         $self->{_list_current} = undef;
     
-        foreach my $line (@in_lines) {
-            if ( my ($startspace, $marker, $postspace, $contents) = 
-                    $line =~ m/^([ ]{0,})($marker_ul|$marker_ol)(\s+)(.+)/
-            ) {
-                $self->_ProcessListLikeLine(
-                    marker   => $marker,
-                    contents => $contents,
-                    space    => length($startspace . $marker . $postspace),
-                );
-            } # We don't find a list item marker... Deal with continuations on a new line
-            else { # by appending to the current item. A blank line forces change of item...
-                $self->_ProcessNotListLikeLine($line);
+        while ( defined(my $line = $self->_shift_line) ) {
+            warn("WORKING FOR LINE $line");
+            if ( ! $self->_in_list ) {
+                warn("Not currently in list");
+                if (my $p = $self->_parseline_forlist($line)) {
+                    # Not in a list already, looked like a list item, generate a new list / item
+                    $self->_list_current_fromline($p);
+                }
+                else {
+                    # Doesn't look like a list, not in a list already, push line straight to output.
+                    $self->_out_line($line);
+                }
+            }
+            else {
+                warn("Am currently in list");
+                if (my $p = $self->_parseline_forlist($line)) {
+                    warn("Parsed as a list line");
+                    # Looked like a list item, already in a list.
+                    # Is this a new list, or an item on the current list?
+                    # Note - also deal with back-tracking to a previous level in multi-level lists
+                    warn("P type " . $p->{type}. " current ". $self->{_list_current}->{type});
+                    if ($p->{type} ne $self->{_list_current}->{type}) { # FIXME, use a method here? :)
+                        # New list (different seperator).
+                        $self->_list_current_finish;
+                        $self->_list_current_fromline($p);
+                    }
+                    else {
+                        if (0 == 1) { # Are we at a greater/lesser depth, if so, do the right thing with sub-lists
+                            
+                        }
+                        else { # Same depth, just add the line
+                            $self->_list_current_additem($p)
+                        }
+                    }
+                    
+                }
+                else {
+                    warn("Parsed not as a list line");
+                    # Are in a list, but this didn't look like a list line.
+                    # If it was a blank line, add it to the line stack.
+                    # If this is indented, add it to the line stack. (Note, needs to cope with multi-level lists correctly)
+                    if ($line =~ /^\s*$/) {
+                        warn("STACKING WHITESPACE LINE '$line'");
+                        $self->_stack_line($line);
+                    }
+                    elsif ($line =~ /^\s+\S/) {
+                        warn("STACKING INDENTED LINE '$line");
+                        $self->_stack_line($line); # FIXME, just adds to stack (i.e. last item) if indented at all.
+                    }
+                    else { # If this isn't indented, close list!
+                        warn("Not indented, closing list and outputting line '$line'");
+                        $self->_list_current_finish;
+                        $self->_out_line($line);
+                    }
+                }
             }
         }
+        # Deal with the case where we get to the end of document, with a list item still considered 'current'.
         if ($self->{_list_current}) {
-            push(@{$self->{_out_lines}}, $self->{_list_current});
+            $self->_current_list_absorblinestack;
+            $self->_out_line($self->{_list_current});
         }
     
         use Data::Dumper;
@@ -1198,18 +1254,19 @@ sub _DoHeaders {
         my $out;
         foreach my $line (@{$self->{_out_lines}}) {
             if (ref $line) {
-                $out .= sprintf("<%s>\n%s\n</%s>\n\n", 
+                $out .= sprintf("<%s>\n%s\n</%s>\n", 
                     $line->{type}, 
                     join("\n", 
-                        map { 
-                            if ( 'loose' eq $line->{mode} ) {
+                        map { # FIXME!
+                            if ( defined $line->{mode} && 'loose' eq $line->{mode} ) {
                                 "<li>" . $self->_RunBlockGamut($_) . "</li>";
                             }
                             else {
                                 "<li>" . $self->_RunSpanGamut($_) . "</li>";
                             }
                         }
-                        @{ $line->{items} } 
+                        map { $_->{contents} }
+                        @{ $line->{contents} } 
                     ), 
                     $line->{type}
                 );

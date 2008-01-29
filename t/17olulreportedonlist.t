@@ -30,7 +30,7 @@ foo
 </ol>
 bar
 EOF
-
+exit;
 my $html2 = $m->_DoLists(<<'EOF');
 foo
 
