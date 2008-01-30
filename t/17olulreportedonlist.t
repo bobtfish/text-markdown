@@ -1,5 +1,5 @@
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use_ok('Text::MultiMarkdown', 'markdown');
 
@@ -24,13 +24,15 @@ foo
 <li>a</li>
 <li>b</li>
 </ul>
+
 <ol>
 <li>1</li>
 <li>2</li>
 </ol>
+
 bar
 EOF
-exit;
+
 my $html2 = $m->_DoLists(<<'EOF');
 foo
 
@@ -90,5 +92,29 @@ back.</p></li>
 <li><p>Item 2.</p></li>
 <li><p>Item 3.</p></li>
 </ol>
+
 bar
 EOF
+
+my $html5 = $m->_DoLists(<<'EOF');
+1. First
+2. Second:
+	* Fee
+	* Fie
+	* Foe
+3. Third
+EOF
+
+is( $html5, <<'EOF' );
+<ol>
+<li>First</li>
+<li>Second:
+<ul>
+<li>Fee</li>
+<li>Fie</li>
+<li>Foe</li>
+</ul></li>
+<li>Third</li>
+</ol>
+EOF
+

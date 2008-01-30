@@ -1119,6 +1119,17 @@ sub _DoHeaders {
         return shift(@{$self->{_stacked_lines}});
     }
     
+    sub _unstack_all {
+        my ($self, $curline) = @_;
+        warn("Unshift curline $curline");
+        $self->_unshift_line($curline);
+        while (defined(my $l = $self->_unstack_line)) {
+            warn("Unshift line $l");
+            $self->_unshift_line($l);
+        }
+        warn("Queued lines are: " . Dumper($self->{_in_lines}));
+    }
+    
     sub _out_line {
         my ($self, $line) = @_;
         push( @{ $self->{_out_lines} }, $line);
@@ -1138,17 +1149,22 @@ sub _DoHeaders {
         return \%p;
     }
     
-    sub _current_list_absorblinestack {
+    sub _current_list_item_absorblinestack {
         my ($self) = @_;
         while (defined(my $l = $self->_unstack_line)) {
-            warn("Throwing away stacked line $l");
+            warn("Added '$l' to stack");
+            my $c = $self->{_list_current}->{contents};
+            warn("CONTENTS" . Dumper($c));
+            my $item = $c->[$#{ $c }];
+            my $indent = length($item->{marker} . $item->{prespace} . $item->{postspace});
+            $l =~ s/^\s{0,$indent}//; # Trim the leading indent whitespace.
+            $item->{contents} .= "\n" . $l;
         }
     }
     
     sub _list_current_finish {
         my ($self) = @_;
         if ($self->{_list_current}) {
-            $self->_current_list_absorblinestack;
             $self->_out_line($self->{_list_current});
         }
         $self->{_list_current} = undef;
@@ -1208,14 +1224,18 @@ sub _DoHeaders {
                     warn("P type " . $p->{type}. " current ". $self->{_list_current}->{type});
                     if ($p->{type} ne $self->{_list_current}->{type}) { # FIXME, use a method here? :)
                         # New list (different seperator).
+                        # Finish current list, unstack everything and iterate again
+                        # FIXME - trailing paragraph bug?
                         $self->_list_current_finish;
-                        $self->_list_current_fromline($p);
+                        $self->_unstack_all($line);
+                        # Throw 
                     }
                     else {
                         if (0 == 1) { # Are we at a greater/lesser depth, if so, do the right thing with sub-lists
                             
                         }
-                        else { # Same depth, just add the line
+                        else { # Same depth, absorb any stack into the last item, and just add the line
+                            $self->_current_list_item_absorblinestack;
                             $self->_list_current_additem($p)
                         }
                     }
@@ -1234,17 +1254,17 @@ sub _DoHeaders {
                         warn("STACKING INDENTED LINE '$line");
                         $self->_stack_line($line); # FIXME, just adds to stack (i.e. last item) if indented at all.
                     }
-                    else { # If this isn't indented, close list!
+                    else { # If this isn't indented, close list then give back any lines captured and restart
                         warn("Not indented, closing list and outputting line '$line'");
                         $self->_list_current_finish;
-                        $self->_out_line($line);
+                        $self->_unstack_all($line);
                     }
                 }
             }
         }
         # Deal with the case where we get to the end of document, with a list item still considered 'current'.
         if ($self->{_list_current}) {
-            $self->_current_list_absorblinestack;
+            $self->_current_list_item_absorblinestack; #FIXME
             $self->_out_line($self->{_list_current});
         }
     
@@ -1254,11 +1274,13 @@ sub _DoHeaders {
         my $out;
         foreach my $line (@{$self->{_out_lines}}) {
             if (ref $line) {
+                warn(Dumper($line));
                 $out .= sprintf("<%s>\n%s\n</%s>\n", 
                     $line->{type}, 
                     join("\n", 
-                        map { # FIXME!
-                            if ( defined $line->{mode} && 'loose' eq $line->{mode} ) {
+                        map {
+                            s/\s+$//;
+                            if ( $self->_list_is_loose($line) ) {
                                 "<li>" . $self->_RunBlockGamut($_) . "</li>";
                             }
                             else {
@@ -1278,6 +1300,13 @@ sub _DoHeaders {
     
         $out =~ s/\n\n$/\n/;
         return $out;
+    }
+    
+    sub _list_is_loose {
+        my ($self, $list) = @_;
+        my $n =  grep { $_->{contents} =~ /\n/ } @{ $list->{contents} };
+        print "N is $n\n";
+        return 1 if $n;
     }
 }
 

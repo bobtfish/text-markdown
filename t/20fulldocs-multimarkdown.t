@@ -60,6 +60,10 @@ sub get_files {
     my $DH;
     opendir($DH, $docsdir) or die("Could not open $docsdir");
     my @files = uniq map { s/\.(html|text)$// ? $_ : (); } readdir($DH);
+    if (scalar @ARGV) { # Supply an argument and I'll run only part of the suite..
+        my $arg = shift(@ARGV);
+        @files = grep { /$arg/ } @files;
+    }
     closedir($DH);
     return @files;
 }
