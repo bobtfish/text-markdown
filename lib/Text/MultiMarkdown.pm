@@ -168,12 +168,15 @@ This is the base URL for referencing wiki pages. In this is not supplied, all wi
 
 use Digest::MD5 qw(md5_hex);
 use Encode      qw();
-use Carp        qw(croak);
+use Carp        qw(croak confess);
 use base        'Exporter';
 
 our $VERSION   = '1.0.12';
 our @EXPORT_OK = qw(markdown);
 
+BEGIN: {
+        *_warn = sub {};
+}
 ## Disabled; causes problems under Perl 5.6.1:
 # use utf8;
 # binmode( STDOUT, ":utf8" );  # c.f.: http://acis.openlib.org/dev/perl-unicode-struggle.html
@@ -1121,13 +1124,13 @@ sub _DoHeaders {
     
     sub _unstack_all {
         my ($self, $curline) = @_;
-        warn("Unshift curline $curline");
+        _warn("Unshift curline $curline");
         $self->_unshift_line($curline);
         while (defined(my $l = $self->_unstack_line)) {
-            warn("Unshift line $l");
+            _warn("Unshift line $l");
             $self->_unshift_line($l);
         }
-        warn("Queued lines are: " . Dumper($self->{_in_lines}));
+        _warn("Queued lines are: " . Dumper($self->{_in_lines}));
     }
     
     sub _out_line {
@@ -1142,24 +1145,50 @@ sub _DoHeaders {
     
     sub _parseline_forlist {
         my ($self, $line) = @_;
-        warn("PARSE LINE $line");
+        _warn("PARSE LINE $line");
         my %p;
-        return unless ($p{prespace}, $p{marker}, $p{postspace}, $p{contents}) = $line =~ m/^([ ]{0,})($marker_ul|$marker_ol)(\s+)(.+)/;
+        return unless ($p{prespace}, $p{marker}, $p{postspace}, $p{contents}) = $line =~ m/^(\s{0,})($marker_ul|$marker_ol)(\s+)(.+)/;
         $p{type} = ($p{marker} =~ m/$marker_ul/) ? 'ul' : 'ol';
+        $p{contents} = [ $p{contents} ];
         return \%p;
     }
     
+    use List::Util qw( max sum );
     sub _current_list_item_absorblinestack {
         my ($self) = @_;
         while (defined(my $l = $self->_unstack_line)) {
-            warn("Added '$l' to stack");
+            _warn("Added '$l' to stack");
             my $c = $self->{_list_current}->{contents};
-            warn("CONTENTS" . Dumper($c));
+            _warn("CONTENTS" . Dumper($c));
             my $item = $c->[$#{ $c }];
-            my $indent = length($item->{marker} . $item->{prespace} . $item->{postspace});
+            my $indent = max( $self->_list_depths($self->{_list_current}) );
             $l =~ s/^\s{0,$indent}//; # Trim the leading indent whitespace.
-            $item->{contents} .= "\n" . $l;
+            push( @{ $item->{contents} }, $l);
         }
+    }
+    
+    sub _list_depth {
+        my ($self, $list) = @_;
+        my @depths = $self->_list_depths($list);
+        _warn("DEPTHS " . Dumper(\@depths));
+        return sum( @depths ) / scalar( @{ $list->{contents} } );
+    }
+    
+    sub _list_depths {
+        my ($self, $list) = @_;
+        use Data::Dumper;
+        confess("AGHH") unless (ref $list && ref($list->{contents}));
+        _warn("AGHHH" . Dumper($list->{contents}));
+        my $t = ' ' x $self->{tab_width};
+        my @c = @{$list->{contents}};
+        my @o;
+        foreach my $c (@c) {
+            # $c->{marker},  FIXME?
+            my $space = join('', grep { defined $_ } ($c->{prespace}, $c->{postspace}));
+            $space =~ s/\t/$t/g;
+            push(@o, length($space));
+        }
+        return @o;
     }
     
     sub _list_current_finish {
@@ -1172,122 +1201,90 @@ sub _DoHeaders {
     use Data::Dumper;
     sub _list_current_fromline {
         my ($self, $line) = @_;
-        warn("CURRENT LINE IS " . Dumper($line));
+        _warn("CURRENT LINE IS " . Dumper($line));
+        confess("Not a hashref") unless (ref $line && ref($line) eq 'HASH');
         confess("Already a current list") if $self->{_list_current};
         my $list = {
             feature  => 'list',
             type     => delete($line->{type}),
             contents => [ $line ],
         };
-        warn("CREATED LIST" . Dumper($list));
+        _warn("CREATED LIST" . Dumper($list));
         $self->{_list_current} = $list;
+    }
+    
+    sub _list_additem {
+        my ($self, $list, $line) = @_;
+        delete($line->{type}) if (!$line->{feature}); # Do not delete the type out of sub-lists
+        push( @{ $list->{contents} }, $line );
     }
     
     sub _list_current_additem {
         my ($self, $line) = @_;
         confess("No current list") unless $self->{_list_current};
         confess("Current list is a different type!") unless ($self->{_list_current}->{type} eq $line->{type});
-        delete($line->{type});
-        push( @{ $self->{_list_current}->{contents} }, $line );
+        $self->_list_additem($self->{_list_current}, $line);
     }
-
-    sub _DoLists {
-    # Form HTML ordered (numbered) and unordered (bulleted) lists.
-        my ($self, $text) = @_;
-
-        $self->{_in_lines} = [ split /\n/, $text ];
-        $self->{_out_lines} = [];
-        $self->{_stacked_lines} = []; 
+    sub _list_is_loose {
+        my ($self, $list) = @_;
+        my $n =  grep { $_->{contents} =~ /\n/ } @{ $list->{contents} };
+        _warn("N is $n");
+        return 1 if $n;
+    }
     
-        $self->{_list_current} = undef;
+    sub _open_sublist {
+        my ($self, $line) = @_;
+        # We grab the current item (old list)
+        my $parent = $self->{_list_current};
+        # Stop this being the current list
+        $self->_list_current_finish;
+        # We then create a new list from this line and add as the current list
+        $self->_list_current_fromline($line);
+        # Here is the start of the road to hell. Makes _close_sublist much easier to implement tho ;)
+        use Scalar::Util qw(weaken);
+        $self->{_list_current}->{_parent} = $parent;
+        weaken($self->{_list_current}->{_parent}); 
+        # Then add this new list as a child of it's parent
+        $self->_list_additem($parent, $self->{_list_current});
+        _warn("DONE WITH OPEN SUBLIST, entire struct is" . Dumper($self->{_out_lines}));
+    }
+    sub _close_sublist {
+        my ($self) = @_;
+        # This is naieve. We *just* skip one level back to the parent, and you can make documents
+        # which will break this. FIXME 
+        my $current = $self->{_list_current};
+        # We close the current list
+        $self->_list_current_finish;
+        # and make the parent node the current list, and add a
+        # new item to it.. 
+        $self->{_list_current} = $current->{_parent};
+        _warn("Closed sub list. Current list is " . Dumper($self->{_list_current}));
+    }
     
-        while ( defined(my $line = $self->_shift_line) ) {
-            warn("WORKING FOR LINE $line");
-            if ( ! $self->_in_list ) {
-                warn("Not currently in list");
-                if (my $p = $self->_parseline_forlist($line)) {
-                    # Not in a list already, looked like a list item, generate a new list / item
-                    $self->_list_current_fromline($p);
-                }
-                else {
-                    # Doesn't look like a list, not in a list already, push line straight to output.
-                    $self->_out_line($line);
-                }
-            }
-            else {
-                warn("Am currently in list");
-                if (my $p = $self->_parseline_forlist($line)) {
-                    warn("Parsed as a list line");
-                    # Looked like a list item, already in a list.
-                    # Is this a new list, or an item on the current list?
-                    # Note - also deal with back-tracking to a previous level in multi-level lists
-                    warn("P type " . $p->{type}. " current ". $self->{_list_current}->{type});
-                    if ($p->{type} ne $self->{_list_current}->{type}) { # FIXME, use a method here? :)
-                        # New list (different seperator).
-                        # Finish current list, unstack everything and iterate again
-                        # FIXME - trailing paragraph bug?
-                        $self->_list_current_finish;
-                        $self->_unstack_all($line);
-                        # Throw 
-                    }
-                    else {
-                        if (0 == 1) { # Are we at a greater/lesser depth, if so, do the right thing with sub-lists
-                            
-                        }
-                        else { # Same depth, absorb any stack into the last item, and just add the line
-                            $self->_current_list_item_absorblinestack;
-                            $self->_list_current_additem($p)
-                        }
-                    }
-                    
-                }
-                else {
-                    warn("Parsed not as a list line");
-                    # Are in a list, but this didn't look like a list line.
-                    # If it was a blank line, add it to the line stack.
-                    # If this is indented, add it to the line stack. (Note, needs to cope with multi-level lists correctly)
-                    if ($line =~ /^\s*$/) {
-                        warn("STACKING WHITESPACE LINE '$line'");
-                        $self->_stack_line($line);
-                    }
-                    elsif ($line =~ /^\s+\S/) {
-                        warn("STACKING INDENTED LINE '$line");
-                        $self->_stack_line($line); # FIXME, just adds to stack (i.e. last item) if indented at all.
-                    }
-                    else { # If this isn't indented, close list then give back any lines captured and restart
-                        warn("Not indented, closing list and outputting line '$line'");
-                        $self->_list_current_finish;
-                        $self->_unstack_all($line);
-                    }
-                }
-            }
-        }
-        # Deal with the case where we get to the end of document, with a list item still considered 'current'.
-        if ($self->{_list_current}) {
-            $self->_current_list_item_absorblinestack; #FIXME
-            $self->_out_line($self->{_list_current});
-        }
-    
-        use Data::Dumper;
-        warn Dumper $self->{_out_lines};
-    
+    sub _print_list {
+        my ($self, $list) = @_;
         my $out;
-        foreach my $line (@{$self->{_out_lines}}) {
+        foreach my $line (@{$list}) {
             if (ref $line) {
-                warn(Dumper($line));
+                _warn("PRINT LINE" . Dumper($line));
                 $out .= sprintf("<%s>\n%s\n</%s>\n", 
                     $line->{type}, 
                     join("\n", 
                         map {
-                            s/\s+$//;
-                            if ( $self->_list_is_loose($line) ) {
-                                "<li>" . $self->_RunBlockGamut($_) . "</li>";
+                            if ($_->{feature}) {
+                                _warn("SUB LIST: " . Dumper($_));
+                                $self->_print_list([$_]);
                             }
                             else {
-                                "<li>" . $self->_RunSpanGamut($_) . "</li>";
+                                s/\s+$//;
+                                if ( $self->_list_is_loose($line) ) {
+                                    "<li>" . $self->_RunBlockGamut($_->{contents}) . "</li>";
+                                }
+                                else {
+                                    "<li>" . $self->_RunSpanGamut($_->{contents}) . "</li>";
+                                }
                             }
                         }
-                        map { $_->{contents} }
                         @{ $line->{contents} } 
                     ), 
                     $line->{type}
@@ -1302,12 +1299,106 @@ sub _DoHeaders {
         return $out;
     }
     
-    sub _list_is_loose {
-        my ($self, $list) = @_;
-        my $n =  grep { $_->{contents} =~ /\n/ } @{ $list->{contents} };
-        print "N is $n\n";
-        return 1 if $n;
+    sub _DoLists {
+    # Form HTML ordered (numbered) and unordered (bulleted) lists.
+        my ($self, $text) = @_;
+
+        $self->{_in_lines} = [ split /\n/, $text ];
+        $self->{_out_lines} = [];
+        $self->{_stacked_lines} = []; 
+    
+        $self->{_list_current} = undef;
+    
+        while ( defined(my $line = $self->_shift_line) ) {
+            _warn("WORKING FOR LINE $line");
+            if ( ! $self->_in_list ) {
+                _warn("Not currently in list");
+                if (my $p = $self->_parseline_forlist($line)) {
+                    # Not in a list already, looked like a list item, generate a new list / item
+                    $self->_list_current_fromline($p);
+                }
+                else {
+                    # Doesn't look like a list, not in a list already, push line straight to output.
+                    $self->_out_line($line);
+                }
+            }
+            else {
+                _warn("Am currently in list");
+                if (my $p = $self->_parseline_forlist($line)) {
+                    _warn("Parsed as a list line");
+                    # Looked like a list item, already in a list.
+                    # Is this a new list, or an item on the current list?
+                    # Note - also deal with back-tracking to a previous level in multi-level lists
+                    _warn(Dumper($p));
+                    # FIXME - $p->{marker}
+                    my $indent = $p->{prespace}  . $p->{postspace};
+                    my $t = ' ' x $self->{tab_width}; # FIXME - Is this correct here? Maybe it's tab_width-1
+                    $indent =~ s/\t/$t/g;
+                    _warn("indent is '$indent'");
+                    _warn("Current depth" . $self->_list_depth($self->{_list_current}) . " new depth " . length($indent));
+                    if ($self->_list_depth($self->{_list_current}) != length($indent)) { # Are we at a greater/lesser depth, if so, do the right thing with sub-lists
+                        # Change of depth
+                        if (length($indent) > $self->_list_depth($self->{_list_current})) {
+                            # More indent, start of a sub-list.
+                            $self->_open_sublist($p);
+                        }
+                        else {
+                            # Less indent, go back to the last list..
+                            $self->_close_sublist($p);
+                        }
+                    }
+                    else {
+                        _warn("About to compare new item with current: " . Dumper($self->{_list_current}));
+                        _warn("P type " . $p->{type}. " current ". $self->{_list_current}->{type});
+                        if ($p->{type} ne $self->{_list_current}->{type}) { # FIXME, use a method here? :)
+                            # New list (different seperator).
+                            # Finish current list, unstack everything and iterate again
+                            # FIXME - trailing paragraph bug?
+                            $self->_list_current_finish;
+                            $self->_unstack_all($line);
+                            # Throw 
+                        }
+                        else { # Same depth, same seperator - absorb any stack into the last item, and just add this item
+                            $self->_current_list_item_absorblinestack;
+                            $self->_list_current_additem($p)
+                        }
+                    }
+                    
+                }
+                else {
+                    _warn("Parsed not as a list line");
+                    # Are in a list, but this didn't look like a list line.
+                    # If it was a blank line, add it to the line stack.
+                    # If this is indented, add it to the line stack. (Note, needs to cope with multi-level lists correctly)
+                    if ($line =~ /^\s*$/) {
+                        _warn("STACKING WHITESPACE LINE '$line'");
+                        $self->_stack_line($line);
+                    }
+                    elsif ($line =~ /^\s+\S/) {
+                        _warn("STACKING INDENTED LINE '$line");
+                        $self->_stack_line($line); # FIXME, just adds to stack (i.e. last item) if indented at all.
+                    }
+                    else { # If this isn't indented, close list then give back any lines captured and restart
+                        _warn("Not indented, closing list and outputting line '$line'");
+                        $self->_list_current_finish;
+                        $self->_unstack_all($line);
+                    }
+                }
+            }
+        }
+        # Deal with the case where we get to the end of document, with a list item still considered 'current'.
+        #if ($self->{_list_current}) {
+        #    $self->_current_list_item_absorblinestack; #FIXME
+        #    $self->_out_line($self->{_list_current});
+        #}
+    
+        use Data::Dumper;
+        warn("FINAL DUMP: " . Dumper $self->{_out_lines});
+    
+        return $self->_print_list($self->{_out_lines});
     }
+    
+
 }
 
         # We use a different prefix before nested lists than top-level lists.
@@ -2514,7 +2605,7 @@ __END__
 
 =head1 NOTICE
 
-Warning: this code is messy and does not adhere to any consistent set of code
+warning: this code is messy and does not adhere to any consistent set of code
 guidelines; this is not because of the original quality of the code, which is
 far above what I can pretend to be capable of creating, but because of the
 various patching and diffing steps in between and the incomplete translation of
