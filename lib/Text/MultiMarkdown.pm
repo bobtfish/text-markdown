@@ -39,9 +39,13 @@ is most similar to that of plain text email, and supports features such
 as headers, *emphasis*, code blocks, blockquotes, and links.
 
 Markdown's syntax is designed not as a generic markup language, but
-specifically to serve as a front-end to (X)HTML. You can  use span-level
+specifically to serve as a front-end to (X)HTML. You can use span-level
 HTML tags anywhere in a Markdown document, and you can use block level
 HTML tags (like <div> and <table> as well).
+
+This module implements the MultiMarkdown markdown syntax extensions from:
+
+L<http://fletcherpenney.net/MultiMarkdown/>
 
 =head1 SYNTAX
 
@@ -216,11 +220,9 @@ $g_metadata_newline{default} = "\n";
 
 =head1 METHODS
 
-=over 4
+=head2 new
 
-=item new
-
-A very simple constructor.
+A simple constructor, see the SYNTAX and OPTIONS sections for more information.
 
 =cut
 
@@ -1123,7 +1125,7 @@ sub _DoLists {
               (?=\S)
               (?!                       # Negative lookahead for another list item marker
                 [ \t]*
-                \3[ \t]+                # FIXME - makes perl crap itself, This used to be ${marker_any}[ \t]+
+                ${marker_any}[ \t]+
               )
           )
         )

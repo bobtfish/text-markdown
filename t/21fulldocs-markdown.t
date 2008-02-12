@@ -10,12 +10,8 @@ my @files = get_files($docsdir);
 
 plan tests => scalar(@files) + 1;
 
-use_ok('Text::MultiMarkdown');
+use_ok('Text::Markdown');
 
-my $m = Text::MultiMarkdown->new(
-    use_metadata => 0,
-    heading_ids  => 0, # Remove MultiMarkdown behavior change in <hX> tags.
-    img_ids      => 0, # Remove MultiMarkdown behavior change in <img> tags.
-);
+my $m = Text::Markdown->new();
 
 run_tests($m, $docsdir, @files);

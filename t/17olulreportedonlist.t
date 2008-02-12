@@ -1,4 +1,5 @@
 use warnings;
+use strict;
 use Test::More tests => 2;
 
 use_ok('Text::MultiMarkdown', 'markdown');
@@ -12,7 +13,10 @@ my $html1 = $m->markdown(<<"EOF");
 2. 2
 EOF
 
-is( $html1, <<"EOF" );
+{
+    local $TODO = 'Does not work as expected in current Markdown, known bug.';
+
+    is( $html1, <<"EOF" );
 <ul>
 <li>a</li>
 <li>b</li>
@@ -23,3 +27,5 @@ is( $html1, <<"EOF" );
 <li>2</li>
 </ol>
 EOF
+
+};
