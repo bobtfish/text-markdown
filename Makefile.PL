@@ -2,8 +2,8 @@
 use inc::Module::Install;
 
 # Define metadata
-name            'Text-MultiMarkdown';
-author          'Darren M. Kulp <kulp@cpan.org>';
+name            'Text-Markdown';
+author          'Tomas Doran <bobtfish@bobtfish.net>';
 license			'bsd';
 all_from        'lib/Text/MultiMarkdown.pm';
 
