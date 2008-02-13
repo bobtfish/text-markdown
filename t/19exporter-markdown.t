@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Test::Exception;
 
 use_ok( 'Text::Markdown', 'markdown' );
@@ -17,6 +17,19 @@ chomp($outstr);
 is(
     $outstr => '<p>' . $instr . '</p>', 
     'exported markdown function works'
+);
+
+# Test that we *force* multimarkdown features to be off
+$instr = q{# Heading 1};
+my $expstr = qq{<h1>Heading 1</h1>\n};
+
+lives_ok {
+    $outstr = markdown($instr, { heading_ids => 1});
+} 'Functional markdown works without an exception, with options';
+
+is(
+    $outstr => $expstr, 
+    'exported markdown function overrides passed options'
 );
 
 {

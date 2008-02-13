@@ -110,6 +110,18 @@ Controls indent width in the generated markup, defaults to 4
 
 Controls if Markdown is processed when inside HTML blocks. Defaults to 0.
 
+=item disable_tables
+
+If true, this disables the MultiMarkdown table handling.
+
+=item disable_footnotes
+
+If true, this disables the MultiMarkdown footnotes handling.
+
+=item disable_bibliography
+
+If true, this disables the MultiMarkdown bibliography/citation handling.
+
 =back
 
 A number of possible items of metadata can also be supplied as options. 
@@ -295,8 +307,10 @@ sub markdown {
     local $self->{document_format}          = exists $options->{document_format}        ? $options->{document_format}        : $self->{document_format};
     local $self->{use_metadata}             = exists $options->{use_metadata}           ? $options->{use_metadata}           : $self->{use_metadata};
     local $self->{strip_metadata}           = exists $options->{strip_metadata}         ? $options->{strip_metadata}         : $self->{strip_metadata};
-    local $self->{markdown_in_html_blocks}  = exists $options->{markdown_in_html_blocks}? $options->{markdown_in_html_blocks}: $self->{markdown_in_html_blocks};
-
+    local $self->{markdown_in_html_blocks}  = exists $options->{markdown_in_html_blocks}? $options->{o}: $self->{markdown_in_html_blocks};
+    local $self->{disable_tables}           = exists $options->{disable_tables}         ? $options->{disable_tables}         : $self->{disable_tables};
+    local $self->{disable_footnotes}        = exists $options->{disable_footnotes}      ? $options->{disable_footnotes}      : $self->{disable_footnotesf};
+    local $self->{disable_bibliography}     = exists $options->{disable_bibliography}   ? $options->{disable_bibliography}   : $self->{disable_bibliography};
     if (exists $options->{tab_width}) {
         local $self->{tab_width} = $options->{tab_width};
     }    
@@ -365,7 +379,7 @@ sub _Markdown {
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     # Strip link definitions, store in hashes.
-    $text = $self->_StripFootnoteDefinitions($text);
+    $text = $self->_StripFootnoteDefinitions($text) unless $self->{disable_footnotes};
 
     $text = $self->_StripLinkDefinitions($text);
 
@@ -375,19 +389,19 @@ sub _Markdown {
 
     $text = $self->_RunBlockGamut($text);
     
-    $text = $self->_DoMarkdownCitations($text);
+    $text = $self->_DoMarkdownCitations($text) unless $self->{disable_bibliography};
     
-    $text = $self->_DoFootnotes($text);
+    $text = $self->_DoFootnotes($text) unless $self->{disable_footnotes};
     
     $text = $self->_UnescapeSpecialChars($text);
 
     # This must follow _UnescapeSpecialChars
     $text = $self->_UnescapeWikiWords($text);
 
-    $text = $self->_FixFootnoteParagraphs($text);
-    $text .= $self->_PrintFootnotes();
+    $text = $self->_FixFootnoteParagraphs($text) unless $self->{disable_footnotes};
+    $text .= $self->_PrintFootnotes() unless $self->{disable_footnotes};
     
-    $text .= $self->_PrintMarkdownBibliography();
+    $text .= $self->_PrintMarkdownBibliography() unless $self->{disable_bibliography};
         
     $text = $self->_ConvertCopyright($text);
 
@@ -1992,6 +2006,9 @@ sub _UnescapeWikiWords {
 
 sub _DoTables {
     my ($self, $text) = @_;
+    
+    return $text if $self->{disable_tables};
+    
     my $less_than_tab = $self->{tab_width} - 1;
 
     # Algorithm inspired by PHP Markdown Extra's

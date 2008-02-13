@@ -64,11 +64,12 @@ This documentation is going to be moved/copied into this module for clearer read
 =cut
 
 my %force_opts = (
-    use_metadata      => 0,
-    heading_ids       => 0, # Remove MultiMarkdown behavior change in <hX> tags.
-    img_ids           => 0, # Remove MultiMarkdown behavior change in <img> tags.
-    disable_tables    => 1, # FIXME - implement
-    disable_footnotes => 1, # FIXME - implement
+    use_metadata         => 0, # Treat the first lines of the document as normal.
+    heading_ids          => 0, # Remove MultiMarkdown behavior change in <hX> tags.
+    img_ids              => 0, # Remove MultiMarkdown behavior change in <img> tags.
+    disable_tables       => 1, # Disable all the multimarkdown specific features.
+    disable_footnotes    => 1, 
+    disable_bibliography => 1,
 );
 
 sub new {

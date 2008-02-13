@@ -72,6 +72,10 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           that warning in the test case, then shipping without retesting, NOT 
           SMART!
           
-1.0.12 2008-01-??T??:??:??
-        - Fix bug in ul/ol formatting when there is no separating block. 
-          Fix and test contributed by Kztk Matsuda, thanks!
+1.0.12 2008-02-14T??:??:??
+        - Text::Markdown - borgborgborgborgborg.
+        - Added additional POD documentation and links to other projects.
+        - Cleaned up some tests, and some additional test cases.
+        - Options to turn off all the extra features introduced in 
+          MultiMarkdown.
+        

@@ -10,11 +10,9 @@ my @files = get_files($docsdir);
 
 plan tests => scalar(@files) + 1;
 
-use_ok('Text::MultiMarkdown');
+use_ok('Text::Markdown');
 
-my $m = Text::MultiMarkdown->new(
-    use_metadata => 0,
-);
+my $m = Text::Markdown->new();
 
 {
     local $TODO = 'These tests are known broken';
