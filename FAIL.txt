@@ -1,0 +1,7 @@
+tdpb:~/Text-MultiMarkdown t0m$ /usr/bin/perl -Ilib t/07fulldoc.t 2>&1 | grep fail
+tdpb:~/Text-MultiMarkdown t0m$ /usr/bin/perl -v | grep built
+This is perl, v5.8.6 built for darwin-thread-multi-2level
+tdpb:~/Text-MultiMarkdown t0m$ /usr/local/bin/perl -Ilib t/07fulldoc.t 2>&1 | grep fail
+# Looks like you failed 1 test of 2.
+tdpb:~/Text-MultiMarkdown t0m$ /usr/local/bin/perl -v | grep built
+This is perl, v5.10.0 built for darwin-2level
