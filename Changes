@@ -72,7 +72,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           that warning in the test case, then shipping without retesting, NOT 
           SMART!
           
-1.0.12 2008-02-14T??:??:??
+1.0.12 2008-02-18T??:??:??
         - Text::Markdown - borgborgborgborgborg.
         - Added additional POD documentation and links to other projects.
         - Cleaned up some tests, and some additional test cases.

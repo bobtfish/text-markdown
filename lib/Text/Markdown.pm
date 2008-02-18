@@ -49,7 +49,7 @@ This module implements the 'original' Markdown markdown syntax from:
 
     http://daringfireball.net/projects/markdown/
     
-If you would like different options available / to controll the parser
+If you would like different options available / to control the parser
 behavior more then you're recommended to look at the OPTIONS section in
 the pod for L<Text::MultiMarkdown>
 
@@ -60,6 +60,8 @@ For more information about Markdown's syntax, see:
     http://daringfireball.net/projects/markdown/
 
 This documentation is going to be moved/copied into this module for clearer reading in a future release..
+
+=head1 METHODS
 
 =cut
 
@@ -72,6 +74,29 @@ my %force_opts = (
     disable_bibliography => 1,
 );
 
+=head2 new
+
+Simple constructor. Takes the same arguments as the constructor of L<Text::MultiMarkdown>, however this module
+overrides the following settings:
+
+=over
+
+=item use_metadata => 0
+
+=item heading_ids => 0
+
+=item img_ids => 0
+
+=item disable_tables => 1
+
+=item disable_footnotes  => 1
+
+=item disable_bibliography => 1
+
+=back
+
+=cut
+
 sub new {
     my ($class, %p) = @_;
 
@@ -79,6 +104,13 @@ sub new {
     
     return $class->SUPER::new(%p);
 }
+
+=head2 markdown($text, $options)
+
+Processes $text as markdown text and returns HTML. Takes an optional hashref of arguments, as per the
+new method.
+
+=cut
 
 sub markdown {
     my ( $self, $text, $options ) = @_;

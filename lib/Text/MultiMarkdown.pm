@@ -273,7 +273,7 @@ sub new {
     return $self;
 }
 
-=item markdown
+=head2 markdown
 
 The main function as far as the outside world is concerned. See the SYNOPSIS
 for details on use.
@@ -338,12 +338,6 @@ sub markdown {
     return $t; 
 }
 
-=item _Markdown
-
-The main function (internal use only).
-
-=cut
-
 sub _Markdown {
 #
 # Main function. The order in which other subs are called here is
@@ -406,10 +400,10 @@ sub _Markdown {
     $text = $self->_ConvertCopyright($text);
 
     if (lc($self->{document_format}) =~ /^complete\s*$/) {
-        return $self->xhtmlMetaData() . "<body>\n" . $text . "\n</body>\n</html>";
+        return $self->_xhtmlMetaData() . "<body>\n" . $text . "\n</body>\n</html>";
     } 
     else {
-        return $self->textMetaData() . $text . "\n";
+        return $self->_textMetaData() . $text . "\n";
     }
     
 }
@@ -798,7 +792,7 @@ sub _DoAnchors {
         }
 
         # Allow automatic cross-references to headers
-        my $label = $self->Header2Label($link_id);
+        my $label = $self->_Header2Label($link_id);
         if (defined $self->{_crossrefs}{$label}) {
             my $url = $self->{_crossrefs}{$label};
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
@@ -956,7 +950,7 @@ sub _DoImages {
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
             $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
             
-            my $label = $self->Header2Label($alt_text);
+            my $label = $self->_Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
             #if (! defined $self->{_titles}{$link_id}) {
             #    $self->{_titles}{$link_id} = $alt_text;
@@ -1019,7 +1013,7 @@ sub _DoImages {
         $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
         $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
 
-        my $label = $self->Header2Label($alt_text);
+        my $label = $self->_Header2Label($alt_text);
         $self->{_crossrefs}{$label} = "#$label";
 #       $self->{_titles}{$label} = $alt_text;          # FIXME - I think this line should not be here
 
@@ -1055,7 +1049,7 @@ sub _DoHeaders {
     #     --------
     #
     $text =~ s{ ^(.+)[ \t]*\n=+[ \t]*\n+ }{
-        $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
+        $label = $self->{heading_ids} ? q{ id="} . $self->_Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
         if ($label ne '') {
@@ -1067,7 +1061,7 @@ sub _DoHeaders {
     }egmx;
 
     $text =~ s{ ^(.+)[ \t]*\n-+[ \t]*\n+ }{
-        $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
+        $label = $self->{heading_ids} ? q{ id="} . $self->_Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
         if ($label ne '') {
@@ -1099,7 +1093,7 @@ sub _DoHeaders {
             $header = $self->_RunSpanGamut($2);
             
             if ($self->{heading_ids}) {
-                $label = $self->Header2Label($2);
+                $label = $self->_Header2Label($2);
                 $self->{_crossrefs}{$label} = "#$label";
                 $self->{_titles}{$label} = $header;
             }
@@ -1781,7 +1775,7 @@ sub _StripFootnoteDefinitions {
         my $footnote = "$2\n";
         $footnote =~ s/^[ ]{0,$self->{tab_width}}//gm;
     
-        $self->{_footnotes}{$self->Header2Label($id)} = $footnote;
+        $self->{_footnotes}{$self->_Header2Label($id)} = $footnote;
     }
     
     return $text;
@@ -1809,7 +1803,7 @@ sub _DoFootnotes {
         \[\^(.*?)\]     # id = $1
     }{
         my $result;
-        my $id = $self->Header2Label($1);
+        my $id = $self->_Header2Label($1);
         
         if (defined $self->{_footnotes}{$id} ) {
             $footnote_counter++;
@@ -1850,13 +1844,7 @@ sub _PrintFootnotes {
     return $result;
 }
 
-=item Header2Label
-
-Internal use only.
-
-=cut
-
-sub Header2Label {
+sub _Header2Label {
     my ($self, $header) = @_;
     my $label = lc $header;
     $label =~ s/[^A-Za-z0-9:_.-]//g;        # Strip illegal characters
@@ -1865,13 +1853,7 @@ sub Header2Label {
     return $label;
 }
 
-=item xhtmlMetaData
-
-Internal use only.
-
-=cut
-
-sub xhtmlMetaData {
+sub _xhtmlMetaData {
     my ($self) = @_;
     # FIXME: Should not assume encoding
     my $result; # FIXME: This breaks some things in IE 6- = qq{<?xml version="1.0" encoding="UTF-8" ?>\n};
@@ -1898,13 +1880,7 @@ sub xhtmlMetaData {
     return $result;
 }
 
-=item textMetaData
-
-Internal use only.
-
-=cut
-
-sub textMetaData {
+sub _textMetaData {
     my ($self) = @_;
     my $result = "";
     
@@ -2069,7 +2045,7 @@ sub _DoTables {
         if ($table =~ s/^$line_start\[\s*(.*?)\s*\](\[\s*(.*?)\s*\])?[ \t]*$//m) {
             if (defined $3) {
                 # add caption id to cross-ref list
-                my $table_id = $self->Header2Label($3);
+                my $table_id = $self->_Header2Label($3);
                 $result .= qq{<caption id="$table_id">} . $self->_RunSpanGamut($1). "</caption>\n";
                 
                 $self->{_crossrefs}{$table_id} = "#$table_id";
@@ -2317,7 +2293,7 @@ sub _DoMarkdownCitations {
             $result .= ")</span>";
         }
         
-        if ($self->Header2Label($anchor_text) eq "notcited"){
+        if ($self->_Header2Label($anchor_text) eq "notcited"){
             $result = qq[<span class="notcited" id="$id"/>];
         }
         $result;
@@ -2380,7 +2356,7 @@ sub _GenerateImageCrossRefs {
 
         $alt_text =~ s/"/&quot;/g;
         if (defined $self->{_urls}{$link_id}) {
-            my $label = $self->Header2Label($alt_text);
+            my $label = $self->_Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
         }
         else {
@@ -2418,7 +2394,7 @@ sub _GenerateImageCrossRefs {
         my $alt_text    = $2;
 
         $alt_text =~ s/"/&quot;/g;
-        my $label = $self->Header2Label($alt_text);
+        my $label = $self->_Header2Label($alt_text);
         $self->{_crossrefs}{$label} = "#$label";
         $whole_match;
     }xsge;
@@ -2430,27 +2406,35 @@ sub _GenerateImageCrossRefs {
 1;
 __END__
 
+=head1 OTHER IMPLEMENTATIONS
+
+Markdown has been re-implemented in a number of languages, and with a number of additions.
+
+Those that I have found are listed below:
+
+=over
+
+=item python
+
+=item ruby (maruku)
+
+=item php
+
+=item lua
+
+=item haskell
+
+=item javascript
+
 =back
-
-=head1 NOTICE
-
-Warning: this code is messy and does not adhere to any consistent set of code
-guidelines; this is not because of the original quality of the code, which is
-far above what I can pretend to be capable of creating, but because of the
-various patching and diffing steps in between and the incomplete translation of
-the original code into a module. 
 
 =head1 BUGS
 
 To file bug reports or feature requests (other than topics listed in the
 Caveats section above) please send email to:
 
-    support@daringfireball.net (for Markdown issues)
-
-    fletcher@freeshell.org (for MultiMarkdown issues)
-
-    kulp@cpan.org, bobtfish@bobtfish.net (for Text::MultiMarkdown issues)
-
+    bug-Text-Markdown@rt.cpan.org
+    
 Please include with your report: (1) the example input; (2) the output
 you expected; (3) the output Markdown actually produced.
 
@@ -2470,8 +2454,9 @@ See the Changes file for detailed release notes for this version.
     http://fletcher.freeshell.org/
 
     CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
-    Riedel) by Darren Kulp & Tomas Doran
-    http://kulp.ch/ & http://www.bobtfish.net/
+    Riedel) originally by Darren Kulp (http://kulp.ch/)
+    
+    This module is maintained by: Tomas Doran http://www.bobtfish.net/
 
 =head1 COPYRIGHT AND LICENSE
 

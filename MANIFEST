@@ -1,6 +1,5 @@
 Changes
 inc/Module/AutoInstall.pm
-inc/Module/Install/Makefile.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Base.pm
@@ -10,6 +9,7 @@ inc/Module/Install/Include.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
+lib/Text/Markdown.pm
 lib/Text/MultiMarkdown.pm
 License.text
 MANIFEST			This list of files
@@ -17,7 +17,6 @@ MANIFEST.skip
 META.yml
 README
 Readme.text
-Makefile.PL
 t/01use.t
 t/02pod.t
 t/03podcoverage.t
@@ -34,7 +33,10 @@ t/12empty_element_suffix.t
 t/13multimarkdown-nometadata-firstpara.t
 t/14unicode.t
 t/15inlinehtmldoenoturnoffmarkdown.t
+t/16headingsinlists.t
 t/17olulreportedonlist.t
+t/18codespanextra.t
+t/19exporter-markdown.t
 t/20fulldocs-multimarkdown.t
 t/21fulldocs-markdown.t
 t/22fulldocs-multimarkdown-todo.t
@@ -43,7 +45,8 @@ t/24fulldocs-pythonmarkdown2-tm.t
 t/26fulldocs-php-markdown.t
 t/27fulldocs-php-markdown-fails.t
 t/28fulldocs-php-markdown-extra.t
-t/30fulldocs-maruku-unittest.t
+t/29fulldocs-maruku-unittest.t
+t/30disable_multimarkdown_features.t
 t/docs-markdown-todo/.empty
 t/docs-markdown/Amps_and_angle_encoding.html
 t/docs-markdown/Amps_and_angle_encoding.text

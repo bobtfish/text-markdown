@@ -29,3 +29,8 @@ wiki
 wikilinks
 xHTML
 xhtmlMetaData
+lua
+haskell
+maruku
+javascript
+php
