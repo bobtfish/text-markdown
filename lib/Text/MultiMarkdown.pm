@@ -1,7 +1,15 @@
 package Text::MultiMarkdown;
-require 5.006_000;
+require 5.008_000;
 use strict;
 use warnings;
+
+use Digest::MD5 qw(md5_hex);
+use Encode      qw();
+use Carp        qw(croak);
+use base        'Exporter';
+
+our $VERSION   = '1.0.13';
+our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
 
@@ -181,18 +189,6 @@ This is the base URL for referencing wiki pages. In this is not supplied, all wi
 =back
 
 =cut
-
-use Digest::MD5 qw(md5_hex);
-use Encode      qw();
-use Carp        qw(croak);
-use base        'Exporter';
-
-our $VERSION   = '1.0.12';
-our @EXPORT_OK = qw(markdown);
-
-## Disabled; causes problems under Perl 5.6.1:
-# use utf8;
-# binmode( STDOUT, ":utf8" );  # c.f.: http://acis.openlib.org/dev/perl-unicode-struggle.html
 
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.

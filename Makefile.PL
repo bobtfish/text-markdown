@@ -5,9 +5,10 @@ use inc::Module::Install;
 name            'Text-Markdown';
 author          'Tomas Doran <bobtfish@bobtfish.net>';
 license			'bsd';
-all_from        'lib/Text/MultiMarkdown.pm';
+all_from        'lib/Text/Markdown.pm';
 
 # Specific dependencies
+perl_version    '5.008';
 requires        'MIME::Base64'    => undef;
 requires        'List::Util'      => undef;
 requires        'Digest::MD5'     => undef;

@@ -1,4 +1,4 @@
-abstract: ~
+abstract: Convert MultiMarkdown syntax to (X)HTML
 author: Tomas Doran <bobtfish@bobtfish.net>
 build_requires: 
   File::Slurp: 0
@@ -20,4 +20,5 @@ requires:
   MIME::Base64: 0
   Scalar::Util: 0
   Text::Balanced: 0
-version: 1.0.12
+  perl: 5.8.0
+version: 1.0.13
