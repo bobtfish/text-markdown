@@ -1,4 +1,3 @@
-Makefile.PL
 Changes
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
@@ -7,6 +6,7 @@ inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Include.pm
+inc//Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
@@ -17,6 +17,7 @@ MANIFEST			This list of files
 MANIFEST.skip
 META.yml
 README
+Makefile.PL
 Readme.text
 t/01use.t
 t/02pod.t
@@ -48,6 +49,7 @@ t/27fulldocs-php-markdown-fails.t
 t/28fulldocs-php-markdown-extra.t
 t/29fulldocs-maruku-unittest.t
 t/30disable_multimarkdown_features.t
+t/31angleedgecase.t
 t/docs-markdown-todo/.empty
 t/docs-markdown/Amps_and_angle_encoding.html
 t/docs-markdown/Amps_and_angle_encoding.text

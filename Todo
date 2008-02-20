@@ -1,7 +1,6 @@
 Todo pre 1.0.14:
     . Need a dingus, ask the catalyst guys?
-    . RT#33443
-    . Add links to other implementations to docs and expand a bit.
+    . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
 
