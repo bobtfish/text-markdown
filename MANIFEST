@@ -6,18 +6,18 @@ inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Include.pm
-inc//Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/Makefile.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Text/Markdown.pm
 lib/Text/MultiMarkdown.pm
 License.text
+Makefile.PL
 MANIFEST			This list of files
 MANIFEST.skip
 META.yml
 README
-Makefile.PL
 Readme.text
 t/01use.t
 t/02pod.t
@@ -422,4 +422,3 @@ t/docs-pythonmarkdown2-tm-cases-pass/tricky_anchors.html
 t/docs-pythonmarkdown2-tm-cases-pass/tricky_anchors.text
 t/docs-pythonmarkdown2-tm-cases-pass/underline_in_autolink.html
 t/docs-pythonmarkdown2-tm-cases-pass/underline_in_autolink.text
-Todo
