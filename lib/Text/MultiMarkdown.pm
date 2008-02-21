@@ -8,7 +8,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.0.13';
+our $VERSION   = '1.0.14';
 our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
@@ -1500,9 +1500,6 @@ sub _EncodeAmpsAndAngles {
 
     # Encode naked <'s
     $text =~ s{<(?![a-z/?\$!])}{&lt;}gi;
-
-    warn("FOO $text");
-
     
     # And >'s - added by Fletcher Penney
 #   $text =~ s{>(?![a-z/?\$!])}{&gt;}gi;
@@ -2423,12 +2420,12 @@ One of the nicest implementations out there. Builds a parse tree internally so v
 
 =item php - <http://michelf.com/projects/php-markdown/>
 
-A direct port of Markdown.pl, also has an 'extra' verion, which adds a number of features that
+A direct port of Markdown.pl, also has an 'extra' version, which adds a number of features that
 were borrowed by MultiMarkdown
 
 =item lua - <http://www.frykholm.se/files/markdown.lua>
 
-Port to lua. Simple and leightweight (as lua is).
+Port to lua. Simple and lightweight (as lua is).
 
 =item haskell - <http://johnmacfarlane.net/pandoc/>
 

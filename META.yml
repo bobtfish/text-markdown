@@ -21,4 +21,4 @@ requires:
   Scalar::Util: 0
   Text::Balanced: 0
   perl: 5.8.0
-version: 1.0.13
+version: 1.0.14

@@ -84,3 +84,9 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
          5.8, note this in the Makefile.PL and modules.
        - I managed to ship a module without Makefile.PL, WTF? Really
          need to start using ShipIt.
+
+1.0.14 2008-02-21T22:41:33
+       - Fix a bug in the packaging of the last version.
+       - Add links to other implementations and some notes about them.
+       - Add a (failing) unit test for some unexpected behavior reported on 
+         the list.

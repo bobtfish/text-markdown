@@ -34,3 +34,6 @@ haskell
 maruku
 javascript
 php
+reStructuredText
+Pandoc
+API

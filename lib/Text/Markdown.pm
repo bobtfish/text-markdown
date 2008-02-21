@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Text::MultiMarkdown);
 
-our $VERSION   = '1.0.13';
+our $VERSION   = '1.0.14';
 our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
