@@ -26,7 +26,7 @@ if (!$@) {
     };
 }
 else {
-    warn("Install Text::Diff for more helpful failure message! ($@)");
+    warn("Install Text::Diff for more helpful failure messages! ($@)");
     *difftest = \&Test::More::is;
 }
 

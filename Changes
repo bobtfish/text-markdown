@@ -90,3 +90,6 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
        - Add links to other implementations and some notes about them.
        - Add a (failing) unit test for some unexpected behavior reported on 
          the list.
+
+1.0.15 2008-02-23T11:13:07
+       - Start using ShipIt to package the distribution.
