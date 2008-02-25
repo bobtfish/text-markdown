@@ -50,6 +50,7 @@ t/28fulldocs-php-markdown-extra.t
 t/29fulldocs-maruku-unittest.t
 t/30disable_multimarkdown_features.t
 t/31angleedgecase.t
+t/32tabwidth.t
 t/docs-markdown-todo/.empty
 t/docs-markdown/Amps_and_angle_encoding.html
 t/docs-markdown/Amps_and_angle_encoding.text
