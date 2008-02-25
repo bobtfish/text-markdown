@@ -507,10 +507,7 @@ sub _HashHTMLBlocks {
 	my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
 
 	my @chunks;
-	## TO-DO: the 0,3 on the next line ought to respect the
-	## tabwidth, or else, we should mandate 4-space tabwidth and
-	## be done with it:
-	while ($text =~ s{^(([ ]{0,3}<)?.*\n)}{}m) {
+	while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
 		my $cur_line = $1;
 		if (defined $2) {
 			# current line could be start of code block
