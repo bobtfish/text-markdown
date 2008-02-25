@@ -93,3 +93,6 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 
 1.0.15 2008-02-23T11:13:07
        - Start using ShipIt to package the distribution.
+
+1.0.16 2008-02-??T??:??:??
+       - Fix bugs with tab_width in constructor / as an option

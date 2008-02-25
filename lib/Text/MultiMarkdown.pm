@@ -307,9 +307,7 @@ sub markdown {
     local $self->{disable_tables}           = exists $options->{disable_tables}         ? $options->{disable_tables}         : $self->{disable_tables};
     local $self->{disable_footnotes}        = exists $options->{disable_footnotes}      ? $options->{disable_footnotes}      : $self->{disable_footnotesf};
     local $self->{disable_bibliography}     = exists $options->{disable_bibliography}   ? $options->{disable_bibliography}   : $self->{disable_bibliography};
-    if (exists $options->{tab_width}) {
-        local $self->{tab_width} = $options->{tab_width};
-    }    
+    local $self->{tab_width}                = exists $options->{tab_width}              ? $options->{tab_width}              : $self->{tab_width};
     
     # Clear the global hashes. If we don't clear these, you get conflicts
     # from other articles when generating a page which contains more than

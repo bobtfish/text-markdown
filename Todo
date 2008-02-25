@@ -1,16 +1,16 @@
-Todo pre 1.0.14:
+Todo pre 1.0.17:
     . Need a dingus, ask the catalyst guys?
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
 
-Todo pre 1.0.15:
+Todo pre 1.0.18:
     . Stop perl shitting itself due to regex backreference when doing listsug
       and fix the list bug
       (see t/17ulolreportedonlist.t and Markdown mailing list)
       This probably involves the first draught of the new parser...
 
-Todo pre 1.0.16:
+Todo pre 1.0.19:
    . Have a look at extra features in 
      http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
      we consider useful on the roadmap.
@@ -18,7 +18,7 @@ Todo pre 1.0.16:
      more.
    . Have a look at the php markdown extra tests to see if we want to steal 
      any of those features.
-   . Document the markdown (and multimarkdown) syntaxes in the module
+   . Document the markdown (and multimarkdown) syntaxes in the module.
      
 Todo pre 1.1:
    . Build a parse tree when parsing (which can be returned), rather than just 
