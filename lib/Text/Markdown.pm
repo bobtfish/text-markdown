@@ -129,6 +129,7 @@ sub markdown {
 
     $options ||= {};
     %{ $options } = (%$options, %force_opts);
+
     return $self->SUPER::markdown($text, $options);
 }
 
