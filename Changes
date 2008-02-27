@@ -65,13 +65,31 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Ship non-broken dist at CPAN (oops, rushing!)
 
 1.0.10 2008-01-23T15:40:00
-        - Fix bug with links procesing in HTML blocks.
+        - Fix bug with links processing in HTML blocks.
 
 1.0.11 2008-01-24T00:12:00
         - Fix syntax error in one of the tests. Note to self - just fixing 
           that warning in the test case, then shipping without retesting, NOT 
           SMART!
           
-1.0.12 2008-01-??T??:??:??
-        - Fix bug in ul/ol formatting when there is no separating block. 
-          Fix and test contributed by Kztk Matsuda, thanks!
+1.0.12 2008-02-18T22:00:00
+        - Text::Markdown - borgborgborgborgborg.
+        - Added additional POD documentation.
+        - Cleaned up some tests, and some additional test cases.
+        - Options to turn off all the extra features introduced in 
+          MultiMarkdown.
+        
+1.0.13 2008-02-19T23:54:33
+       - Due to the UFT8 support this module no longer works on perl <
+         5.8, note this in the Makefile.PL and modules.
+       - I managed to ship a module without Makefile.PL, WTF? Really
+         need to start using ShipIt.
+
+1.0.14 2008-02-21T22:41:33
+       - Fix a bug in the packaging of the last version.
+       - Add links to other implementations and some notes about them.
+       - Add a (failing) unit test for some unexpected behavior reported on 
+         the list.
+
+1.0.15 2008-02-23T11:13:07
+       - Start using ShipIt to package the distribution.

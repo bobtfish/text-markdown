@@ -1,7 +1,15 @@
 package Text::MultiMarkdown;
-require 5.006_000;
+require 5.008_000;
 use strict;
 use warnings;
+
+use Digest::MD5 qw(md5_hex);
+use Encode      qw();
+use Carp        qw(croak);
+use base        'Exporter';
+
+our $VERSION   = '1.0.14';
+our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
 
@@ -39,9 +47,13 @@ is most similar to that of plain text email, and supports features such
 as headers, *emphasis*, code blocks, blockquotes, and links.
 
 Markdown's syntax is designed not as a generic markup language, but
-specifically to serve as a front-end to (X)HTML. You can  use span-level
+specifically to serve as a front-end to (X)HTML. You can use span-level
 HTML tags anywhere in a Markdown document, and you can use block level
 HTML tags (like <div> and <table> as well).
+
+This module implements the MultiMarkdown markdown syntax extensions from:
+
+L<http://fletcherpenney.net/MultiMarkdown/>
 
 =head1 SYNTAX
 
@@ -105,6 +117,18 @@ Controls indent width in the generated markup, defaults to 4
 =item markdown_in_html_blocks
 
 Controls if Markdown is processed when inside HTML blocks. Defaults to 0.
+
+=item disable_tables
+
+If true, this disables the MultiMarkdown table handling.
+
+=item disable_footnotes
+
+If true, this disables the MultiMarkdown footnotes handling.
+
+=item disable_bibliography
+
+If true, this disables the MultiMarkdown bibliography/citation handling.
 
 =back
 
@@ -219,11 +243,9 @@ $g_metadata_newline{default} = "\n";
 
 =head1 METHODS
 
-=over 4
+=head2 new
 
-=item new
-
-A very simple constructor.
+A simple constructor, see the SYNTAX and OPTIONS sections for more information.
 
 =cut
 
@@ -262,7 +284,7 @@ sub new {
     return $self;
 }
 
-=item markdown
+=head2 markdown
 
 The main function as far as the outside world is concerned. See the SYNOPSIS
 for details on use.
@@ -296,8 +318,10 @@ sub markdown {
     local $self->{document_format}          = exists $options->{document_format}        ? $options->{document_format}        : $self->{document_format};
     local $self->{use_metadata}             = exists $options->{use_metadata}           ? $options->{use_metadata}           : $self->{use_metadata};
     local $self->{strip_metadata}           = exists $options->{strip_metadata}         ? $options->{strip_metadata}         : $self->{strip_metadata};
-    local $self->{markdown_in_html_blocks}  = exists $options->{markdown_in_html_blocks}? $options->{markdown_in_html_blocks}: $self->{markdown_in_html_blocks};
-
+    local $self->{markdown_in_html_blocks}  = exists $options->{markdown_in_html_blocks}? $options->{o}: $self->{markdown_in_html_blocks};
+    local $self->{disable_tables}           = exists $options->{disable_tables}         ? $options->{disable_tables}         : $self->{disable_tables};
+    local $self->{disable_footnotes}        = exists $options->{disable_footnotes}      ? $options->{disable_footnotes}      : $self->{disable_footnotesf};
+    local $self->{disable_bibliography}     = exists $options->{disable_bibliography}   ? $options->{disable_bibliography}   : $self->{disable_bibliography};
     if (exists $options->{tab_width}) {
         local $self->{tab_width} = $options->{tab_width};
     }    
@@ -324,12 +348,6 @@ sub markdown {
 
     return $t; 
 }
-
-=item _Markdown
-
-The main function (internal use only).
-
-=cut
 
 sub _Markdown {
 #
@@ -366,7 +384,7 @@ sub _Markdown {
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     # Strip link definitions, store in hashes.
-    $text = $self->_StripFootnoteDefinitions($text);
+    $text = $self->_StripFootnoteDefinitions($text) unless $self->{disable_footnotes};
 
     $text = $self->_StripLinkDefinitions($text);
 
@@ -376,27 +394,27 @@ sub _Markdown {
 
     $text = $self->_RunBlockGamut($text);
     
-    $text = $self->_DoMarkdownCitations($text);
+    $text = $self->_DoMarkdownCitations($text) unless $self->{disable_bibliography};
     
-    $text = $self->_DoFootnotes($text);
+    $text = $self->_DoFootnotes($text) unless $self->{disable_footnotes};
     
     $text = $self->_UnescapeSpecialChars($text);
 
     # This must follow _UnescapeSpecialChars
     $text = $self->_UnescapeWikiWords($text);
 
-    $text = $self->_FixFootnoteParagraphs($text);
-    $text .= $self->_PrintFootnotes();
+    $text = $self->_FixFootnoteParagraphs($text) unless $self->{disable_footnotes};
+    $text .= $self->_PrintFootnotes() unless $self->{disable_footnotes};
     
-    $text .= $self->_PrintMarkdownBibliography();
+    $text .= $self->_PrintMarkdownBibliography() unless $self->{disable_bibliography};
         
     $text = $self->_ConvertCopyright($text);
 
     if (lc($self->{document_format}) =~ /^complete\s*$/) {
-        return $self->xhtmlMetaData() . "<body>\n" . $text . "\n</body>\n</html>";
+        return $self->_xhtmlMetaData() . "<body>\n" . $text . "\n</body>\n</html>";
     } 
     else {
-        return $self->textMetaData() . $text . "\n";
+        return $self->_textMetaData() . $text . "\n";
     }
     
 }
@@ -785,7 +803,7 @@ sub _DoAnchors {
         }
 
         # Allow automatic cross-references to headers
-        my $label = $self->Header2Label($link_id);
+        my $label = $self->_Header2Label($link_id);
         if (defined $self->{_crossrefs}{$label}) {
             my $url = $self->{_crossrefs}{$label};
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
@@ -943,7 +961,7 @@ sub _DoImages {
             $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
             $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
             
-            my $label = $self->Header2Label($alt_text);
+            my $label = $self->_Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
             #if (! defined $self->{_titles}{$link_id}) {
             #    $self->{_titles}{$link_id} = $alt_text;
@@ -1006,7 +1024,7 @@ sub _DoImages {
         $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
         $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
 
-        my $label = $self->Header2Label($alt_text);
+        my $label = $self->_Header2Label($alt_text);
         $self->{_crossrefs}{$label} = "#$label";
 #       $self->{_titles}{$label} = $alt_text;          # FIXME - I think this line should not be here
 
@@ -1042,7 +1060,7 @@ sub _DoHeaders {
     #     --------
     #
     $text =~ s{ ^(.+)[ \t]*\n=+[ \t]*\n+ }{
-        $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
+        $label = $self->{heading_ids} ? q{ id="} . $self->_Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
         if ($label ne '') {
@@ -1054,7 +1072,7 @@ sub _DoHeaders {
     }egmx;
 
     $text =~ s{ ^(.+)[ \t]*\n-+[ \t]*\n+ }{
-        $label = $self->{heading_ids} ? q{ id="} . $self->Header2Label($1) . q{"} : '';
+        $label = $self->{heading_ids} ? q{ id="} . $self->_Header2Label($1) . q{"} : '';
         $header = $self->_RunSpanGamut($1);
         
         if ($label ne '') {
@@ -1086,7 +1104,7 @@ sub _DoHeaders {
             $header = $self->_RunSpanGamut($2);
             
             if ($self->{heading_ids}) {
-                $label = $self->Header2Label($2);
+                $label = $self->_Header2Label($2);
                 $self->{_crossrefs}{$label} = "#$label";
                 $self->{_titles}{$label} = $header;
             }
@@ -1512,7 +1530,7 @@ sub _DoBlockQuotes {
             $bq =~ s/^[ \t]+$//mg;          # trim whitespace-only lines
             $bq = $self->_RunBlockGamut($bq);      # recurse
 
-            $bq =~ s/^/  /g;
+            $bq =~ s/^/  /mg;
             # These leading spaces screw with <pre> content, so we need to fix that:
             $bq =~ s{
                     (\s*<pre>.+?</pre>)
@@ -1850,7 +1868,7 @@ sub _StripFootnoteDefinitions {
         my $footnote = "$2\n";
         $footnote =~ s/^[ ]{0,$self->{tab_width}}//gm;
     
-        $self->{_footnotes}{$self->Header2Label($id)} = $footnote;
+        $self->{_footnotes}{$self->_Header2Label($id)} = $footnote;
     }
     
     return $text;
@@ -1878,7 +1896,7 @@ sub _DoFootnotes {
         \[\^(.*?)\]     # id = $1
     }{
         my $result;
-        my $id = $self->Header2Label($1);
+        my $id = $self->_Header2Label($1);
         
         if (defined $self->{_footnotes}{$id} ) {
             $footnote_counter++;
@@ -1919,13 +1937,7 @@ sub _PrintFootnotes {
     return $result;
 }
 
-=item Header2Label
-
-Internal use only.
-
-=cut
-
-sub Header2Label {
+sub _Header2Label {
     my ($self, $header) = @_;
     my $label = lc $header;
     $label =~ s/[^A-Za-z0-9:_.-]//g;        # Strip illegal characters
@@ -1934,13 +1946,7 @@ sub Header2Label {
     return $label;
 }
 
-=item xhtmlMetaData
-
-Internal use only.
-
-=cut
-
-sub xhtmlMetaData {
+sub _xhtmlMetaData {
     my ($self) = @_;
     # FIXME: Should not assume encoding
     my $result; # FIXME: This breaks some things in IE 6- = qq{<?xml version="1.0" encoding="UTF-8" ?>\n};
@@ -1967,13 +1973,7 @@ sub xhtmlMetaData {
     return $result;
 }
 
-=item textMetaData
-
-Internal use only.
-
-=cut
-
-sub textMetaData {
+sub _textMetaData {
     my ($self) = @_;
     my $result = "";
     
@@ -2075,6 +2075,9 @@ sub _UnescapeWikiWords {
 
 sub _DoTables {
     my ($self, $text) = @_;
+    
+    return $text if $self->{disable_tables};
+    
     my $less_than_tab = $self->{tab_width} - 1;
 
     # Algorithm inspired by PHP Markdown Extra's
@@ -2135,7 +2138,7 @@ sub _DoTables {
         if ($table =~ s/^$line_start\[\s*(.*?)\s*\](\[\s*(.*?)\s*\])?[ \t]*$//m) {
             if (defined $3) {
                 # add caption id to cross-ref list
-                my $table_id = $self->Header2Label($3);
+                my $table_id = $self->_Header2Label($3);
                 $result .= qq{<caption id="$table_id">} . $self->_RunSpanGamut($1). "</caption>\n";
                 
                 $self->{_crossrefs}{$table_id} = "#$table_id";
@@ -2383,7 +2386,7 @@ sub _DoMarkdownCitations {
             $result .= ")</span>";
         }
         
-        if ($self->Header2Label($anchor_text) eq "notcited"){
+        if ($self->_Header2Label($anchor_text) eq "notcited"){
             $result = qq[<span class="notcited" id="$id"/>];
         }
         $result;
@@ -2446,7 +2449,7 @@ sub _GenerateImageCrossRefs {
 
         $alt_text =~ s/"/&quot;/g;
         if (defined $self->{_urls}{$link_id}) {
-            my $label = $self->Header2Label($alt_text);
+            my $label = $self->_Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
         }
         else {
@@ -2484,7 +2487,7 @@ sub _GenerateImageCrossRefs {
         my $alt_text    = $2;
 
         $alt_text =~ s/"/&quot;/g;
-        my $label = $self->Header2Label($alt_text);
+        my $label = $self->_Header2Label($alt_text);
         $self->{_crossrefs}{$label} = "#$label";
         $whole_match;
     }xsge;
@@ -2496,27 +2499,48 @@ sub _GenerateImageCrossRefs {
 1;
 __END__
 
+=head1 OTHER IMPLEMENTATIONS
+
+Markdown has been re-implemented in a number of languages, and with a number of additions.
+
+Those that I have found are listed below:
+
+=over
+
+=item python - <http://www.freewisdom.org/projects/python-markdown/>
+
+Python Markdown which is mostly compatible with the original, with an interesting extension API.
+
+=item ruby (maruku) - <http://maruku.rubyforge.org/>
+
+One of the nicest implementations out there. Builds a parse tree internally so very flexible.
+
+=item php - <http://michelf.com/projects/php-markdown/>
+
+A direct port of Markdown.pl, also has an 'extra' version, which adds a number of features that
+were borrowed by MultiMarkdown
+
+=item lua - <http://www.frykholm.se/files/markdown.lua>
+
+Port to lua. Simple and lightweight (as lua is).
+
+=item haskell - <http://johnmacfarlane.net/pandoc/>
+
+Pandoc is a more general library, supporting Markdown, reStructuredText, LaTeX and more.
+
+=item javascript - <http://www.attacklab.net/showdown-gui.html>
+
+Direct(ish) port of Markdown.pl to JavaScript
+
 =back
-
-=head1 NOTICE
-
-warning: this code is messy and does not adhere to any consistent set of code
-guidelines; this is not because of the original quality of the code, which is
-far above what I can pretend to be capable of creating, but because of the
-various patching and diffing steps in between and the incomplete translation of
-the original code into a module. 
 
 =head1 BUGS
 
 To file bug reports or feature requests (other than topics listed in the
 Caveats section above) please send email to:
 
-    support@daringfireball.net (for Markdown issues)
-
-    fletcher@freeshell.org (for MultiMarkdown issues)
-
-    kulp@cpan.org, bobtfish@bobtfish.net (for Text::MultiMarkdown issues)
-
+    bug-Text-Markdown@rt.cpan.org
+    
 Please include with your report: (1) the example input; (2) the output
 you expected; (3) the output Markdown actually produced.
 
@@ -2536,8 +2560,9 @@ See the Changes file for detailed release notes for this version.
     http://fletcher.freeshell.org/
 
     CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
-    Riedel) by Darren Kulp & Tomas Doran
-    http://kulp.ch/ & http://www.bobtfish.net/
+    Riedel) originally by Darren Kulp (http://kulp.ch/)
+    
+    This module is maintained by: Tomas Doran http://www.bobtfish.net/
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -2550,7 +2575,7 @@ MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney
 All rights reserved.
 
 Text::MultiMarkdown changes Copyright (c) 2006-2008 Darren Kulp
-<http://kulp.ch> and Tomas Doran <bobtfish@bobtfish.net>
+<http://kulp.ch> and Tomas Doran <http://www.bobtfish.net>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

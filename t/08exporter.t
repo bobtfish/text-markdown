@@ -28,5 +28,5 @@ is(
 
     chomp($outstr);
 
-    is($outstr, '<p>' . $instr . '</p>', 'Text::Markdown->markdown() works (as class method)');
+    is($outstr, '<p>' . $instr . '</p>', 'Text::MultiMarkdown->markdown() works (as class method)');
 };
