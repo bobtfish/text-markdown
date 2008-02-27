@@ -14,6 +14,7 @@ requires        'Digest::MD5'     => undef;
 requires        'Scalar::Util'    => undef;
 requires        'Text::Balanced'  => undef;
 requires        'Encode'          => undef;
+requires        'Tree::Simple'    => '1.17';
 build_requires  'Test::More'      => '0.42';
 build_requires  'Test::Exception' => undef;
 build_requires  'List::MoreUtils' => undef;

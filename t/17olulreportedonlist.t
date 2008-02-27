@@ -105,6 +105,7 @@ my $html5 = $m->_DoLists(<<'EOF');
 	* Fie
 	* Foe
 3. Third
+
 EOF
 
 is( $html5, <<'EOF' );
