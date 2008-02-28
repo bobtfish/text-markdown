@@ -1693,8 +1693,13 @@ sub _Detab {
 #
     my ($self, $text) = @_;
 
-    # FIXME - Anchor
-    $text =~ s{(.*?)\t}{$1.(' ' x ($self->{tab_width} - length($1) % $self->{tab_width}))}ge;
+    # FIXME - Better anchor/regex would be quicker.
+    
+    # Original:
+    #$text =~ s{(.*?)\t}{$1.(' ' x ($self->{tab_width} - length($1) % $self->{tab_width}))}ge;
+    
+    # Much swifter, but pretty hateful:
+    do {} while ($text =~ s{^(.*?)\t}{$1.(' ' x ($self->{tab_width} - length($1) % $self->{tab_width}))}mge);
     return $text;
 }
 

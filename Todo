@@ -1,14 +1,22 @@
 Todo pre 1.0.17:
-    . Need a dingus, ask the catalyst guys?
+    . Need a dingus, write a small app then ask the catalyst guys?
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
+    . Document the markdown (and multimarkdown) syntaxes in the module.
+    . Add a Markdown.pl and MultiMarkdown.pl scripts which are prompt the user 
+      if they should be installed. Make these totally compatible with the 
+      'original' versions.
 
 Todo pre 1.0.18:
     . Stop perl shitting itself due to regex backreference when doing listsug
       and fix the list bug
       (see t/17ulolreportedonlist.t and Markdown mailing list)
       This probably involves the first draught of the new parser...
+    . Text::Balanced is the slowest thing ever. 
+      The syntax guide looks like this:
+        49.4   0.569  0.568    113   0.0050 0.0050  Text::Balanced::_match_tagged
+        18.1   0.209  0.791      3   0.0696 0.2637  Text::MultiMarkdown::_HashHTMLBlocks
 
 Todo pre 1.0.19:
    . Have a look at extra features in 
@@ -18,7 +26,6 @@ Todo pre 1.0.19:
      more.
    . Have a look at the php markdown extra tests to see if we want to steal 
      any of those features.
-   . Document the markdown (and multimarkdown) syntaxes in the module.
      
 Todo pre 1.1:
    . Build a parse tree when parsing (which can be returned), rather than just 
