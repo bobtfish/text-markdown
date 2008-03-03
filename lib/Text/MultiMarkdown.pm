@@ -57,19 +57,19 @@ L<http://fletcherpenney.net/MultiMarkdown/>
 
 =head1 SYNTAX
 
-For more information about Markdown's syntax, see:
+For more information about (original) Markdown's syntax, see:
 
     http://daringfireball.net/projects/markdown/
     
 This module implements MultiMarkdown, which is an extension to Markdown..
 
-This is documented at:
+The extension is documented at:
 
-http://michelf.com/projects/php-markdown/extra/
+    http://fletcherpenney.net/MultiMarkdown/
 
-and
+and borrows heavilly from php-markdown, which lives at:
 
-http://fletcherpenney.net/MultiMarkdown/
+    http://michelf.com/projects/php-markdown/extra/
 
 This documentation is going to be moved/copied into this module for clearer reading in a future release..
 
