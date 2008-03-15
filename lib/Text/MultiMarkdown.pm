@@ -499,8 +499,8 @@ sub _HashHTMLBlocks {
 						)*				# Zero or more
 					}x;
 
-	my $empty_tag = qr{< \w+ $tag_attrs \s* />}xms;
-	my $open_tag =  qr{< $block_tags $tag_attrs \s* >}xms;
+	my $empty_tag = qr{< \w+ $tag_attrs \s* />}oxms;
+	my $open_tag =  qr{< $block_tags $tag_attrs \s* >}oxms;
 	my $close_tag = undef;	# let Text::Balanced handle this
 
 	use Text::Balanced qw(gen_extract_tagged);
@@ -534,10 +534,21 @@ sub _HashHTMLBlocks {
 
 	$text = join '', @chunks;
 
-
-
 	# Special case just for <hr />. It was easier to make a special case than
 	# to make the other regex more complicated.	
+	$text = $self->_HashHR($text);
+	
+    $text = $self->_HashHTMLComments($text);
+
+    $text = $self->_HashPHPASPBlocks($text);
+
+	return $text;
+}
+
+sub _HashHR {
+    my ($self, $text) = @_;
+    my $less_than_tab = $self->{tab_width} - 1;
+    
 	$text =~ s{
 				(?:
 					(?<=\n\n)		# Starting after a blank line
@@ -553,13 +564,20 @@ sub _HashHTMLBlocks {
 					[ \t]*
 					(?=\n{2,}|\Z)		# followed by a blank line or end of document
 				)
-			}{
-				my $key = _md5_utf8($1);
-				$self->{_html_blocks}{$key} = $1;
-				"\n\n" . $key . "\n\n";
-			}egx;
+	}{
+		my $key = _md5_utf8($1);
+		$self->{_html_blocks}{$key} = $1;
+		"\n\n" . $key . "\n\n";
+	}egx;
+			
+	return $text;
+}
 
-	# Special case for standalone HTML comments:
+sub _HashHTMLComments {
+    my ($self, $text) = @_;
+    my $less_than_tab = $self->{tab_width} - 1;
+    
+    # Special case for standalone HTML comments:
 	$text =~ s{
 				(?:
 					(?<=\n\n)		# Starting after a blank line
@@ -576,13 +594,20 @@ sub _HashHTMLBlocks {
 					[ \t]*
 					(?=\n{2,}|\Z)		# followed by a blank line or end of document
 				)
-			}{
-				my $key = _md5_utf8($1);
-				$self->{_html_blocks}{$key} = $1;
-				"\n\n" . $key . "\n\n";
-			}egx;
+	}{
+		my $key = _md5_utf8($1);
+		$self->{_html_blocks}{$key} = $1;
+		"\n\n" . $key . "\n\n";
+	}egx;
+	
+	return $text;
+}
 
-	# PHP and ASP-style processor instructions (<?…?> and <%…%>)
+sub _HashPHPASPBlocks {
+    my ($self, $text) = @_;
+    my $less_than_tab = $self->{tab_width} - 1;
+    
+    # PHP and ASP-style processor instructions (<?…?> and <%…%>)
 	$text =~ s{
 				(?:
 					(?<=\n\n)		# Starting after a blank line
@@ -604,10 +629,8 @@ sub _HashHTMLBlocks {
 				$self->{_html_blocks}{$key} = $1;
 				"\n\n" . $key . "\n\n";
 			}egx;
-
 	return $text;
 }
-
 
 sub _RunBlockGamut {
 #
@@ -713,8 +736,8 @@ sub _EscapeSpecialChars {
             # corresponding MD5 checksum value; this is likely
             # overkill, but it should prevent us from colliding
             # with the escape values by accident.
-            $cur_token->[1] =~  s! \* !$g_escape_table{'*'}!gx;
-            $cur_token->[1] =~  s! _  !$g_escape_table{'_'}!gx;
+            $cur_token->[1] =~  s! \* !$g_escape_table{'*'}!ogx;
+            $cur_token->[1] =~  s! _  !$g_escape_table{'_'}!ogx;
             $text .= $cur_token->[1];
         } else {
             my $t = $cur_token->[1];
@@ -739,10 +762,10 @@ sub _EscapeSpecialCharsWithinTagAttributes {
 
 	foreach my $cur_token (@$tokens) {
 		if ($cur_token->[0] eq "tag") {
-			$cur_token->[1] =~  s! \\ !$g_escape_table{'\\'}!gx;
-			$cur_token->[1] =~  s{ (?<=.)</?code>(?=.)  }{$g_escape_table{'`'}}gx;
-			$cur_token->[1] =~  s! \* !$g_escape_table{'*'}!gx;
-			$cur_token->[1] =~  s! _  !$g_escape_table{'_'}!gx;
+			$cur_token->[1] =~  s! \\ !$g_escape_table{'\\'}!gox;
+			$cur_token->[1] =~  s{ (?<=.)</?code>(?=.)  }{$g_escape_table{'`'}}gox;
+			$cur_token->[1] =~  s! \* !$g_escape_table{'*'}!gox;
+			$cur_token->[1] =~  s! _  !$g_escape_table{'_'}!gox;
 		}
 		$text .= $cur_token->[1];
 	}
@@ -786,13 +809,13 @@ sub _DoAnchors {
         my $label = $self->_Header2Label($link_id);
         if (defined $self->{_crossrefs}{$label}) {
             my $url = $self->{_crossrefs}{$label};
-            $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
+            $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
+            $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
             $result = qq[<a href="$url"];
             if ( defined $self->{_titles}{$label} ) {
                 my $title = $self->{_titles}{$label};
-                $title =~ s! \* !$g_escape_table{'*'}!gx;
-                $title =~ s!  _ !$g_escape_table{'_'}!gx;
+                $title =~ s! \* !$g_escape_table{'*'}!gox;
+                $title =~ s!  _ !$g_escape_table{'_'}!gox;
                 $result .=  " title=\"$title\"";
             }
             $result .= $self->_DoAttributes($label);
@@ -800,13 +823,13 @@ sub _DoAnchors {
         } 
         elsif (defined $self->{_urls}{$link_id}) {
             my $url = $self->{_urls}{$link_id};
-            $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
+            $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
+            $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
             $result = "<a href=\"$url\"";
             if ( defined $self->{_titles}{$link_id} ) {
                 my $title = $self->{_titles}{$link_id};
-                $title =~ s! \* !$g_escape_table{'*'}!gx;
-                $title =~ s!  _ !$g_escape_table{'_'}!gx;
+                $title =~ s! \* !$g_escape_table{'*'}!gox;
+                $title =~ s!  _ !$g_escape_table{'_'}!gox;
                 $result .=  qq{ title="$title"};
             }
             $result .= $self->_DoAttributes($label);
@@ -845,15 +868,15 @@ sub _DoAnchors {
         my $url         = $3;
         my $title       = $6;
         
-        $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
-        $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
+        $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
+        $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
         $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
         $result = "<a href=\"$url\"";
 
         if (defined $title) {
             $title =~ s/"/&quot;/g;
-            $title =~ s! \* !$g_escape_table{'*'}!gx;
-            $title =~ s!  _ !$g_escape_table{'_'}!gx;
+            $title =~ s! \* !$g_escape_table{'*'}!ogx;
+            $title =~ s!  _ !$g_escape_table{'_'}!ogx;
             $result .=  " title=\"$title\"";
         }
 
@@ -881,13 +904,13 @@ sub _DoAnchors {
 
 		if (defined $self->{_urls}{$link_id}) {
 			my $url = $self->{_urls}{$link_id};
-			$url =~ s! \* !$g_escape_table{'*'}!gx;		# We've got to encode these to avoid
-			$url =~ s!  _ !$g_escape_table{'_'}!gx;		# conflicting with italics/bold.
+			$url =~ s! \* !$g_escape_table{'*'}!ogx;		# We've got to encode these to avoid
+			$url =~ s!  _ !$g_escape_table{'_'}!ogx;		# conflicting with italics/bold.
 			$result = "<a href=\"$url\"";
 			if ( defined $self->{titles}{$link_id} ) {
 				my $title = $self->{titles}{$link_id};
-				$title =~ s! \* !$g_escape_table{'*'}!gx;
-				$title =~ s!  _ !$g_escape_table{'_'}!gx;
+				$title =~ s! \* !$g_escape_table{'*'}!ogx;
+				$title =~ s!  _ !$g_escape_table{'_'}!ogx;
 				$result .=  qq{ title="$title"};
 			}
 			$result .= ">$link_text</a>";
@@ -938,8 +961,8 @@ sub _DoImages {
         $alt_text =~ s/"/&quot;/g;
         if (defined $self->{_urls}{$link_id}) {
             my $url = $self->{_urls}{$link_id};
-            $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
+            $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
+            $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
             
             my $label = $self->_Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
@@ -951,8 +974,8 @@ sub _DoImages {
             $result = qq{<img$label src="$url" alt="$alt_text"};
             if (length $link_id && defined $self->{_titles}{$link_id} && length $self->{_titles}{$link_id}) {
                 my $title = $self->{_titles}{$link_id};
-                $title =~ s! \* !$g_escape_table{'*'}!gx;
-                $title =~ s!  _ !$g_escape_table{'_'}!gx;
+                $title =~ s! \* !$g_escape_table{'*'}!ogx;
+                $title =~ s!  _ !$g_escape_table{'_'}!ogx;
                 $result .=  qq{ title="$title"};
             }
             $result .= $self->_DoAttributes($link_id);
@@ -1000,8 +1023,8 @@ sub _DoImages {
 
         $alt_text =~ s/"/&quot;/g;
         $title    =~ s/"/&quot;/g;
-        $url =~ s! \* !$g_escape_table{'*'}!gx;     # We've got to encode these to avoid
-        $url =~ s!  _ !$g_escape_table{'_'}!gx;     # conflicting with italics/bold.
+        $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
+        $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
         $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
 
         my $label = $self->_Header2Label($alt_text);
@@ -1011,8 +1034,8 @@ sub _DoImages {
         $label = $self->{img_ids} ? qq{ id="$label"} : '';
         $result = qq{<img$label src="$url" alt="$alt_text"};
         if (defined $title && length $title) {
-            $title =~ s! \* !$g_escape_table{'*'}!gx;
-            $title =~ s!  _ !$g_escape_table{'_'}!gx;
+            $title =~ s! \* !$g_escape_table{'*'}!ogx;
+            $title =~ s!  _ !$g_escape_table{'_'}!ogx;
             $result .=  qq{ title="$title"};
         }
         $result .= $self->{empty_element_suffix};
@@ -1370,13 +1393,13 @@ sub _EncodeCode {
     s! >  !&gt;!gx;
 
     # Now, escape characters that are magic in Markdown:
-    s! \* !$g_escape_table{'*'}!gx;
-    s! _  !$g_escape_table{'_'}!gx;
-    s! {  !$g_escape_table{'{'}!gx;
-    s! }  !$g_escape_table{'}'}!gx;
-    s! \[ !$g_escape_table{'['}!gx;
-    s! \] !$g_escape_table{']'}!gx;
-    s! \\ !$g_escape_table{'\\'}!gx;
+    s! \* !$g_escape_table{'*'}!ogx;
+    s! _  !$g_escape_table{'_'}!ogx;
+    s! {  !$g_escape_table{'{'}!ogx;
+    s! }  !$g_escape_table{'}'}!ogx;
+    s! \[ !$g_escape_table{'['}!ogx;
+    s! \] !$g_escape_table{']'}!ogx;
+    s! \\ !$g_escape_table{'\\'}!ogx;
 
     return $_;
 }
@@ -1525,22 +1548,22 @@ sub _EncodeBackslashEscapes {
     my $self = shift;
     local $_ = shift;
 
-    s! \\\\  !$g_escape_table{'\\'}!gx;     # Must process escaped backslashes first.
-    s! \\`   !$g_escape_table{'`'}!gx;
-    s! \\\*  !$g_escape_table{'*'}!gx;
-    s! \\_   !$g_escape_table{'_'}!gx;
-    s! \\\{  !$g_escape_table{'{'}!gx;
-    s! \\\}  !$g_escape_table{'}'}!gx;
-    s! \\\[  !$g_escape_table{'['}!gx;
-    s! \\\]  !$g_escape_table{']'}!gx;
-    s! \\\(  !$g_escape_table{'('}!gx;
-    s! \\\)  !$g_escape_table{')'}!gx;
-    s! \\>   !$g_escape_table{'>'}!gx;
-    s! \\\#  !$g_escape_table{'#'}!gx;
-    s! \\\+  !$g_escape_table{'+'}!gx;
-    s! \\\-  !$g_escape_table{'-'}!gx;
-    s! \\\.  !$g_escape_table{'.'}!gx;
-    s{ \\!  }{$g_escape_table{'!'}}gx;
+    s! \\\\  !$g_escape_table{'\\'}!ogx;     # Must process escaped backslashes first.
+    s! \\`   !$g_escape_table{'`'}!ogx;
+    s! \\\*  !$g_escape_table{'*'}!ogx;
+    s! \\_   !$g_escape_table{'_'}!ogx;
+    s! \\\{  !$g_escape_table{'{'}!ogx;
+    s! \\\}  !$g_escape_table{'}'}!ogx;
+    s! \\\[  !$g_escape_table{'['}!ogx;
+    s! \\\]  !$g_escape_table{']'}!ogx;
+    s! \\\(  !$g_escape_table{'('}!ogx;
+    s! \\\)  !$g_escape_table{')'}!ogx;
+    s! \\>   !$g_escape_table{'>'}!ogx;
+    s! \\\#  !$g_escape_table{'#'}!ogx;
+    s! \\\+  !$g_escape_table{'+'}!ogx;
+    s! \\\-  !$g_escape_table{'-'}!ogx;
+    s! \\\.  !$g_escape_table{'.'}!ogx;
+    s{ \\!  }{$g_escape_table{'!'}}ogx;
 
     return $_;
 }
@@ -1658,9 +1681,9 @@ sub _TokenizeHTML {
     my $nested_tags = join('|', ('(?:<[a-z/!$](?:[^<>]') x $depth) . (')*>)' x  $depth);
     my $match = qr/(?s: <! ( -- .*? -- \s* )+ > ) |  # comment
                    (?s: <\? .*? \?> ) |              # processing instruction
-                   $nested_tags/ix;                   # nested tags
+                   $nested_tags/iox;                   # nested tags
 
-    while ($str =~ m/($match)/g) {
+    while ($str =~ m/($match)/og) {
         my $whole_tag = $1;
         my $sec_start = pos $str;
         my $tag_start = $sec_start - length $whole_tag;
