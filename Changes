@@ -98,9 +98,14 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
        - Fix bugs with tab_width in constructor / as an option.
        - Fix bugs with tab width in pre/code blocks.
        
-1.0.17 2008-02-??T??:??:??
-       - Add Markdown.pl and MultiMarkdown.pl, which work the same way as the 
-         originals.
-       - Make _DeTab significantly quicker. Text::Balanced is still the main
-         performance sore point however. :(
+1.0.17 2008-03-??T??:??:??
+       - Add Markdown.pl and MultiMarkdown.pl scripts, which are installed 
+         with the distribution and work the same way as the originals.
+       - Make _DeTab significantly quicker by simplifying the regex a lot, and 
+         then running it multiple times.
+       - Totally rewrite HTML block hashing to be *a lot* quicker. No longer 
+         uses Text::Balanced, which was the main performance sore point in the 
+         module.
+       - These performance improvements make us over 40% faster on 
+         t/20fulldocs-multimarkdown.t
  

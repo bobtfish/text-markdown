@@ -9,11 +9,7 @@ all_from        'lib/Text/Markdown.pm';
 
 # Specific dependencies
 perl_version    '5.008';
-requires        'MIME::Base64'    => undef;
-requires        'List::Util'      => undef;
 requires        'Digest::MD5'     => undef;
-requires        'Scalar::Util'    => undef;
-requires        'Text::Balanced'  => undef;
 requires        'Encode'          => undef;
 build_requires  'Test::More'      => '0.42';
 build_requires  'Test::Exception' => undef;
