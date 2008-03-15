@@ -17,7 +17,7 @@ if ($cli_opts{'version'}) {     # Version info
     print "Copyright 2004 John Gruber\n";
     print "Copyright 2006 Fletcher Penny\n";
     print "Copyright 2008 Tomas Doran\n";
-    print "Parts contributed by several other people."
+    print "Parts contributed by several other people.";
     print "http://fletcherpenney.net/MultiMarkdown/\n\n";
     exit 0;
 }
@@ -45,7 +45,8 @@ if (defined $fn && length $fn) {
     close($fh) or die;
 }
 else { # STDIN
-    $f = join('', <>);
+    local $/;               # Slurp the whole file
+    $f = <>;
 }
 
 sub main {

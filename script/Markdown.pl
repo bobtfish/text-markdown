@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Text::Markdown;
+use Text::Markdown qw(markdown);
 
 #### Check for command-line switches: #################
 my %cli_opts;
@@ -16,7 +16,7 @@ if ($cli_opts{'version'}) {     # Version info
     print "\nThis is Markdown, version $Text::Markdown::VERSION.\n";
     print "Copyright 2004 John Gruber\n";
     print "Copyright 2008 Tomas Doran\n";
-    print "Parts contributed by several other people."
+    print "Parts contributed by several other people.";
     print "http://daringfireball.net/projects/markdown/\n\n";
     exit 0;
 }
@@ -46,7 +46,7 @@ if (defined $fn && length $fn) {
 }
 else { # STDIN
     local $/;               # Slurp the whole file
-    $text = <>;
+    $f = <>;
 }
 
 sub main {

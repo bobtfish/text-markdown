@@ -20,6 +20,10 @@ build_requires  'Test::Exception' => undef;
 build_requires  'List::MoreUtils' => undef;
 build_requires  'File::Slurp'     => undef;
 
+# Scripts I install
+install_script   'script/Markdown.pl';
+install_script   'script/MultiMarkdown.pl';
+
 auto_install;
 WriteAll;
 

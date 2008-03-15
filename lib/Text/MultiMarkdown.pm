@@ -67,7 +67,7 @@ The extension is documented at:
 
     http://fletcherpenney.net/MultiMarkdown/
 
-and borrows heavilly from php-markdown, which lives at:
+and borrows from php-markdown, which lives at:
 
     http://michelf.com/projects/php-markdown/extra/
 
@@ -1794,7 +1794,7 @@ sub _DoFootnotes {
     }
     
     my $footnote_counter = 0;
-    
+        
     $text =~ s{
         \[\^(.*?)\]     # id = $1
     }{
