@@ -30,7 +30,7 @@ $instr = qq{foo\nbar\n};
 is_deeply(\@out, \@exp, 'foo\nbar\n');
 
 $instr = qq{foo\n};
-@exp = ( ['text', 'foo'], ['text', "\n"] );
+@exp = ( ['text', 'foo'], ['text', "\n"]);
 @out = $m->_TokenizeText($instr);
 is_deeply(\@out, \@exp, 'foo\n');
 
