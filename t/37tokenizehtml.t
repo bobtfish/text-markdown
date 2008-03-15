@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Text::MultiMarkdown ();
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 # Test the _TokenizeHTML routine This takes a chunk of text/HTML and splits it on HTML tags which appear
 # within tab_width -1 of the start of a line, making a number of tokens.
@@ -80,6 +80,15 @@ $instr = qq{<h1 id=foobarbaz>Heading</H1>};
 );
 $out = $m->_TokenizeHTML($instr);
 is_deeply($out, \@exp, '<h1 id=foobarbaz>Heading</H1>');
+
+$instr = qq{<h1 id=">">Heading</h1>};
+@exp = (
+    ['tag',  '<h1 id=">">', 'h1'],
+    ['text', 'Heading'                  ],
+    ['tag',  '</h1>', 'h1'              ],
+);
+$out = $m->_TokenizeHTML($instr);
+is_deeply($out, \@exp, '<h1 id=">">Heading</h1> - Hard case with > in attribute value');
 
 $instr = q{<hr/>};
 @exp = (
