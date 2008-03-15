@@ -472,10 +472,11 @@ my @block_tags = qw(
 		dl          ol        ul        script        noscript    form   
 		fieldset    iframe    math      ins           del
 );
-my %block_tags = map { ('<' . $_ . '>', '</' . $_ . '>') } @block_tags;
+my %block_tags = map { ($_, '</' . $_ . '>') } @block_tags;
 
-sub _HashHTMLBlocksNew {
+sub _HashHTMLBlocks {
     my ($self, $text) = @_;
+    #warn ("In _HashHTMLBlocks for text {$text}");
     my $less_than_tab = $self->{tab_width} - 1;
 
 	# Hashify HTML blocks:
@@ -493,14 +494,18 @@ sub _HashHTMLBlocksNew {
     my @collected = ();
     my @output = ();
     my $current_block_tag;
+    my $nesting_level = 0;
     
+    use Data::Dumper;
     foreach my $token (@$tokens) {
         if ($token->[0] eq 'text') {
+            #warn("In text " . Dumper($token));
             if ($current_block_tag) {
                 push @collected, $token;
                 next;
             }
             if ($token->[1] eq "\n") { # New line, start caring again
+                #warn("Started caring");
                 $care = 1;
                 $lspace = 0;
             }
@@ -514,22 +519,34 @@ sub _HashHTMLBlocksNew {
             push @output, $token;
         }
         else { # Is a tag
+            use Data::Dumper;
+            #warn("Got tag token: " . Dumper($token));
             if ($current_block_tag) { # If in tag already
-                if ($token->[1] eq $block_tags{$current_block_tag}) { # If end of current block.
-                    push @collected, $token;
-                    my $block = join('', map { $_->[1]} @collected);
-                    warn("BLOCK {$block}");
-                    my $key = _md5_utf8($block);
-                    $self->{_html_blocks}{$key} = $block;
-                    push(@output, ['text', "\n\n" . $key . "\n\n"]);
-                    @collected = ();
-                    $current_block_tag = undef;
-                    $care = 0; # Do not care about anything left on the line
+                push @collected, $token;
+                if ($token->[1] eq $block_tags{$current_block_tag}) { # End tag for current block
+                    $nesting_level--;
+                    if (0 == $nesting_level) {# If end of current block.
+                        my $block = join('', map { $_->[1]} @collected);
+                        #warn("BLOCK {$block}");
+                        my $key = _md5_utf8($block);
+                        $self->{_html_blocks}{$key} = $block;
+                        push(@output, ['text', "\n"], ['text', "\n"], ['text', $key], ['text', "\n"], ['text', "\n"]);
+                        @collected = ();
+                        $current_block_tag = undef;
+                        $care = 0; # Do not care about anything left on the line
+                    }
+                }
+                elsif ($token->[2] eq $current_block_tag) { # Another occurance of the same tag
+                    $nesting_level++;
                 }
             }
-            else {
-                if ($care && ($lspace <= $less_than_tab) && $block_tags{$token->[1]}) {
-                    $current_block_tag = $token->[1];
+            else { # Not in tag already
+                #warn("Not in tag already");
+                #warn("Care $care, lspace $lspace block tag" . $block_tags{$token->[2]});
+                if ($care && ($lspace <= $less_than_tab) && $block_tags{$token->[2]}) {
+                    #warn("IN TAG");
+                    $nesting_level++;
+                    $current_block_tag = $token->[2];
                     push @collected, $token;
                 }
                 else {
@@ -549,10 +566,12 @@ sub _HashHTMLBlocksNew {
 
     $text = $self->_HashPHPASPBlocks($text);
 
+    #warn ("OUT _HashHTMLBlocks for text {$text}");
+
 	return $text;
 }
 
-sub _HashHTMLBlocks {
+sub _HashHTMLBlocksOld {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
 
@@ -1772,31 +1791,40 @@ sub _TokenizeHTML {
         my $sec_start = pos $str;
         my $tag_start = $sec_start - length $whole_tag;
         if ($pos < $tag_start) {
-            my $l = $tag_start - $pos;
-            my $text = substr($str, $pos, $l);
-            my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
-            if (($i = index($text, "\n")) != -1) {
-                #warn("MEEP for {$text}");
-                my @newtokens = grep { length $_->[1] } 
-                    (['text', substr($text, 0, $i)], ['text', "\n"], ['text', substr($text, $i+1, $l-($i+1))]);
-                #use Data::Dumper;
-                #warn("NEW TOKENS: " . Dumper(\@newtokens));
-                push @tokens, @newtokens;
-            }
-            #if ($text =~ s/([^\n]*)\n([^\n]*)/$3/) {
-            #    push @tokens => ['text', $1], ['text', $2];
-            #}
-            else {
-                push @tokens, ['text', $text];
-            }
+            push @tokens, $self->_TokenizeText( substr($str, $pos, $tag_start - $pos) );
         }
-        push @tokens, ['tag', $whole_tag];
+        $whole_tag =~ /^<\/?([^> ]+)/;
+        push @tokens, ['tag', $whole_tag, $1];
         $pos = pos $str;
     }
-    push @tokens, ['text', substr($str, $pos, $len - $pos)] if $pos < $len;
+    push @tokens, $self->_TokenizeText( substr($str, $pos, $len - $pos) ) if $pos < $len;
     \@tokens;
 }
 
+sub _TokenizeText {
+    my ($self, $text) = @_;
+    
+    my @tokens;
+    
+    while (my $l = length $text) {
+        #warn("Tokenize $text");
+        my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
+        if (($i = index($text, "\n")) != -1) {
+            #warn("MEEP for {$text}");
+            push @tokens, ['text', substr($text, 0, $i)], ['text', "\n"];
+            $text = substr($text, $i+1, $l-($i+1));
+            #warn("REMAINING {$text}");
+            #use Data::Dumper;
+            #warn(Dumper(\@tokens));
+        }
+        else {
+            push @tokens => ['text', $text];
+            $text = '';
+        }
+        #warn("ABOUT TO LOOP {$text}");
+    }
+    return grep { length $_->[1] } @tokens;
+}
 
 sub _Outdent {
 #
