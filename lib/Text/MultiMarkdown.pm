@@ -1720,7 +1720,7 @@ sub _TokenizeHTML {
             push @tokens, $self->_TokenizeText( substr($str, $pos, $tag_start - $pos) );
         }
         $whole_tag =~ /^<\/?([^> ]+)/;
-        push @tokens, ['tag', $whole_tag, $1];
+        push @tokens, ['tag', $whole_tag, lc($1)];
         $pos = pos $str;
     }
     push @tokens, $self->_TokenizeText( substr($str, $pos, $len - $pos) ) if $pos < $len;
@@ -1730,6 +1730,7 @@ sub _TokenizeHTML {
 sub _TokenizeText {
     my ($self, $text) = @_;
     
+    # FIXME - Can this just become a split, or am I being over complex for a reason?
     my @tokens;
     
     while (my $l = length $text) {
