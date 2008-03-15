@@ -474,7 +474,7 @@ my @block_tags = qw(
 );
 my %block_tags = map { ('<' . $_ . '>', '</' . $_ . '>') } @block_tags;
 
-sub _HashHTMLBlocks {
+sub _HashHTMLBlocksNew {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
 
@@ -552,7 +552,7 @@ sub _HashHTMLBlocks {
 	return $text;
 }
 
-sub _HashHTMLBlocksOld {
+sub _HashHTMLBlocks {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
 
@@ -594,9 +594,7 @@ sub _HashHTMLBlocksOld {
 	my @chunks;
 	while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
 		my $cur_line = $1;
-		warn("Cur line $1");
 		if (defined $2) {
-		    warn("MATCH");
 			# current line could be start of code block
 
 			my ($tag, $remainder) = $extract_block->($cur_line . $text);
