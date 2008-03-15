@@ -467,6 +467,13 @@ sub _md5_utf8 {
     }
 }
 
+my @block_tags = qw(
+    	p           div       h1  h2 h3 h4 h5 h6  blockquote    pre         table  
+		dl          ol        ul        script        noscript    form   
+		fieldset    iframe    math      ins           del
+);
+my %block_tags = map { ('<' . $_ . '>', '</' . $_ . '>') } @block_tags;
+
 sub _HashHTMLBlocks {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
@@ -503,36 +510,92 @@ sub _HashHTMLBlocks {
 	my $open_tag =  qr{< $block_tags $tag_attrs \s* >}oxms;
 	my $close_tag = undef;	# let Text::Balanced handle this
 
-	use Text::Balanced qw(gen_extract_tagged);
-	my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
+    my $tokens = $self->_TokenizeHTML($text);
+	$text = '';   # rebuild $text from the tokens
 
-	my @chunks;
-	while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
-		my $cur_line = $1;
-		if (defined $2) {
+	#use Text::Balanced qw(gen_extract_tagged);
+	#my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
+
+    my $care = 1;
+    my $lspace = 0;
+    my @collected = ();
+    my @output = ();
+    my $current_block_tag;
+    
+    foreach my $token (@$tokens) {
+        if ($token->[0] eq 'text') {
+            if ($current_block_tag) {
+                push @collected, $token;
+                next;
+            }
+            if ($token->[1] eq "\n") { # New line, start caring again
+                $care = 1;
+                $lspace = 0;
+            }
+            elsif ($token->[1] =~ /^[ ]+$/ && $care) {
+                $lspace += length($token->[1]);
+                $care = 0 if ($lspace > $less_than_tab);
+            }
+            else {
+                $care = 0;
+            }
+            push @output, $token;
+        }
+        else { # Is a tag
+            if ($current_block_tag) { # If in tag already
+                if ($token->[1] eq $block_tags{$current_block_tag}) { # If end of current block.
+                    push @collected, $token;
+                    my $block = join('', map { $_->[1]} @collected);
+                    warn("BLOCK {$block}");
+                    my $key = _md5_utf8($block);
+                    $self->{_html_blocks}{$key} = $block;
+                    push(@output, ['text', "\n\n" . $key . "\n\n"]);
+                    @collected = ();
+                    $current_block_tag = undef;
+                    $care = 0; # Do not care about anything left on the line
+                }
+            }
+            else {
+                if ($care && ($lspace <= $less_than_tab) && $block_tags{$token->[1]}) {
+                    $current_block_tag = $token->[1];
+                    push @collected, $token;
+                }
+                else {
+                    push @output, $token;
+                }
+            }
+        }
+    }
+
+	#my @chunks;
+	#while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
+#		my $cur_line = $1;
+#		warn("Cur line $1");
+#		if (defined $2) {
+#		    warn("MATCH");
 			# current line could be start of code block
 
-			my ($tag, $remainder) = $extract_block->($cur_line . $text);
-			if ($tag) {
-				my $key = _md5_utf8($tag);
-				$self->{_html_blocks}{$key} = $tag;
-				push @chunks, "\n\n" . $key . "\n\n";
-				$text = $remainder;
-			}
-			else {
+#			my ($tag, $remainder) = $extract_block->($cur_line . $text);
+#			if ($tag) {
+#				my $key = _md5_utf8($tag);
+#				$self->{_html_blocks}{$key} = $tag;
+#				push @chunks, "\n\n" . $key . "\n\n";
+#				$text = $remainder;
+#			}
+#			else {
 				# No tag match, so toss $cur_line into @chunks
-				push @chunks, $cur_line;
-			}
-		}
-		else {
+#				push @chunks, $cur_line;
+#			}
+#		}
+#		else {
 			# current line could NOT be start of code block
-			push @chunks, $cur_line;
-		}
+#			push @chunks, $cur_line;
+#		}
 
-	}
-	push @chunks, $text; # Whatever is left.
+#	}
+#	push @chunks, $text; # Whatever is left.
 
-	$text = join '', @chunks;
+	$text = join '', map { $_->[1] } @output;
 
 	# Special case just for <hr />. It was easier to make a special case than
 	# to make the other regex more complicated.	
@@ -1671,7 +1734,6 @@ sub _TokenizeHTML {
 #   Derived from the _tokenize() subroutine from Brad Choate's MTRegex plugin.
 #       <http://www.bradchoate.com/past/mtregex.php>
 #
-
     my ($self, $str) = @_;
     my $pos = 0;
     my $len = length $str;
@@ -1688,7 +1750,23 @@ sub _TokenizeHTML {
         my $sec_start = pos $str;
         my $tag_start = $sec_start - length $whole_tag;
         if ($pos < $tag_start) {
-            push @tokens, ['text', substr($str, $pos, $tag_start - $pos)];
+            my $l = $tag_start - $pos;
+            my $text = substr($str, $pos, $l);
+            my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
+            if (($i = index($text, "\n")) != -1) {
+                #warn("MEEP for {$text}");
+                my @newtokens = grep { length $_->[1] } 
+                    (['text', substr($text, 0, $i)], ['text', "\n"], ['text', substr($text, $i+1, $l-($i+1))]);
+                #use Data::Dumper;
+                #warn("NEW TOKENS: " . Dumper(\@newtokens));
+                push @tokens, @newtokens;
+            }
+            #if ($text =~ s/([^\n]*)\n([^\n]*)/$3/) {
+            #    push @tokens => ['text', $1], ['text', $2];
+            #}
+            else {
+                push @tokens, ['text', $text];
+            }
         }
         push @tokens, ['tag', $whole_tag];
         $pos = pos $str;
