@@ -1719,7 +1719,7 @@ sub _TokenizeHTML {
         if ($pos < $tag_start) {
             push @tokens, $self->_TokenizeText( substr($str, $pos, $tag_start - $pos) );
         }
-        $whole_tag =~ /^<\/?([^> ]+)/;
+        $whole_tag =~ /^<\/?([^> \/]+)/;
         push @tokens, ['tag', $whole_tag, lc($1)];
         $pos = pos $str;
     }
