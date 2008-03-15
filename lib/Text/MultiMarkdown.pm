@@ -484,14 +484,14 @@ sub _HashHTMLBlocks {
 	# lists, and tables. That's because we still want to wrap <p>s around
 	# "paragraphs" that are wrapped in non-block-level tags, such as anchors,
 	# phrase emphasis, and spans. The list of tags we're looking for is
-	# hard-coded:
+	# hard-coded (see @block_tags above)
 
     my $tokens = $self->_TokenizeHTML($text);
 	$text = '';   # rebuild $text from the tokens
 
     my $care = 1;
     my $lspace = 0;
-    my @collected = (); # Would be faster to keep indexes, then slice them here.
+    my @collected = (); # Would probably be faster to keep indexes, then slice them here.
     my @output = ();
     my $current_block_tag;
     my $current_block_end_tag;
@@ -708,7 +708,6 @@ sub _RunBlockGamut {
     return $text;
 }
 
-
 sub _RunSpanGamut {
 #
 # These are all the transformations that occur *within* block-level
@@ -769,7 +768,8 @@ sub _EscapeSpecialChars {
             $cur_token->[1] =~  s! \* !$g_escape_table{'*'}!ogx;
             $cur_token->[1] =~  s! _  !$g_escape_table{'_'}!ogx;
             $text .= $cur_token->[1];
-        } else {
+        } 
+        else {
             my $t = $cur_token->[1];
             $t = $self->_EncodeBackslashEscapes($t);
             $text .= $t;
@@ -801,7 +801,6 @@ sub _EscapeSpecialCharsWithinTagAttributes {
 	}
 	return $text;
 }
-
 
 sub _DoAnchors {
 #
@@ -954,7 +953,6 @@ sub _DoAnchors {
     return $text;
 }
 
-
 sub _DoImages {
 #
 # Turn Markdown image shortcuts into <img> tags.
@@ -1076,7 +1074,6 @@ sub _DoImages {
     return $text;
 }
 
-
 sub _DoHeaders {
     my ($self, $text) = @_;
     my $header = "";
@@ -1147,7 +1144,6 @@ sub _DoHeaders {
 
     return $text;
 }
-
 
 sub _DoLists {
 #
@@ -1240,7 +1236,6 @@ sub _DoLists {
     return $text;
 }
 
-
 sub _ProcessListItems {
 #
 #   Process the contents of a single ordered or unordered list, splitting it
@@ -1306,8 +1301,6 @@ sub _ProcessListItems {
     return $list_str;
 }
 
-
-
 sub _DoCodeBlocks {
 #
 #   Process Markdown `<pre><code>` blocks.
@@ -1340,7 +1333,6 @@ sub _DoCodeBlocks {
 
 	return $text;
 }
-
 
 sub _DoCodeSpans {
 #
@@ -1388,7 +1380,6 @@ sub _DoCodeSpans {
     return $text;
 }
 
-
 sub _EncodeCode {
 #
 # Encode/escape certain characters inside Markdown code runs.
@@ -1434,7 +1425,6 @@ sub _EncodeCode {
     return $_;
 }
 
-
 sub _DoItalicsAndBold {
     my ($self, $text) = @_;
 
@@ -1461,7 +1451,6 @@ sub _DoItalicsAndBold {
 
     return $text;
 }
-
 
 sub _DoBlockQuotes {
     my ($self, $text) = @_;
@@ -1497,7 +1486,6 @@ sub _DoBlockQuotes {
 
     return $text;
 }
-
 
 sub _FormParagraphs {
 #
@@ -1535,7 +1523,6 @@ sub _FormParagraphs {
     return join "\n\n", @grafs;
 }
 
-
 sub _EncodeAmpsAndAngles {
 # Smart processing for ampersands and angle brackets that need to be encoded.
 
@@ -1567,7 +1554,6 @@ sub _EncodeAmpsAndAngles {
 
     return $text;
 }
-
 
 sub _EncodeBackslashEscapes {
 #
