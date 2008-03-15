@@ -211,7 +211,7 @@ sub _Markdown {
         
     $text = $self->_ConvertCopyright($text);
 
-    return $text;
+    return $text . "\n";
 }
 
 sub _StripLinkDefinitions {

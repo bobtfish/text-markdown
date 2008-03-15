@@ -2,9 +2,13 @@ use strict;
 use warnings;
 use Test::More tests => 4;
 
-use_ok('Text::Markdown');
+use_ok('Text::MultiMarkdown');
 
-my $m = Text::Markdown->new;
+my $m = Text::MultiMarkdown->new(
+    disable_tables => 1,
+    disable_footnotes => 1,
+    disable_bibliography => 1,
+);
 
 my $instr = q{Here is some text containing a footnote.[^somesamplefootnote]
     
