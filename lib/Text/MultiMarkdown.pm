@@ -619,7 +619,7 @@ sub _HashHTMLBlocksOld {
     }
 	push @chunks, $text; # Whatever is left.
 
-	$text = join '', map { $_->[1] } @output;
+	$text = join '', @chunks;
 
 	# Special case just for <hr />. It was easier to make a special case than
 	# to make the other regex more complicated.	
