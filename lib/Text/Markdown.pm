@@ -1448,5 +1448,4 @@ sub _ConvertCopyright {
     return $text;
 }
 
-
 1;

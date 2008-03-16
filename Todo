@@ -1,13 +1,12 @@
 Todo pre 1.0.17:
-   . Generally sort out the code layout so that not all of the code lives in
-     MultiMarkdown.pm (i.e. Text::Markdown should stand on it's own, with 
-     Text::MultiMarkdown being a superset).
-    . Sort out the documentation / options to go with this.
-    . Finish removing copy and paste code.
-    . Write unit tests to ensure that the following features which would have 
+    . Sort out the documentation / options to go with the code reorganisation.
+    . Restore _StripLinkDefinitions to the original Markdown version in 
+      Markdown.pl.
+    . Write unit tests to ensure that the following features which previously 
       bled into Text::Markdown now don't work:
         . Link attributes
         . Header Xrefs
+        . Image Xrefs
     . If installed interactively, prompt the user if the Markdown.pl and 
       MultiMarkdown.pl scripts should be installed. Make sure these are 
       totally compatible with the 'original' versions.
@@ -26,7 +25,8 @@ Todo pre 1.0.19:
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
-    . Document the markdown (and multimarkdown) syntaxes in the module.
+    . Document the markdown (and multimarkdown) syntaxes in the module 
+      properly.
 
 Todo pre 1.0.20:
     . Stop perl shitting itself due to regex backreference when doing listsug

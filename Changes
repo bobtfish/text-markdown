@@ -120,15 +120,22 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
          - Text::Markdown will no longer support the following features, which 
            were not in original Markdown, but were previously supported after
            the code merge:
+
             . Cross references to images and headers (would not work without 
             the relevant id attributes switched on)
             . Additional attribute specification for images and links.
+
            If you are relying on these features, it is recommended that you 
            use Text::MultiMarkdown (configured as you prefer), as these are 
            not supported features in the original Markdown.
-         - MultiMarkdown only - Changed order of attributes in image tags, id 
-           will no longer be the first attribute.
+
+         - Text::MultiMarkdown has changed the order of attributes in image 
+           tags, the id attribute is moved from the first to the last 
+           attribute (barring user supplied attributes). An example of the 
+           expected change is included below:
+
            Old output:  <img id="image" src="http://path.to/image" alt="image" title="Image title" width="40px" height="400px" />
+
            New output: <img src="http://path.to/image" alt="image" title="Image title" id="image" width="40px" height="400px" />
          
            This is due to the code re-organisation, moving the id attribute 

@@ -6,7 +6,7 @@ use warnings;
 use Digest::MD5 qw(md5_hex);
 use Encode      qw();
 use Carp        qw(croak);
-use base        qw(Text::Markdown Exporter);
+use base        qw(Text::Markdown);
 
 our $VERSION   = '1.0.17';
 our @EXPORT_OK = qw(markdown);
@@ -320,9 +320,7 @@ sub markdown {
     # (see _ProcessListItems() for details)
     $self->{_list_level} = 0;
 
-    my $t =  $self->_Markdown($text);
-
-    return $t; 
+    return $self->_Markdown($text); 
 }
 
 sub _Markdown {
@@ -332,6 +330,7 @@ sub _Markdown {
 # _EscapeSpecialChars(), so that any *'s or _'s in the <a>
 # and <img> tags get encoded.
 #
+# Can't think of any good way to make this inherit from the Markdown version as ordering is so important, so I've left it.
     my ($self, $text) = @_;
     
     $text = $self->_CleanUpDoc($text);
@@ -621,9 +620,6 @@ sub _GenerateImageCrossRefs {
 
     return $text;
 }
-
-
-# MultiMarkdown specific routines
 
 sub _StripFootnoteDefinitions {
     my ($self, $text) = @_;
@@ -1176,8 +1172,6 @@ sub _PrintMarkdownBibliography {
     
     return $result;
 }
-
-
 
 1;
 __END__
