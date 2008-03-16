@@ -487,7 +487,6 @@ sub _RunBlockGamut {
     return $text;
 }
 
-
 sub _RunSpanGamut {
 #
 # These are all the transformations that occur *within* block-level
@@ -570,7 +569,6 @@ sub _EscapeSpecialCharsWithinTagAttributes {
 	}
 	return $text;
 }
-
 
 sub _DoAnchors {
 #
@@ -706,7 +704,6 @@ sub _DoAnchors {
     return $text;
 }
 
-
 sub _DoImages {
 #
 # Turn Markdown image shortcuts into <img> tags.
@@ -815,11 +812,8 @@ sub _DoImages {
     return $text;
 }
 
-
 sub _DoHeaders {
     my ($self, $text) = @_;
-    my $header = "";
-    my $label = "";
     
     # Setext-style headers:
     #     Header 1
@@ -829,11 +823,11 @@ sub _DoHeaders {
     #     --------
     #
     $text =~ s{ ^(.+)[ \t]*\n=+[ \t]*\n+ }{
-        "<h1>"  .  $self->_RunSpanGamut($1)  .  "</h1>\n\n";
+        $self->_GenerateHeader('1', $1);
     }egmx;
 
     $text =~ s{ ^(.+)[ \t]*\n-+[ \t]*\n+ }{
-        "<h2>"  .  $self->_RunSpanGamut($1)  .  "</h2>\n\n";
+        $self->_GenerateHeader('2', $1);
     }egmx;
 
 
@@ -854,12 +848,17 @@ sub _DoHeaders {
             \n+
         }{
             my $h_level = length($1);
-            "<h$h_level>"  .  $2  .  "</h$h_level>\n\n";
+            $self->_GenerateHeader($h_level, $2);
         }egmx;
 
     return $text;
 }
 
+sub _GenerateHeader {
+    my ($self, $level, $id) = @_;
+
+    return "<h$level>"  .  $self->_RunSpanGamut($id)  .  "</h$level>\n\n";
+}
 
 sub _DoLists {
 #
@@ -952,7 +951,6 @@ sub _DoLists {
     return $text;
 }
 
-
 sub _ProcessListItems {
 #
 #   Process the contents of a single ordered or unordered list, splitting it
@@ -1018,8 +1016,6 @@ sub _ProcessListItems {
     return $list_str;
 }
 
-
-
 sub _DoCodeBlocks {
 #
 #   Process Markdown `<pre><code>` blocks.
@@ -1052,7 +1048,6 @@ sub _DoCodeBlocks {
 
 	return $text;
 }
-
 
 sub _DoCodeSpans {
 #
@@ -1100,7 +1095,6 @@ sub _DoCodeSpans {
     return $text;
 }
 
-
 sub _EncodeCode {
 #
 # Encode/escape certain characters inside Markdown code runs.
@@ -1140,7 +1134,6 @@ sub _EncodeCode {
     return $_;
 }
 
-
 sub _DoItalicsAndBold {
     my ($self, $text) = @_;
 
@@ -1167,7 +1160,6 @@ sub _DoItalicsAndBold {
 
     return $text;
 }
-
 
 sub _DoBlockQuotes {
     my ($self, $text) = @_;
@@ -1203,7 +1195,6 @@ sub _DoBlockQuotes {
 
     return $text;
 }
-
 
 sub _FormParagraphs {
 #
@@ -1241,7 +1232,6 @@ sub _FormParagraphs {
     return join "\n\n", @grafs;
 }
 
-
 sub _EncodeAmpsAndAngles {
 # Smart processing for ampersands and angle brackets that need to be encoded.
 
@@ -1274,7 +1264,6 @@ sub _EncodeAmpsAndAngles {
     return $text;
 }
 
-
 sub _EncodeBackslashEscapes {
 #
 #   Parameter:  String.
@@ -1304,7 +1293,6 @@ sub _EncodeBackslashEscapes {
     return $_;
 }
 
-
 sub _DoAutoLinks {
     my ($self, $text) = @_;
 
@@ -1326,7 +1314,6 @@ sub _DoAutoLinks {
 
     return $text;
 }
-
 
 sub _EncodeEmailAddress {
 #
@@ -1379,7 +1366,6 @@ sub _EncodeEmailAddress {
     return $addr;
 }
 
-
 sub _UnescapeSpecialChars {
 #
 # Swap back in all the special characters we've hidden.
@@ -1391,7 +1377,6 @@ sub _UnescapeSpecialChars {
     }
     return $text;
 }
-
 
 sub _TokenizeHTML {
 #
@@ -1433,7 +1418,6 @@ sub _TokenizeHTML {
     \@tokens;
 }
 
-
 sub _Outdent {
 #
 # Remove one level of line-leading tabs or spaces
@@ -1443,7 +1427,6 @@ sub _Outdent {
     $text =~ s/^(\t|[ ]{1,$self->{tab_width}})//gm;
     return $text;
 }
-
 
 sub _Detab {
 #

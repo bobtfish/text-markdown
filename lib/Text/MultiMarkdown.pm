@@ -336,7 +336,7 @@ sub _Markdown {
     
     $text = $self->_CleanUpDoc($text);
     
-    # Strip out MetaData
+    # MMD only. Strip out MetaData
     $text = $self->_ParseMetaData($text) if ($self->{use_metadata} || $self->{strip_metadata});
 
     # Turn block-level HTML blocks into hash entries
@@ -346,26 +346,27 @@ sub _Markdown {
 
     $self->_GenerateImageCrossRefs($text);
     
+    # MMD only
     $text = $self->_StripMarkdownReferences($text);
 
     $text = $self->_RunBlockGamut($text);
     
+    # MMD Only
     $text = $self->_DoMarkdownCitations($text) unless $self->{disable_bibliography};
-    
     $text = $self->_DoFootnotes($text) unless $self->{disable_footnotes};
     
     $text = $self->_UnescapeSpecialChars($text);
 
+    # MMD Only
     # This must follow _UnescapeSpecialChars
     $text = $self->_UnescapeWikiWords($text);
-
     $text = $self->_FixFootnoteParagraphs($text) unless $self->{disable_footnotes};
     $text .= $self->_PrintFootnotes() unless $self->{disable_footnotes};
-    
     $text .= $self->_PrintMarkdownBibliography() unless $self->{disable_bibliography};
         
     $text = $self->_ConvertCopyright($text);
 
+    # MMD Only
     if (lc($self->{document_format}) =~ /^complete\s*$/) {
         return $self->_xhtmlMetaData() . "<body>\n" . $text . "\n</body>\n</html>";
     } 
@@ -736,76 +737,28 @@ sub _DoImages {
     return $text;
 }
 
-# FIXME
 sub _DoHeaders {
     my ($self, $text) = @_;
-    my $header = "";
-    my $label = "";
-    
+
     # Don't do Wiki Links in Headers
     local $self->{use_wikilinks} = 0;
     
-    # Setext-style headers:
-    #     Header 1
-    #     ========
-    #  
-    #     Header 2
-    #     --------
-    #
-    $text =~ s{ ^(.+)[ \t]*\n=+[ \t]*\n+ }{
-        $label = $self->{heading_ids} ? q{ id="} . $self->_Header2Label($1) . q{"} : '';
-        $header = $self->_RunSpanGamut($1);
-        
-        if ($label ne '') {
-            $self->{_crossrefs}{$label} = "#$label";
-            $self->{_titles}{$label} = $header;
-        }
-        
-        "<h1$label>"  .  $self->_RunSpanGamut($1)  .  "</h1>\n\n";
-    }egmx;
+    return $self->SUPER::_DoHeaders($text);
+}
 
-    $text =~ s{ ^(.+)[ \t]*\n-+[ \t]*\n+ }{
-        $label = $self->{heading_ids} ? q{ id="} . $self->_Header2Label($1) . q{"} : '';
-        $header = $self->_RunSpanGamut($1);
-        
-        if ($label ne '') {
-            $self->{_crossrefs}{$label} = "#$label";
-            $self->{_titles}{$label} = $header;
-        }
-        
-        "<h2$label>"  .  $self->_RunSpanGamut($1)  .  "</h2>\n\n";
-    }egmx;
-
-
-    # atx-style headers:
-    #   # Header 1
-    #   ## Header 2
-    #   ## Header 2 with closing hashes ##
-    #   ...
-    #   ###### Header 6
-    #
-    my $l;
-    $text =~ s{
-            ^(\#{1,6})  # $1 = string of #'s
-            [ \t]*
-            (.+?)       # $2 = Header text
-            [ \t]*
-            \#*         # optional closing #'s (not counted)
-            \n+
-        }{
-            my $h_level = length($1);
-            $header = $self->_RunSpanGamut($2);
-            
-            if ($self->{heading_ids}) {
-                $label = $self->_Header2Label($2);
-                $self->{_crossrefs}{$label} = "#$label";
-                $self->{_titles}{$label} = $header;
-            }
-            $l = $self->{heading_ids} ? $h_level . ' id="' . $label . '"' : $h_level;
-            "<h$l>"  .  $header  .  "</h$h_level>\n\n";
-        }egmx;
-
-    return $text;
+sub _GenerateHeader {
+    my ($self, $level, $id) = @_;
+    
+    my $label = $self->{heading_ids} ? $self->_Header2Label($id) : '';
+    my $header = $self->_RunSpanGamut($id);
+    
+    if ($label ne '') {
+        $self->{_crossrefs}{$label} = "#$label";
+        $self->{_titles}{$label} = $header;
+        $label = qq{ id="$label"};
+    }
+    
+    return "<h$level$label>$header</h$level>\n\n";
 }
 
 sub _EncodeCode {
@@ -937,7 +890,6 @@ sub _GenerateImageCrossRefs {
 
         )
     }{
-        my $result;
         my $whole_match = $1;
         my $alt_text    = $2;
         my $link_id     = lc $3;
@@ -947,13 +899,10 @@ sub _GenerateImageCrossRefs {
         }
 
         $alt_text =~ s/"/&quot;/g;
+        
         if (defined $self->{_urls}{$link_id}) {
             my $label = $self->_Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
-        }
-        else {
-            # If there's no such link ID, leave intact:
-            $result = $whole_match;
         }
 
         $whole_match;
