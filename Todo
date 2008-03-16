@@ -2,6 +2,7 @@ Todo pre 1.0.17:
    . Generally sort out the code layout so that not all of the code lives in
      MultiMarkdown.pm (i.e. Text::Markdown should stand on it's own, with 
      Text::MultiMarkdown being a superset).
+    . Sort out the documentation / options to go with this.
     . Finish removing copy and paste code.
     . Write unit tests to ensure that the following features which would have 
       bled into Text::Markdown now don't work:

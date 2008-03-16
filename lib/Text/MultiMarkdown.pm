@@ -343,8 +343,6 @@ sub _Markdown {
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     $text = $self->_StripLinkDefinitions($text);
-
-    $self->_GenerateImageCrossRefs($text);
     
     # MMD only
     $text = $self->_StripMarkdownReferences($text);
@@ -376,119 +374,41 @@ sub _Markdown {
     
 }
 
-sub _RunBlockGamut {
 #
-# These are all the transformations that form block-level
-# tags like paragraphs, headers, and list items.
+# Routines which are overridden for slightly different behavior in MultiMarkdown
 #
-    my ($self, $text) = @_;
 
-    # Do headers first, as these populate cross-refs
-    $text = $self->_DoHeaders($text);
-    
-    # Do tables first to populate the table id's for cross-refs
-    # (but after headers as the tables can contain cross-refs to other things, so we want the header cross-refs)
-    # Escape <pre><code> so we don't get greedy with tables
-    $text = $self->_DoTables($text);
-    
-    # And now, protect our tables
-    $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
-
-    # Do Horizontal Rules:
-    $text =~ s{^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$}{\n<hr$self->{empty_element_suffix}\n}gmx;
-    $text =~ s{^[ ]{0,2}([ ]? -[ ]?){3,}[ \t]*$}{\n<hr$self->{empty_element_suffix}\n}gmx;
-    $text =~ s{^[ ]{0,2}([ ]? _[ ]?){3,}[ \t]*$}{\n<hr$self->{empty_element_suffix}\n}gmx;
-
-    $text = $self->_DoLists($text);
-
-    $text = $self->_DoCodeBlocks($text);
-
-    $text = $self->_DoBlockQuotes($text);
-
-    # We already ran _HashHTMLBlocks() before, in Markdown(), but that
-    # was to escape raw HTML in the original Markdown source. This time,
-    # we're escaping the markup we've just created, so that we don't wrap
-    # <p> tags around block-level tags.
-    $text = $self->_HashHTMLBlocks($text);
-
-    # Escape <pre><code> so we don't get greedy with tables
-#   $text = _DoTables($text);
-    
-    # And now, protect our tables
-#   $text = _HashHTMLBlocks($text);
-
-    $text = $self->_FormParagraphs($text);
-
-    return $text;
-}
-
-
+# Delegate to super class, then do wiki links
 sub _RunSpanGamut {
-#
-# These are all the transformations that occur *within* block-level
-# tags like paragraphs, headers, and list items.
-#
     my ($self, $text) = @_;
 
-    $text = $self->_DoCodeSpans($text);
-    $text = $self->_EscapeSpecialCharsWithinTagAttributes($text);
-    $text = $self->_EscapeSpecialChars($text);
-
-    # Process anchor and image tags. Images must come first,
-    # because ![foo][f] looks like an anchor.
-    $text = $self->_DoImages($text);
-    $text = $self->_DoAnchors($text);
-
+    $text = $self->SUPER::_RunSpanGamut($text);
+    
     # Process WikiWords
     if ($self->_UseWikiLinks()) {
         $text = $self->_DoWikiLinks($text);
         
         # And then reprocess anchors and images
+        # FIXME - This is needed exactly why?
         $text = $self->_DoImages($text);
         $text = $self->_DoAnchors($text);
     }
     
-    # Make links out of things like `<http://example.com/>`
-    # Must come after _DoAnchors(), because you can use < and >
-    # delimiters in inline links like [this](<url>).
-    $text = $self->_DoAutoLinks($text);
-
-    $text = $self->_EncodeAmpsAndAngles($text);
-
-    $text = $self->_DoItalicsAndBold($text);
-
-    # Do hard breaks:
-    $text =~ s/ {2,}\n/ <br$self->{empty_element_suffix}\n/g;
-
     return $text;
 }
 
-sub _GenerateImage {
-    # FIXME - Fugly, change to named params?
-    my ($self, $whole_match, $alt_text, $link_id, $url, $title, $attributes) = @_;
-    
-    if (defined $alt_text && length $alt_text) {
-        my $label = $self->_Header2Label($alt_text);
-        $self->{_crossrefs}{$label} = "#$label";
-        $attributes .= $self->{img_ids} ? qq{ id="$label"} : '';
-    }
-    
-    $attributes .= $self->_DoAttributes($link_id) if defined $link_id;
-    
-    $self->SUPER::_GenerateImage($whole_match, $alt_text, $link_id, $url, $title, $attributes);
-}
-
-#
-# Routines which are overridden for slightly different behavior in MultiMarkdown
-#
-
 # Don't do Wiki Links in Headers, otherwise delegate to super class
+# Do tables stright after headers
 sub _DoHeaders {
     my ($self, $text) = @_;
 
     local $self->{use_wikilinks} = 0;
     
-    return $self->SUPER::_DoHeaders($text);
+    $text = $self->SUPER::_DoHeaders($text);
+    
+    # Do tables to populate the table id's for cross-refs
+    # (but after headers as the tables can contain cross-refs to other things, so we want the header cross-refs)
+    $text = $self->_DoTables($text);
 }
 
 # Generating headers automatically generates X-refs in MultiMarkdown (always)
@@ -521,13 +441,18 @@ sub _EncodeCode {
 }
 
 # Strip footnote definitions at the same time as stripping link definitions.
+# Also extract images and then replace them straight back in (code smell!) to be able to cross reference images
 sub _StripLinkDefinitions {
     my ($self, $text) = @_;
     
     # Strip link definitions, store in hashes.
     $text = $self->_StripFootnoteDefinitions($text) unless $self->{disable_footnotes};
 
-    return $self->SUPER::_StripLinkDefinitions($text);
+    $text = $self->SUPER::_StripLinkDefinitions($text);
+    
+    $text = $self->_GenerateImageCrossRefs($text);
+
+    return $text;
 }
 
 # Add the extra cross-references to headers that MultiMarkdown supports, and also
@@ -549,6 +474,24 @@ sub _GenerateAnchor {
     }
     return $self->SUPER::_GenerateAnchor($whole_match, $link_text, $link_id, $url, $title, $attributes);
 }
+
+# Add the extra cross-references to images that MultiMarkdown supports, and also
+# the additional attributes.
+sub _GenerateImage {
+    # FIXME - Fugly, change to named params?
+    my ($self, $whole_match, $alt_text, $link_id, $url, $title, $attributes) = @_;
+    
+    if (defined $alt_text && length $alt_text) {
+        my $label = $self->_Header2Label($alt_text);
+        $self->{_crossrefs}{$label} = "#$label";
+        $attributes .= $self->{img_ids} ? qq{ id="$label"} : '';
+    }
+    
+    $attributes .= $self->_DoAttributes($link_id) if defined $link_id;
+    
+    $self->SUPER::_GenerateImage($whole_match, $alt_text, $link_id, $url, $title, $attributes);
+}
+
 
 #
 # MultiMarkdown specific routines
@@ -603,7 +546,8 @@ sub _ParseMetaData {
     return $clean_text;
 }
 
-# FIXME
+# FIXME - This is really ugly, why do we match stuff and substitute it with the thing we just matched?
+#         I guess the answer is to do with the original author not knowing about the pos function.
 sub _GenerateImageCrossRefs {
     my ($self, $text) = @_;
 

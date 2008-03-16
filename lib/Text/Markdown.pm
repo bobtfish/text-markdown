@@ -188,8 +188,6 @@ sub _Markdown {
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     $text = $self->_StripLinkDefinitions($text);
-
-    $self->_GenerateImageCrossRefs($text);
     
     $text = $self->_RunBlockGamut($text);
     
@@ -512,6 +510,7 @@ sub _RunSpanGamut {
 
     $text = $self->_DoItalicsAndBold($text);
 
+    # FIXME - Is hard coding space here sane, or does this want to be related to tab width?
     # Do hard breaks:
     $text =~ s/ {2,}\n/ <br$self->{empty_element_suffix}\n/g;
 
@@ -1440,80 +1439,12 @@ sub _Detab {
     return $text;
 }
 
-sub _ConvertCopyright{
+sub _ConvertCopyright {
     my ($self, $text) = @_;
     # Convert to an XML compatible form of copyright symbol
     
     $text =~ s/&copy;/&#xA9;/gi;
     
-    return $text;
-}
-
-sub _GenerateImageCrossRefs {
-    my ($self, $text) = @_;
-
-    #
-    # First, handle reference-style labeled images: ![alt text][id]
-    #
-    $text =~ s{
-        (               # wrap whole match in $1
-          !\[
-            (.*?)       # alt text = $2
-          \]
-
-          [ ]?              # one optional space
-          (?:\n[ ]*)?       # one optional newline followed by spaces
-
-          \[
-            (.*?)       # id = $3
-          \]
-
-        )
-    }{
-        my $result;
-        my $whole_match = $1;
-        my $alt_text    = $2;
-        my $link_id     = lc $3;
-
-        if ($link_id eq "") {
-            $link_id = lc $alt_text;     # for shortcut links like ![this][].
-        }
-
-        $alt_text =~ s/"/&quot;/g;
-
-        $whole_match;
-    }xsge;
-
-    #
-    # Next, handle inline images:  ![alt text](url "optional title")
-    # Don't forget: encode * and _
-
-    $text =~ s{
-        (               # wrap whole match in $1
-          !\[
-            (.*?)       # alt text = $2
-          \]
-          \(            # literal paren
-            [ \t]*
-            <?(\S+?)>?  # src url = $3
-            [ \t]*
-            (           # $4
-              (['"])    # quote char = $5
-              (.*?)     # title = $6
-              \5        # matching quote
-              [ \t]*
-            )?          # title is optional
-          \)
-        )
-    }{
-        my $result;
-        my $whole_match = $1;
-        my $alt_text    = $2;
-
-        $alt_text =~ s/"/&quot;/g;
-        $whole_match;
-    }xsge;
-
     return $text;
 }
 
