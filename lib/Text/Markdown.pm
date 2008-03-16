@@ -723,33 +723,12 @@ sub _DoImages {
         my $whole_match = $1;
         my $alt_text    = $2;
         my $link_id     = lc $3;
-
-        if ($link_id eq "") {
+        
+        if ($link_id eq '') {
             $link_id = lc $alt_text;     # for shortcut links like ![this][].
         }
-
-        $alt_text =~ s/"/&quot;/g;
-        if (defined $self->{_urls}{$link_id}) {
-            my $url = $self->{_urls}{$link_id};
-            $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
-            
-            $result = qq{<img src="$url" alt="$alt_text"};
-            if (length $link_id && defined $self->{_titles}{$link_id} && length $self->{_titles}{$link_id}) {
-                my $title = $self->{_titles}{$link_id};
-                $title =~ s! \* !$g_escape_table{'*'}!ogx;
-                $title =~ s!  _ !$g_escape_table{'_'}!ogx;
-                $result .=  qq{ title="$title"};
-            }
-            $result .= $self->{empty_element_suffix};
-            
-        }
-        else {
-            # If there's no such link ID, leave intact:
-            $result = $whole_match;
-        }
-
-        $result;
+        
+        $self->_GenerateImage($whole_match, $alt_text, $link_id);
     }xsge;
 
     #
@@ -783,24 +762,49 @@ sub _DoImages {
             $title      = $6;
         }
 
-        $alt_text =~ s/"/&quot;/g;
-        $title    =~ s/"/&quot;/g;
-        $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
-        $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
-        $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
-
-        $result = qq{<img src="$url" alt="$alt_text"};
-        if (defined $title && length $title) {
-            $title =~ s! \* !$g_escape_table{'*'}!ogx;
-            $title =~ s!  _ !$g_escape_table{'_'}!ogx;
-            $result .=  qq{ title="$title"};
-        }
-        $result .= $self->{empty_element_suffix};
-        
-        $result;
+        $self->_GenerateImage($whole_match, $alt_text, undef, $url, $title);
     }xsge;
 
     return $text;
+}
+
+sub _GenerateImage {
+    # FIXME - Fugly, change to named params?
+    my ($self, $whole_match, $alt_text, $link_id, $url, $title, $attributes) = @_;
+    
+    my $result;
+    
+    $attributes = '' unless defined $attributes;
+    
+    $alt_text ||= '';
+    $alt_text =~ s/"/&quot;/g;
+    # FIXME - how about >
+    
+    if ( !defined $url && defined $self->{_urls}{$link_id}) {
+        $url = $self->{_urls}{$link_id};
+    }
+    
+    # If there's no such link ID, leave intact:
+    return $whole_match unless defined $url; 
+    
+    $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
+    $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
+    $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
+    
+    if (!defined $title && length $link_id && defined $self->{_titles}{$link_id} && length $self->{_titles}{$link_id}) {
+        $title = $self->{_titles}{$link_id};
+    }    
+
+    $result = qq{<img src="$url" alt="$alt_text"};
+    if (defined $title && length $title) {
+        $title =~ s! \* !$g_escape_table{'*'}!ogx;
+        $title =~ s!  _ !$g_escape_table{'_'}!ogx;
+        $title    =~ s/"/&quot;/g;
+        $result .=  qq{ title="$title"};
+    }
+    $result .= $attributes . $self->{empty_element_suffix};
+
+    return $result;
 }
 
 sub _DoHeaders {

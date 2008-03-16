@@ -13,6 +13,7 @@ Todo pre 1.0.17:
     . Better test cases for Markdown.pl and MultiMarkdown.pl
 
 Todo pre 1.0.18:
+    . Remove the nasty hackery of all the locals in the markdown routine.
     . Make the merging of MDTest more obvious, and get back to the markdown
       mailing list about which tests a) I pass, b) I think should be added to 
       MDTest.

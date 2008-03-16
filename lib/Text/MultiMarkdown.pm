@@ -463,126 +463,19 @@ sub _RunSpanGamut {
     return $text;
 }
 
-# FIXME
-sub _DoImages {
-#
-# Turn Markdown image shortcuts into <img> tags.
-#
-    my ($self, $text) = @_;
-
-    #
-    # First, handle reference-style labeled images: ![alt text][id]
-    #
-    $text =~ s{
-        (               # wrap whole match in $1
-          !\[
-            (.*?)       # alt text = $2
-          \]
-
-          [ ]?              # one optional space
-          (?:\n[ ]*)?       # one optional newline followed by spaces
-
-          \[
-            (.*?)       # id = $3
-          \]
-
-        )
-    }{
-        my $result;
-        my $whole_match = $1;
-        my $alt_text    = $2;
-        my $link_id     = lc $3;
-
-        if ($link_id eq "") {
-            $link_id = lc $alt_text;     # for shortcut links like ![this][].
-        }
-
-        $alt_text =~ s/"/&quot;/g;
-        if (defined $self->{_urls}{$link_id}) {
-            my $url = $self->{_urls}{$link_id};
-            $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
-            
-            my $label = $self->_Header2Label($alt_text);
-            $self->{_crossrefs}{$label} = "#$label";
-            #if (! defined $self->{_titles}{$link_id}) {
-            #    $self->{_titles}{$link_id} = $alt_text;
-            #}
-            
-            $label = $self->{img_ids} ? qq{ id="$label"} : '';
-            $result = qq{<img$label src="$url" alt="$alt_text"};
-            if (length $link_id && defined $self->{_titles}{$link_id} && length $self->{_titles}{$link_id}) {
-                my $title = $self->{_titles}{$link_id};
-                $title =~ s! \* !$g_escape_table{'*'}!ogx;
-                $title =~ s!  _ !$g_escape_table{'_'}!ogx;
-                $result .=  qq{ title="$title"};
-            }
-            $result .= $self->_DoAttributes($link_id);
-            $result .= $self->{empty_element_suffix};
-            
-        }
-        else {
-            # If there's no such link ID, leave intact:
-            $result = $whole_match;
-        }
-
-        $result;
-    }xsge;
-
-    #
-    # Next, handle inline images:  ![alt text](url "optional title")
-    # Don't forget: encode * and _
-
-    $text =~ s{
-        (               # wrap whole match in $1
-          !\[
-            (.*?)       # alt text = $2
-          \]
-          \(            # literal paren
-            [ \t]*
-            ($g_nested_parens)  # src url - href = $3
-            [ \t]*
-            (           # $4
-              (['"])    # quote char = $5
-              (.*?)     # title = $6
-              \5        # matching quote
-              [ \t]*
-            )?          # title is optional
-          \)
-        )
-    }{
-        my $result;
-        my $whole_match = $1;
-        my $alt_text    = $2;
-        my $url         = $3;
-        my $title       = '';
-        if (defined($6)) {
-            $title      = $6;
-        }
-
-        $alt_text =~ s/"/&quot;/g;
-        $title    =~ s/"/&quot;/g;
-        $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
-        $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
-        $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
-
+sub _GenerateImage {
+    # FIXME - Fugly, change to named params?
+    my ($self, $whole_match, $alt_text, $link_id, $url, $title, $attributes) = @_;
+    
+    if (defined $alt_text && length $alt_text) {
         my $label = $self->_Header2Label($alt_text);
         $self->{_crossrefs}{$label} = "#$label";
-#       $self->{_titles}{$label} = $alt_text;          # FIXME - I think this line should not be here
-
-        $label = $self->{img_ids} ? qq{ id="$label"} : '';
-        $result = qq{<img$label src="$url" alt="$alt_text"};
-        if (defined $title && length $title) {
-            $title =~ s! \* !$g_escape_table{'*'}!ogx;
-            $title =~ s!  _ !$g_escape_table{'_'}!ogx;
-            $result .=  qq{ title="$title"};
-        }
-        $result .= $self->{empty_element_suffix};
-        
-        $result;
-    }xsge;
-
-    return $text;
+        $attributes .= $self->{img_ids} ? qq{ id="$label"} : '';
+    }
+    
+    $attributes .= $self->_DoAttributes($link_id) if defined $link_id;
+    
+    $self->SUPER::_GenerateImage($whole_match, $alt_text, $link_id, $url, $title, $attributes);
 }
 
 #
