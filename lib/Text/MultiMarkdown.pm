@@ -737,15 +737,22 @@ sub _DoImages {
     return $text;
 }
 
+#
+# Routines which are overridden for slightly different behavior in MultiMarkdown
+#
+
+# Don't do Wiki Links in Headers, otherwise delegate to super class
 sub _DoHeaders {
     my ($self, $text) = @_;
 
-    # Don't do Wiki Links in Headers
     local $self->{use_wikilinks} = 0;
     
     return $self->SUPER::_DoHeaders($text);
 }
 
+# Generating headers automatically generates X-refs in MultiMarkdown (always)
+# Also, by default, you get id attributes added to your headers, you can turn this
+# part of the MultiMarkdown behavior off with the heading_ids flag.
 sub _GenerateHeader {
     my ($self, $level, $id) = @_;
     
@@ -761,55 +768,18 @@ sub _GenerateHeader {
     return "<h$level$label>$header</h$level>\n\n";
 }
 
+# Protect Wiki Links in Code Blocks (if wiki links are turned on), then delegate to super class.
 sub _EncodeCode {
-#
-# Encode/escape certain characters inside Markdown code runs.
-# The point is that in code, these characters are literals,
-# and lose their special Markdown meanings.
-#
-    my $self = shift;
-    local $_ = shift;
+    my ($self, $text) = @_;
 
-    # Protect Wiki Links in Code Blocks
     if ($self->_UseWikiLinks()) {
-        my $WikiWord = '[A-Z]+[a-z\x80-\xff]+[A-Z][A-Za-z\x80-\xff]*';
-        s/($WikiWord)/\\$1/gx;
+        $text =~ s/([A-Z]+[a-z\x80-\xff]+[A-Z][A-Za-z\x80-\xff]*)/\\$1/gx;
     }
     
-    # Encode all ampersands; HTML entities are not
-    # entities within a Markdown code span.
-    s/&/&amp;/g;
-
-    # Encode $'s, but only if we're running under Blosxom.
-    # (Blosxom interpolates Perl variables in article bodies.)
-    {
-        no warnings 'once';
-        if (defined($blosxom::version)) {
-            s/\$/&#036;/g;  
-        }
-    }
-
-
-    # Do the angle bracket song and dance:
-    s! <  !&lt;!gx;
-    s! >  !&gt;!gx;
-
-    # Now, escape characters that are magic in Markdown:
-    s! \* !$g_escape_table{'*'}!ogx;
-    s! _  !$g_escape_table{'_'}!ogx;
-    s! {  !$g_escape_table{'{'}!ogx;
-    s! }  !$g_escape_table{'}'}!ogx;
-    s! \[ !$g_escape_table{'['}!ogx;
-    s! \] !$g_escape_table{']'}!ogx;
-    s! \\ !$g_escape_table{'\\'}!ogx;
-
-    return $_;
+    return $self->SUPER::_EncodeCode($text);
 }
 
-#
-# MultiMarkdown Routines
-#
-
+# Strip footnote definitions at the same time as stripping link definitions.
 sub _StripLinkDefinitions {
     my ($self, $text) = @_;
     
@@ -818,6 +788,12 @@ sub _StripLinkDefinitions {
 
     return $self->SUPER::_StripLinkDefinitions($text);
 }
+
+#
+# MultiMarkdown specific routines
+#
+
+
 
 # FIXME - This is really really ugly!
 sub _ParseMetaData { 
