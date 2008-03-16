@@ -8,7 +8,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        qw(Text::Markdown Exporter);
 
-our $VERSION   = '1.0.16';
+our $VERSION   = '1.0.17';
 our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
@@ -333,34 +333,14 @@ sub _Markdown {
 # and <img> tags get encoded.
 #
     my ($self, $text) = @_;
-
-    # Standardize line endings:
-    $text =~ s{\r\n}{\n}g;  # DOS to Unix
-    $text =~ s{\r}{\n}g;    # Mac to Unix
-
-    # Make sure $text ends with a couple of newlines:
-    $text .= "\n\n";
-
-    # Convert all tabs to spaces.
-    $text = $self->_Detab($text);
-
-    # Strip any lines consisting only of spaces and tabs.
-    # This makes subsequent regexen easier to write, because we can
-    # match consecutive blank lines with /\n+/ instead of something
-    # contorted like /[ \t]*\n+/ .
-    $text =~ s/^[ \t]+$//mg;
+    
+    $text = $self->_CleanUpDoc($text);
     
     # Strip out MetaData
     $text = $self->_ParseMetaData($text) if ($self->{use_metadata} || $self->{strip_metadata});
 
-    # And recheck for leading blank lines
-    $text =~ s/^\n+//s;
-
     # Turn block-level HTML blocks into hash entries
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
-
-    # Strip link definitions, store in hashes.
-    $text = $self->_StripFootnoteDefinitions($text) unless $self->{disable_footnotes};
 
     $text = $self->_StripLinkDefinitions($text);
 
@@ -877,7 +857,17 @@ sub _EncodeCode {
 # MultiMarkdown Routines
 #
 
-sub _ParseMetaData { # FIXME - This is really really ugly!
+sub _StripLinkDefinitions {
+    my ($self, $text) = @_;
+    
+    # Strip link definitions, store in hashes.
+    $text = $self->_StripFootnoteDefinitions($text) unless $self->{disable_footnotes};
+
+    return $self->SUPER::_StripLinkDefinitions($text);
+}
+
+# FIXME - This is really really ugly!
+sub _ParseMetaData { 
     my ($self, $text) = @_;
     my $clean_text = "";
     
@@ -918,6 +908,9 @@ sub _ParseMetaData { # FIXME - This is really really ugly!
             $clean_text .= "$line\n";
         }
     }
+    
+    # Recheck for leading blank lines
+    $clean_text =~ s/^\n+//s;
         
     return $clean_text;
 }

@@ -182,6 +182,27 @@ sub _Markdown {
 #
     my ($self, $text) = @_;
 
+    $text = $self->_CleanUpDoc($text);
+    
+    # Turn block-level HTML blocks into hash entries
+    $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
+
+    $text = $self->_StripLinkDefinitions($text);
+
+    $self->_GenerateImageCrossRefs($text);
+    
+    $text = $self->_RunBlockGamut($text);
+    
+    $text = $self->_UnescapeSpecialChars($text);
+        
+    $text = $self->_ConvertCopyright($text);
+
+    return $text . "\n";
+}
+
+sub _CleanUpDoc {
+    my ($self, $text) = @_;
+    
     # Standardize line endings:
     $text =~ s{\r\n}{\n}g;  # DOS to Unix
     $text =~ s{\r}{\n}g;    # Mac to Unix
@@ -198,20 +219,7 @@ sub _Markdown {
     # contorted like /[ \t]*\n+/ .
     $text =~ s/^[ \t]+$//mg;
     
-    # Turn block-level HTML blocks into hash entries
-    $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
-
-    $text = $self->_StripLinkDefinitions($text);
-
-    $self->_GenerateImageCrossRefs($text);
-    
-    $text = $self->_RunBlockGamut($text);
-    
-    $text = $self->_UnescapeSpecialChars($text);
-        
-    $text = $self->_ConvertCopyright($text);
-
-    return $text . "\n";
+    return $text;
 }
 
 sub _StripLinkDefinitions {
