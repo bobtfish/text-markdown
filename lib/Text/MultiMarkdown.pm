@@ -464,158 +464,6 @@ sub _RunSpanGamut {
 }
 
 # FIXME
-sub _DoAnchors {
-#
-# Turn Markdown link shortcuts into XHTML <a> tags.
-#
-    my ($self, $text) = @_;
-
-    #
-    # First, handle reference-style links: [link text] [id]
-    #
-    $text =~ s{
-        (                   # wrap whole match in $1
-          \[
-            ($g_nested_brackets)    # link text = $2
-          \]
-
-          [ ]?              # one optional space
-          (?:\n[ ]*)?       # one optional newline followed by spaces
-
-          \[
-            (.*?)       # id = $3
-          \]
-        )
-    }{
-        my $result;
-        my $whole_match = $1;
-        my $link_text   = $2;
-        my $link_id     = lc $3;
-
-        if ($link_id eq "") {
-            $link_id = lc $link_text;   # for shortcut links like [this][].
-        }
-
-        # Allow automatic cross-references to headers
-        my $label = $self->_Header2Label($link_id);
-        if (defined $self->{_crossrefs}{$label}) {
-            my $url = $self->{_crossrefs}{$label};
-            $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
-            $result = qq[<a href="$url"];
-            if ( defined $self->{_titles}{$label} ) {
-                my $title = $self->{_titles}{$label};
-                $title =~ s! \* !$g_escape_table{'*'}!gox;
-                $title =~ s!  _ !$g_escape_table{'_'}!gox;
-                $result .=  " title=\"$title\"";
-            }
-            $result .= $self->_DoAttributes($label);
-            $result .= ">$link_text</a>";
-        } 
-        elsif (defined $self->{_urls}{$link_id}) {
-            my $url = $self->{_urls}{$link_id};
-            $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
-            $result = "<a href=\"$url\"";
-            if ( defined $self->{_titles}{$link_id} ) {
-                my $title = $self->{_titles}{$link_id};
-                $title =~ s! \* !$g_escape_table{'*'}!gox;
-                $title =~ s!  _ !$g_escape_table{'_'}!gox;
-                $result .=  qq{ title="$title"};
-            }
-            $result .= $self->_DoAttributes($label);
-            $result .= ">$link_text</a>";
-        }
-        else {
-            $result = $whole_match;
-        }
-        $result;
-    }xsge;
-
-    #
-    # Next, inline-style links: [link text](url "optional title")
-    #
-    $text =~ s{
-        (               # wrap whole match in $1
-          \[
-            ($g_nested_brackets)    # link text = $2
-          \]
-          \(            # literal paren
-            [ \t]*
-            ($g_nested_parens)   # href = $3
-            [ \t]*
-            (           # $4
-              (['"])    # quote char = $5
-              (.*?)     # Title = $6
-              \5        # matching quote
-              [ \t]*	# ignore any spaces/tabs between closing quote and )
-            )?          # title is optional
-          \)
-        )
-    }{
-        my $result;
-        my $whole_match = $1;
-        my $link_text   = $2;
-        my $url         = $3;
-        my $title       = $6;
-        
-        $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
-        $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
-        $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
-        $result = "<a href=\"$url\"";
-
-        if (defined $title) {
-            $title =~ s/"/&quot;/g;
-            $title =~ s! \* !$g_escape_table{'*'}!ogx;
-            $title =~ s!  _ !$g_escape_table{'_'}!ogx;
-            $result .=  " title=\"$title\"";
-        }
-
-        $result .= ">$link_text</a>";
-
-        $result;
-    }xsge;
-    
-    #
-	# Last, handle reference-style shortcuts: [link text]
-	# These must come last in case you've also got [link test][1]
-	# or [link test](/foo)
-	#
-	$text =~ s{
-		(					# wrap whole match in $1
-		  \[
-		    ([^\[\]]+)		# link text = $2; can't contain '[' or ']'
-		  \]
-		)
-	}{
-		my $result;
-		my $whole_match = $1;
-		my $link_text   = $2;
-		(my $link_id = lc $2) =~ s{[ ]?\n}{ }g; # lower-case and turn embedded newlines into spaces
-
-		if (defined $self->{_urls}{$link_id}) {
-			my $url = $self->{_urls}{$link_id};
-			$url =~ s! \* !$g_escape_table{'*'}!ogx;		# We've got to encode these to avoid
-			$url =~ s!  _ !$g_escape_table{'_'}!ogx;		# conflicting with italics/bold.
-			$result = "<a href=\"$url\"";
-			if ( defined $self->{titles}{$link_id} ) {
-				my $title = $self->{titles}{$link_id};
-				$title =~ s! \* !$g_escape_table{'*'}!ogx;
-				$title =~ s!  _ !$g_escape_table{'_'}!ogx;
-				$result .=  qq{ title="$title"};
-			}
-			$result .= ">$link_text</a>";
-		}
-		else {
-			$result = $whole_match;
-		}
-		$result;
-	}xsge;
-
-    return $text;
-}
-
-# FIXME
 sub _DoImages {
 #
 # Turn Markdown image shortcuts into <img> tags.
@@ -789,11 +637,29 @@ sub _StripLinkDefinitions {
     return $self->SUPER::_StripLinkDefinitions($text);
 }
 
+# Add the extra cross-references to headers that MultiMarkdown supports, and also
+# the additional link attributes.
+sub _GenerateAnchor {
+    # FIXME - Fugly, change to named params?
+    my ($self, $whole_match, $link_text, $link_id, $url, $title, $attributes) = @_;
+
+    # Allow automatic cross-references to headers
+    if (defined $link_id) {
+        my $label = $self->_Header2Label($link_id);
+        if (defined $self->{_crossrefs}{$label}) {
+            $url ||= $self->{_crossrefs}{$label};
+        }
+        if ( defined $self->{_titles}{$label} ) {
+            $title ||= $self->{_titles}{$label};
+        }
+        $attributes ||= $self->_DoAttributes($label);
+    }
+    return $self->SUPER::_GenerateAnchor($whole_match, $link_text, $link_id, $url, $title, $attributes);
+}
+
 #
 # MultiMarkdown specific routines
 #
-
-
 
 # FIXME - This is really really ugly!
 sub _ParseMetaData { 
@@ -1358,10 +1224,10 @@ sub _DoAttributes {
     
     if (defined $self->{_attributes}{$id}) {
         while ($self->{_attributes}{$id} =~ s/(\S+)="(.*?)"//) {
-            $result .= " $1=\"$2\"";
+            $result .= qq{ $1="$2"};
         }
         while ($self->{_attributes}{$id} =~ /(\S+)=(\S+)/g) {
-            $result .= " $1=\"$2\"";
+            $result .= qq{ $1="$2"};
         }
     }
     

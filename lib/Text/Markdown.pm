@@ -593,7 +593,6 @@ sub _DoAnchors {
           \]
         )
     }{
-        my $result;
         my $whole_match = $1;
         my $link_text   = $2;
         my $link_id     = lc $3;
@@ -602,23 +601,7 @@ sub _DoAnchors {
             $link_id = lc $link_text;   # for shortcut links like [this][].
         }
 
-        if (defined $self->{_urls}{$link_id}) {
-            my $url = $self->{_urls}{$link_id};
-            $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
-            $result = "<a href=\"$url\"";
-            if ( defined $self->{_titles}{$link_id} ) {
-                my $title = $self->{_titles}{$link_id};
-                $title =~ s! \* !$g_escape_table{'*'}!gox;
-                $title =~ s!  _ !$g_escape_table{'_'}!gox;
-                $result .=  qq{ title="$title"};
-            }
-            $result .= ">$link_text</a>";
-        }
-        else {
-            $result = $whole_match;
-        }
-        $result;
+        $self->_GenerateAnchor($whole_match, $link_text, $link_id);
     }xsge;
 
     #
@@ -648,21 +631,7 @@ sub _DoAnchors {
         my $url         = $3;
         my $title       = $6;
         
-        $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
-        $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
-        $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
-        $result = "<a href=\"$url\"";
-
-        if (defined $title) {
-            $title =~ s/"/&quot;/g;
-            $title =~ s! \* !$g_escape_table{'*'}!ogx;
-            $title =~ s!  _ !$g_escape_table{'_'}!ogx;
-            $result .=  " title=\"$title\"";
-        }
-
-        $result .= ">$link_text</a>";
-
-        $result;
+        $self->_GenerateAnchor($whole_match, $link_text, undef, $url, $title);
     }xsge;
     
     #
@@ -682,26 +651,48 @@ sub _DoAnchors {
 		my $link_text   = $2;
 		(my $link_id = lc $2) =~ s{[ ]?\n}{ }g; # lower-case and turn embedded newlines into spaces
 
-		if (defined $self->{_urls}{$link_id}) {
-			my $url = $self->{_urls}{$link_id};
-			$url =~ s! \* !$g_escape_table{'*'}!ogx;		# We've got to encode these to avoid
-			$url =~ s!  _ !$g_escape_table{'_'}!ogx;		# conflicting with italics/bold.
-			$result = "<a href=\"$url\"";
-			if ( defined $self->{titles}{$link_id} ) {
-				my $title = $self->{titles}{$link_id};
-				$title =~ s! \* !$g_escape_table{'*'}!ogx;
-				$title =~ s!  _ !$g_escape_table{'_'}!ogx;
-				$result .=  qq{ title="$title"};
-			}
-			$result .= ">$link_text</a>";
-		}
-		else {
-			$result = $whole_match;
-		}
-		$result;
+        $self->_GenerateAnchor($whole_match, $link_text, $link_id);
 	}xsge;
 
     return $text;
+}
+
+sub _GenerateAnchor {
+    # FIXME - Fugly, change to named params?
+    my ($self, $whole_match, $link_text, $link_id, $url, $title, $attributes) = @_;
+    
+    my $result;
+    
+    $attributes = '' unless defined $attributes;
+    
+    if ( !defined $url && defined $self->{_urls}{$link_id}) {
+        $url = $self->{_urls}{$link_id};
+    }
+    
+    if (!defined $url) {
+        return $whole_match;
+    }
+        
+    $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
+    $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
+    $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
+        
+    $result = qq{<a href="$url"};
+        
+    if ( !defined $title && defined $link_id && defined $self->{_titles}{$link_id} ) {
+        $title = $self->{_titles}{$link_id};
+    }
+    
+    if ( defined $title ) {
+        $title =~ s/"/&quot;/g;
+        $title =~ s! \* !$g_escape_table{'*'}!gox;
+        $title =~ s!  _ !$g_escape_table{'_'}!gox;
+        $result .=  qq{ title="$title"};
+    }
+    
+    $result .= "$attributes>$link_text</a>";
+
+    return $result;
 }
 
 sub _DoImages {
