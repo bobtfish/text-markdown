@@ -528,17 +528,18 @@ sub _HashHTMLBlocks {
                 if ($token->[1] eq $current_block_end_tag) { # End tag for current block
                     $nesting_level--;
                     if (0 == $nesting_level) {# If end of current block.
-                        my $block = join('', map { $_->[1] } @collected);
-                        #warn("BLOCK {$block}");
-                        my $key = _md5_utf8($block);
-                        $self->{_html_blocks}{$key} = $block;
-                        push(@output, ['text', "\n\n" . $key . "\n\n"]);
-                        @collected = ();
-                        $current_block_tag = $current_block_end_tag = undef;
-                        $care = 0; # Do not care about anything left on the line
+                        end_tag_run:
+                            my $block = join('', map { $_->[1] } @collected);
+                            #warn("BLOCK {$block}");
+                            my $key = _md5_utf8($block);
+                            $self->{_html_blocks}{$key} = $block;
+                            push(@output, ['text', "\n\n" . $key . "\n\n"]);
+                            @collected = ();
+                            $current_block_tag = $current_block_end_tag = undef;
+                            $care = 0; # Do not care about anything left on the line
                     }
                 }
-                elsif ($token->[2] eq $current_block_tag) { # Another occurance of the same tag
+                elsif ($token->[2] eq $current_block_tag && !$token->[3]) { # Another occurance of the same tag, but not self closed
                     $nesting_level++;
                 }
             }
@@ -549,6 +550,10 @@ sub _HashHTMLBlocks {
                 # If we care about tags here, and we find a tag we care about
                 if ($care && ($current_block_end_tag = $block_tags{$token->[2]}) ) {
                     #warn("IN TAG");
+                    if ($token->[3]) { #Self closing tag
+                        push(@collected, $token);
+                        goto end_tag_run;
+                    }
                     $nesting_level++;
                     $current_block_tag = $token->[2];
                     push @collected, $token;
@@ -1693,20 +1698,40 @@ sub _TokenizeHTML {
     my @tokens;
 
     my $depth = 6;
-    my $nested_tags = join('|', ('(?:<[a-z/!$](?:[^<>]') x $depth) . (')*>)' x  $depth);
-    my $match = qr/(?s: <! ( -- .*? -- \s* )+ > ) |  # comment
-                   (?s: <\? .*? \?> ) |              # processing instruction
-                   $nested_tags/iox;                   # nested tags
+    my $tag_attrs = qr{
+						(?:				# Match one attr name/value pair
+							\s+				# There needs to be at least some whitespace
+											# before each attribute name.
+							[\w.:_-]+		# Attribute name
+							\s*=\s*
+							(?:
+								".+?"		# "Attribute value"
+							 |
+								'.+?'		# 'Attribute value'
+							 |
+							    \w+?        # Attributevalue
+							)
+						)*				# Zero or more
+					}x;
+
+	#my $empty_tag = qr{< \w+ $tag_attrs \s* />}oxms;
+	my $match =  qr{</? \w+ $tag_attrs \s* (/)?>}oxms;
+    
+    #my $nested_tags = join('|', ('(?:<[a-z/!$](?:[^<>]') x $depth) . (')*>)' x  $depth);
+    #my $match = qr/(?s: <! ( -- .*? -- \s* )+ > ) |  # comment
+    #               (?s: <\? .*? \?> ) |              # processing instruction
+    #               $nested_tags/iox;                   # nested tags
 
     while ($str =~ m/($match)/og) {
         my $whole_tag = $1;
+        my $standalone = $2 ? 1 : 0;
         my $sec_start = pos $str;
         my $tag_start = $sec_start - length $whole_tag;
         if ($pos < $tag_start) {
             push @tokens, $self->_TokenizeText( substr($str, $pos, $tag_start - $pos) );
         }
         $whole_tag =~ /^<\/?([^> \/]+)/;
-        push @tokens, ['tag', $whole_tag, lc($1)];
+        push @tokens, ['tag', $whole_tag, lc($1), $standalone];
         $pos = pos $str;
     }
     push @tokens, $self->_TokenizeText( substr($str, $pos, $len - $pos) ) if $pos < $len;

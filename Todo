@@ -1,13 +1,7 @@
-Todo pre 1.0.17:
-    . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
-      feature on breaks things (and with new HashHTMLBlocks, breakage is 
-      probably different).
-    . If installed interactively, prompt the user if the Markdown.pl and 
-      MultiMarkdown.pl scripts should be installed. Make sure these are 
-      totally compatible with the 'original' versions.
-    . Better test cases for Markdown.pl and MultiMarkdown.pl
-
 Todo pre 1.0.18:
+    . Make HashHTMLBlocks deal correctly with tags that are *never* closed.
+    . Make all the tests pass again!
+    . Tests for ignoring stuff.. What happens if I have, say <div /><div id="2">foobar</div> on a line?
     . Make the merging of MDTest more obvious, and get back to the markdown
       mailing list about which tests a) I pass, b) I think should be added to 
       MDTest.
