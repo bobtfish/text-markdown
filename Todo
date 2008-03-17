@@ -1,4 +1,11 @@
 Todo pre 1.0.17:
+    . Write unit tests to ensure that the following features which previously 
+      bled into Text::Markdown now don't work:
+        . Link attributes
+        . Header Xrefs
+        . Image Xrefs
+
+Todo pre 1.0.17:
     . Need a dingus, write a small app then ask the catalyst guys?
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
