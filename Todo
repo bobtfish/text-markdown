@@ -1,21 +1,26 @@
-Todo pre 1.0.17:
-    . Write unit tests to ensure that the following features which previously 
-      bled into Text::Markdown now don't work:
-        . Link attributes
-        . Header Xrefs
-        . Image Xrefs
+Todo pre 1.0.18:
+    . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
+      used, and also have docs on what options are available. Expose the other
+      module options in the scripts.
+    . Remove the nasty hackery of all the locals in the markdown routine.
+    . Fix tests for the email address encoding. (Maybe call srand in the 
+      test?)
+    . Fix copy and pasted regexes (nested brackets and StripLinkDefinitions)
+    . Make the merging of MDTest more obvious, and get back to the markdown
+      mailing list about which tests a) I pass, b) I think should be added to 
+      MDTest.
+    . Re-merge Movable Type and Bloxom compatibility, and add tests.
+    . Need a dingus, write a small / demo app then ask the catalyst guys to 
+      host?
 
-Todo pre 1.0.17:
-    . Need a dingus, write a small app then ask the catalyst guys?
+Todo pre 1.0.19:
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
-    . Document the markdown (and multimarkdown) syntaxes in the module.
-    . Add a Markdown.pl and MultiMarkdown.pl scripts which are prompt the user 
-      if they should be installed. Make these totally compatible with the 
-      'original' versions.
+    . Document the markdown (and multimarkdown) syntaxes in the module 
+      properly.
 
-Todo pre 1.0.18:
+Todo pre 1.0.20:
     . Stop perl shitting itself due to regex backreference when doing listsug
       and fix the list bug
       (see t/17ulolreportedonlist.t and Markdown mailing list)
@@ -25,7 +30,7 @@ Todo pre 1.0.18:
         49.4   0.569  0.568    113   0.0050 0.0050  Text::Balanced::_match_tagged
         18.1   0.209  0.791      3   0.0696 0.2637  Text::MultiMarkdown::_HashHTMLBlocks
 
-Todo pre 1.0.19:
+Todo pre 1.0.21:
    . Have a look at extra features in 
      http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
      we consider useful on the roadmap.
