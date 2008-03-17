@@ -1,7 +1,4 @@
 Todo pre 1.0.17:
-    . Sort out the documentation / options to go with the code reorganisation.
-    . Restore _StripLinkDefinitions to the original Markdown version in 
-      Markdown.pl.
     . Write unit tests to ensure that the following features which previously 
       bled into Text::Markdown now don't work:
         . Link attributes
@@ -14,6 +11,9 @@ Todo pre 1.0.17:
 
 Todo pre 1.0.18:
     . Remove the nasty hackery of all the locals in the markdown routine.
+    . Fix tests for the email address encoding. (Maybe call srand in the 
+      test?)
+    . Fix copy and pasted regexes (nested brackets and StripLinkDefinitions)
     . Make the merging of MDTest more obvious, and get back to the markdown
       mailing list about which tests a) I pass, b) I think should be added to 
       MDTest.

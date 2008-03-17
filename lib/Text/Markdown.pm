@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
 
-Text::Markdown - Convert MultiMarkdown syntax to (X)HTML
+Text::Markdown - Convert Markdown syntax to (X)HTML
 
 =head1 SYNOPSIS
 
@@ -49,26 +49,40 @@ specifically to serve as a front-end to (X)HTML. You can use span-level
 HTML tags anywhere in a Markdown document, and you can use block level
 HTML tags (like <div> and <table> as well).
 
+=head1 SYNTAX
+
 This module implements the 'original' Markdown markdown syntax from:
 
     http://daringfireball.net/projects/markdown/
-    
-If you would like different options available / to control the parser
-behavior more then you're recommended to look at the OPTIONS section in
-the pod for L<Text::MultiMarkdown>
 
-=head1 SYNTAX
+=head1 OPTIONS
 
-For more information about Markdown's syntax, see:
+Text::Markdown supports a number of options to it's processor which control the behavior of the output document.
 
-    http://daringfireball.net/projects/markdown/
+These options can be supplied to the constructor, on in a hash with the individual calls to the markdown method.
+See the synopsis for examples of both of the above styles.
 
-This documentation is going to be moved/copied into this module for clearer reading in a future release..
+The options for the processor are:
+
+=over
+
+=item empty element suffix
+
+This option can be used to generate normal HTML output. By default, it is ' />', which is xHTML, change to '>' for normal HTML.
+
+=item tab_width
+
+Controls indent width in the generated markup, defaults to 4
+
+=item markdown_in_html_blocks
+
+Controls if Markdown is processed when inside HTML blocks. Defaults to 0.
+
+=back
 
 =head1 METHODS
 
 =cut
-
 
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
@@ -163,14 +177,12 @@ sub markdown {
     $self->{_titles}      = $options->{titles}      ? $options->{titles}      : {}; # FIXME - ditto
     $self->{_html_blocks} = $options->{html_blocks} ? $options->{html_blocks} : {}; # FIXME - ditto
     $self->{_attributes}  = {}; # What is this used for again?
-    $self->{_citation_counter} = 0;
     # Used to track when we're inside an ordered or unordered list
     # (see _ProcessListItems() for details)
     $self->{_list_level} = 0;
 
-    my $t =  $self->_Markdown($text);
+    return $self->_Markdown($text);
 
-    return $t; 
 }
 
 sub _Markdown {
@@ -245,15 +257,6 @@ sub _StripLinkDefinitions {
                             [")]
                             [ \t]*
                         )?  # title is optional
-                        
-                        # MultiMarkdown addition for attribute support
-                        \n?
-                        (               # Attributes = $4
-                            (?<=\s)         # lookbehind for whitespace
-                            (([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
-                        )?
-                        [ \t]*
-                        # /addition
                         (?:\n+|\Z)
                     }
                     {}mx) {
@@ -263,11 +266,6 @@ sub _StripLinkDefinitions {
             $self->{_titles}{lc $1} =~ s/"/&quot;/g;
         }
         
-        # MultiMarkdown addition "
-        if ($4) {
-            $self->{_attributes}{lc $1} = $4;
-        }
-        # /addition
     }
 
     return $text;
@@ -1449,3 +1447,125 @@ sub _ConvertCopyright {
 }
 
 1;
+
+__END__
+
+=head1 OTHER IMPLEMENTATIONS
+
+Markdown has been re-implemented in a number of languages, and with a number of additions.
+
+Those that I have found are listed below:
+
+=over
+
+=item python - <http://www.freewisdom.org/projects/python-markdown/>
+
+Python Markdown which is mostly compatible with the original, with an interesting extension API.
+
+=item ruby (maruku) - <http://maruku.rubyforge.org/>
+
+One of the nicest implementations out there. Builds a parse tree internally so very flexible.
+
+=item php - <http://michelf.com/projects/php-markdown/>
+
+A direct port of Markdown.pl, also has a separately maintained 'extra' version, 
+which adds a number of features that were borrowed by MultiMarkdown.
+
+=item lua - <http://www.frykholm.se/files/markdown.lua>
+
+Port to lua. Simple and lightweight (as lua is).
+
+=item haskell - <http://johnmacfarlane.net/pandoc/>
+
+Pandoc is a more general library, supporting Markdown, reStructuredText, LaTeX and more.
+
+=item javascript - <http://www.attacklab.net/showdown-gui.html>
+
+Direct(ish) port of Markdown.pl to JavaScript
+
+=back
+
+=head1 BUGS
+
+To file bug reports or feature requests please send email to:
+
+    bug-Text-Markdown@rt.cpan.org
+    
+Please include with your report: (1) the example input; (2) the output
+you expected; (3) the output Markdown actually produced.
+
+=head1 VERSION HISTORY
+
+See the Changes file for detailed release notes for this version.
+
+=head1 AUTHOR
+
+    John Gruber
+    http://daringfireball.net/
+
+    PHP port and other contributions by Michel Fortin
+    http://michelf.com/
+
+    MultiMarkdown changes by Fletcher Penney
+    http://fletcher.freeshell.org/
+
+    CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
+    Riedel) originally by Darren Kulp (http://kulp.ch/)
+    
+    This module is maintained by: Tomas Doran http://www.bobtfish.net/
+
+=head1 THIS DISTRIBUTION
+
+Please note that this distribution is a fork of John Gruber's original Markdown project, 
+and it *is not* in any way blessed by him.
+
+Whilst this code aims to be compatible with the original Markdown.pl (and incorporates 
+and passes the Markdown test suite) whilst fixing a number of bugs in the original - 
+there may be differences between the behavior of this module and Markdown.pl. If you find
+any differences where you believe Text::Markdown behaves contrary to the Markdown spec, 
+please report them as bugs.
+
+Text::Markdown *does not* extend the markdown dialect in any way from that which is documented at
+daringfireball. If you want additional features, you should look at L<Text::MultiMarkdown>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Original Code Copyright (c) 2003-2004 John Gruber   
+<http://daringfireball.net/>   
+All rights reserved.
+
+MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney   
+<http://fletcher.freeshell.org/>   
+All rights reserved.
+
+Text::MultiMarkdown changes Copyright (c) 2006-2008 Darren Kulp
+<http://kulp.ch> and Tomas Doran <http://www.bobtfish.net>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+* Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+* Neither the name "Markdown" nor the names of its contributors may
+  be used to endorse or promote products derived from this software
+  without specific prior written permission.
+
+This software is provided by the copyright holders and contributors "as
+is" and any express or implied warranties, including, but not limited
+to, the implied warranties of merchantability and fitness for a
+particular purpose are disclaimed. In no event shall the copyright owner
+or contributors be liable for any direct, indirect, incidental, special,
+exemplary, or consequential damages (including, but not limited to,
+procurement of substitute goods or services; loss of use, data, or
+profits; or business interruption) however caused and on any theory of
+liability, whether in contract, strict liability, or tort (including
+negligence or otherwise) arising in any way out of the use of this
+software, even if advised of the possibility of such damage.
+
+=cut

@@ -188,8 +188,6 @@ This is the base URL for referencing wiki pages. In this is not supplied, all wi
 
 =back
 
-=cut
-
 =head1 METHODS
 
 =head2 new
@@ -439,16 +437,65 @@ sub _EncodeCode {
     return $self->SUPER::_EncodeCode($text);
 }
 
+# Full function pulled out of Text::Markdown as MultiMarkdown supports supplying extra 'attributes' with links and
+#  images which are then pushed back into the generated HTML, and this needs a different regex. It should be possible
+#  to extract the just the regex from Text::Markdown, and use that here, but I haven't done so yet.
 # Strip footnote definitions at the same time as stripping link definitions.
 # Also extract images and then replace them straight back in (code smell!) to be able to cross reference images
 sub _StripLinkDefinitions {
+#
+# Strips link definitions from text, stores the URLs and titles in
+# hash references.
+#
     my ($self, $text) = @_;
     
-    # Strip link definitions, store in hashes.
     $text = $self->_StripFootnoteDefinitions($text) unless $self->{disable_footnotes};
-
-    $text = $self->SUPER::_StripLinkDefinitions($text);
     
+    my $less_than_tab = $self->{tab_width} - 1;
+
+    # Link defs are in the form: ^[id]: url "optional title"
+    # FIXME - document attributes here.
+    while ($text =~ s{
+                        ^[ ]{0,$less_than_tab}\[(.+)\]: # id = $1
+                          [ \t]*
+                          \n?               # maybe *one* newline
+                          [ \t]*
+                        <?(\S+?)>?          # url = $2
+                          [ \t]*
+                          \n?               # maybe one newline
+                          [ \t]*
+                        (?:
+                            (?<=\s)         # lookbehind for whitespace
+                            ["(]
+                            (.+?)           # title = $3
+                            [")]
+                            [ \t]*
+                        )?  # title is optional
+                        
+                        # MultiMarkdown addition for attribute support
+                        \n?
+                        (               # Attributes = $4
+                            (?<=\s)         # lookbehind for whitespace
+                            (([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
+                        )?
+                        [ \t]*
+                        # /addition
+                        (?:\n+|\Z)
+                    }
+                    {}mx) {
+        $self->{_urls}{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
+        if ($3) {
+            $self->{_titles}{lc $1} = $3;
+            $self->{_titles}{lc $1} =~ s/"/&quot;/g;
+        }
+        
+        # MultiMarkdown addition "
+        if ($4) {
+            $self->{_attributes}{lc $1} = $4;
+        }
+        # /addition
+    }
+
     $text = $self->_GenerateImageCrossRefs($text);
 
     return $text;
@@ -1174,47 +1221,12 @@ sub _PrintMarkdownBibliography {
 }
 
 1;
+
 __END__
-
-=head1 OTHER IMPLEMENTATIONS
-
-Markdown has been re-implemented in a number of languages, and with a number of additions.
-
-Those that I have found are listed below:
-
-=over
-
-=item python - <http://www.freewisdom.org/projects/python-markdown/>
-
-Python Markdown which is mostly compatible with the original, with an interesting extension API.
-
-=item ruby (maruku) - <http://maruku.rubyforge.org/>
-
-One of the nicest implementations out there. Builds a parse tree internally so very flexible.
-
-=item php - <http://michelf.com/projects/php-markdown/>
-
-A direct port of Markdown.pl, also has an 'extra' version, which adds a number of features that
-were borrowed by MultiMarkdown
-
-=item lua - <http://www.frykholm.se/files/markdown.lua>
-
-Port to lua. Simple and lightweight (as lua is).
-
-=item haskell - <http://johnmacfarlane.net/pandoc/>
-
-Pandoc is a more general library, supporting Markdown, reStructuredText, LaTeX and more.
-
-=item javascript - <http://www.attacklab.net/showdown-gui.html>
-
-Direct(ish) port of Markdown.pl to JavaScript
-
-=back
 
 =head1 BUGS
 
-To file bug reports or feature requests (other than topics listed in the
-Caveats section above) please send email to:
+To file bug reports or feature requests please send email to:
 
     bug-Text-Markdown@rt.cpan.org
     
@@ -1240,6 +1252,20 @@ See the Changes file for detailed release notes for this version.
     Riedel) originally by Darren Kulp (http://kulp.ch/)
     
     This module is maintained by: Tomas Doran http://www.bobtfish.net/
+
+=head1 THIS DISTRIBUTION
+
+Please note that this distribution is a fork of Fletcher Penny's MultiMarkdown project, 
+and it *is not* in any way blessed by him.
+
+Whilst this code aims to be compatible with the original MultiMarkdown (and incorporates 
+and passes the MultiMarkdown test suite) whilst fixing a number of bugs in the original - 
+there may be differences between the behavior of this module and MultiMarkdown. If you find
+any differences where you believe Text::MultiMarkdown behaves contrary to the MultiMarkdown spec, 
+please report them as bugs.
+
+Text::Markdown *does not* extend the markdown dialect in any way from that which is documented at
+daringfireball. If you want additional features, you should look at L<Text::MultiMarkdown>.
 
 =head1 COPYRIGHT AND LICENSE
 
