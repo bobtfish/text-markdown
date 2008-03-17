@@ -13,7 +13,7 @@ GetOptions(\%cli_opts,
     'html4tags',
 );
 if ($cli_opts{'version'}) {     # Version info
-    print "\nThis is Markdown, version $Text::MultiMarkdown::VERSION.\n";
+    print "\nThis is MultiMarkdown, version $Text::MultiMarkdown::VERSION.\n";
     print "Copyright 2004 John Gruber\n";
     print "Copyright 2006 Fletcher Penny\n";
     print "Copyright 2008 Tomas Doran\n";
@@ -34,23 +34,24 @@ else {
     $m = Text::MultiMarkdown->new;
 }
 
-my $fn = shift(@ARGV);
-my $f;
-if (defined $fn && length $fn) {
-    die("Cannot find file $fn") unless (-r $fn);
-
-    my $fh;
-    open($fh, '<', $fn) or die;
-    $f = join('', <$fh>);
-    close($fh) or die;
-}
-else { # STDIN
-    local $/;               # Slurp the whole file
-    $f = <>;
-}
-
 sub main {
+    my ($fn) = @_;
+    
+    my $f;
+    if (defined $fn && length $fn) {
+        die("Cannot find file $fn") unless (-r $fn);
+
+        my $fh;
+        open($fh, '<', $fn) or die;
+        $f = join('', <$fh>);
+        close($fh) or die;
+    }
+    else { # STDIN
+        local $/;               # Slurp the whole file
+        $f = <>;
+    }
+
     return markdown($f);
 }
 
-print main() unless caller();
+print main(shift(@ARGV)) unless caller();

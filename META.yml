@@ -2,6 +2,7 @@ abstract: Convert Markdown syntax to (X)HTML
 author: Tomas Doran <bobtfish@bobtfish.net>
 build_requires: 
   File::Slurp: 0
+  FindBin: 0
   List::MoreUtils: 0
   Test::Exception: 0
   Test::More: 0.42

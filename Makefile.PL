@@ -16,6 +16,7 @@ build_requires  'Test::More'      => '0.42';
 build_requires  'Test::Exception' => undef;
 build_requires  'List::MoreUtils' => undef;
 build_requires  'File::Slurp'     => undef;
+build_requires  'FindBin'         => undef;
 
 # Scripts I install
 prompt_script   'script/Markdown.pl';

@@ -4,9 +4,11 @@ Todo pre 1.0.17:
         . Link attributes
         . Header Xrefs
         . Image Xrefs
-    . Better test cases for Markdown.pl and MultiMarkdown.pl
 
 Todo pre 1.0.18:
+    . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
+      used, and also have docs on what options are available. Expose the other
+      module options in the scripts.
     . Remove the nasty hackery of all the locals in the markdown routine.
     . Fix tests for the email address encoding. (Maybe call srand in the 
       test?)
