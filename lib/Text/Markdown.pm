@@ -1458,6 +1458,11 @@ Those that I have found are listed below:
 
 =over
 
+=item C - <http://www.pell.portland.or.us/~orc/Code/discount>
+
+Discount - Original Markdown, but in C. Fastest implementation available, and passes MDTest. 
+Adds it's own set of custom features.
+
 =item python - <http://www.freewisdom.org/projects/python-markdown/>
 
 Python Markdown which is mostly compatible with the original, with an interesting extension API.
