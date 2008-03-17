@@ -98,7 +98,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
        - Fix bugs with tab_width in constructor / as an option.
        - Fix bugs with tab width in pre/code blocks.
        
-1.0.17 2008-03-17T??:??:??
+1.0.17 2008-03-17T01:54:00  
        - Add Markdown.pl and MultiMarkdown.pl, which work the same way as the 
          original Markdown.pl. These scripts *are not* installed by default, 
          but you will be prompted to install them when you run Makefile.PL
