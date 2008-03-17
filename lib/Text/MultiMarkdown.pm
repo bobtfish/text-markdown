@@ -479,6 +479,8 @@ sub _HashHTMLBlocks {
     #warn ("In _HashHTMLBlocks for text {$text}");
     my $less_than_tab = $self->{tab_width} - 1;
 
+    #warn("IN {$text}");
+
 	# Hashify HTML blocks:
 	# We only want to do this for block-level HTML tags, such as headers,
 	# lists, and tables. That's because we still want to wrap <p>s around
@@ -497,7 +499,8 @@ sub _HashHTMLBlocks {
     my $current_block_end_tag;
     my $nesting_level = 0;
     
-    use Data::Dumper;
+    #use Data::Dumper;
+    #warn(Dumper($tokens));
     foreach my $token (@$tokens) {
         if ($token->[0] eq 'text') {
             
@@ -557,6 +560,9 @@ sub _HashHTMLBlocks {
                     $nesting_level++;
                     $current_block_tag = $token->[2];
                     push @collected, $token;
+                    if ($lspace) { # If we have space at the start of the line, we need to strip it at this point..
+                        pop @output; # Any whitespace will be 1 token max...
+                    }
                 }
                 else {
                     push @output, $token;
@@ -565,7 +571,11 @@ sub _HashHTMLBlocks {
         }
     }
 
+    #warn(Dumper(\@output));
+
 	$text = join '', map { $_->[1] } @output;
+
+    #warn("{$text}");
 
 	# Special case just for <hr />. It was easier to make a special case than
 	# to make the other regex more complicated.	
