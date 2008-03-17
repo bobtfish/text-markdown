@@ -98,7 +98,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
        - Fix bugs with tab_width in constructor / as an option.
        - Fix bugs with tab width in pre/code blocks.
        
-1.0.17 2008-03-??T??:??:??
+1.0.17 2008-03-17T??:??:??
        - Add Markdown.pl and MultiMarkdown.pl, which work the same way as the 
          original Markdown.pl. These scripts *are not* installed by default, 
          but you will be prompted to install them when you run Makefile.PL
@@ -120,17 +120,14 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
        
          Detailed description of any possible user visible changes below:
          
-         - Text::Markdown will no longer support the following features, which 
-           were not in original Markdown, but were previously supported after
-           the code merge:
+         - Text::Markdown will no longer supports the additional attribute 
+           specification for images and links feature, which was not in 
+           original Markdown, but were previously supported after
+           the code merge of Text::Markdown and Text::MultiMarkdown.
 
-            . Cross references to images and headers (would not work without 
-            the relevant id attributes switched on)
-            . Additional attribute specification for images and links.
-
-           If you are relying on these features, it is recommended that you 
-           use Text::MultiMarkdown (configured as you prefer), as these are 
-           not supported features in the original Markdown.
+           If you are relying on this features, it is recommended that you 
+           use Text::MultiMarkdown (configured as you prefer), as this is 
+           not a supported feature in the original Markdown.
 
          - Text::MultiMarkdown has changed the order of attributes in image 
            tags, the id attribute is moved from the first to the last 

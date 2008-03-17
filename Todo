@@ -9,7 +9,8 @@ Todo pre 1.0.18:
     . Make the merging of MDTest more obvious, and get back to the markdown
       mailing list about which tests a) I pass, b) I think should be added to 
       MDTest.
-    . Re-merge Movable Type and Bloxom compatibility, and add tests.
+    . Re-merge Movable Type and Bloxom compatibility to the scripts, and add 
+      tests.
     . Need a dingus, write a small / demo app then ask the catalyst guys to 
       host?
 
@@ -21,7 +22,7 @@ Todo pre 1.0.19:
       properly.
 
 Todo pre 1.0.20:
-    . Stop perl shitting itself due to regex backreference when doing listsug
+    . Stop perl shitting itself due to regex backreference when doing lists
       and fix the list bug
       (see t/17ulolreportedonlist.t and Markdown mailing list)
       This probably involves the first draught of the new parser...

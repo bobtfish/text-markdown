@@ -593,7 +593,6 @@ sub _ParseMetaData {
 }
 
 # FIXME - This is really ugly, why do we match stuff and substitute it with the thing we just matched?
-#         I guess the answer is to do with the original author not knowing about the pos function.
 sub _GenerateImageCrossRefs {
     my ($self, $text) = @_;
 
