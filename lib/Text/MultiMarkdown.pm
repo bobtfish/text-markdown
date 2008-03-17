@@ -53,7 +53,7 @@ HTML tags (like <div> and <table> as well).
 
 This module implements the MultiMarkdown markdown syntax extensions from:
 
-L<http://fletcherpenney.net/MultiMarkdown/>
+    http://fletcherpenney.net/MultiMarkdown/
 
 =head1 SYNTAX
 
