@@ -17,6 +17,5 @@ no_index:
 requires: 
   Digest::MD5: 0
   Encode: 0
-  Text::Balanced: 0
   perl: 5.8.0
 version: 1.0.18

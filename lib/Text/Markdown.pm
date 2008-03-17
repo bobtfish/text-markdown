@@ -283,72 +283,115 @@ sub _md5_utf8 {
     }
 }
 
+my @block_tags = qw(
+    	p           div       h1  h2 h3 h4 h5 h6  blockquote    pre         table  
+		dl          ol        ul        script        noscript    form   
+		fieldset    iframe    math      ins           del
+);
+my %block_tags = map { ($_, '</' . $_ . '>') } @block_tags;
+
 sub _HashHTMLBlocks {
     my ($self, $text) = @_;
+    #warn ("In _HashHTMLBlocks for text {$text}");
     my $less_than_tab = $self->{tab_width} - 1;
+
+    #warn("IN {$text}");
 
 	# Hashify HTML blocks:
 	# We only want to do this for block-level HTML tags, such as headers,
 	# lists, and tables. That's because we still want to wrap <p>s around
 	# "paragraphs" that are wrapped in non-block-level tags, such as anchors,
 	# phrase emphasis, and spans. The list of tags we're looking for is
-	# hard-coded:
-	my $block_tags = qr{
-		  (?:
-			p         |  div     |  h[1-6]  |  blockquote  |  pre       |  table  |
-			dl        |  ol      |  ul      |  script      |  noscript  |  form   |
-			fieldset  |  iframe  |  math    |  ins         |  del
-		  )
-		}x;
+	# hard-coded (see @block_tags above)
 
-	my $tag_attrs = qr{
-						(?:				# Match one attr name/value pair
-							\s+				# There needs to be at least some whitespace
-											# before each attribute name.
-							[\w.:_-]+		# Attribute name
-							\s*=\s*
-							(?:
-								".+?"		# "Attribute value"
-							 |
-								'.+?'		# 'Attribute value'
-							)
-						)*				# Zero or more
-					}x;
+    my $tokens = $self->_TokenizeHTML($text);
+	$text = '';   # rebuild $text from the tokens
 
-	my $empty_tag = qr{< \w+ $tag_attrs \s* />}oxms;
-	my $open_tag =  qr{< $block_tags $tag_attrs \s* >}oxms;
-	my $close_tag = undef;	# let Text::Balanced handle this
+    my $care = 1;
+    my $lspace = 0;
+    my @collected = (); # Would probably be faster to keep indexes, then slice them here.
+    my @output = ();
+    my $current_block_tag;
+    my $current_block_end_tag;
+    my $nesting_level = 0;
+    
+    #use Data::Dumper;
+    #warn(Dumper($tokens));
+    foreach my $token (@$tokens) {
+        if ($token->[0] eq 'text') {
+            
+            if ($current_block_tag) { # In a block, push text and loop
+                push @collected, $token;
+                next;
+            }
+            
+            # Not in a block
+            if ($token->[1] eq "\n") { # New line, start caring (looking for blocks) again
+                $care = 1;
+                $lspace = 0;
+            }
+            elsif ($care && $token->[1] =~ /^([ ]+)$/) { # If we get too much whitespace, stop caring
+                $care = 0 if ( ($lspace += length($1) ) > $less_than_tab);
+            }
+            else {
+                $care = 0;
+            }
+            push @output, $token;
+        }
+        else { # Is a tag
+            #warn("Got tag token: " . Dumper($token));
+            
+            if ($current_block_tag) { # If in tag already
+                push @collected, $token; # Always collect this token, even if it's the end tag
+            
+                if ($token->[1] eq $current_block_end_tag) { # End tag for current block
+                    $nesting_level--;
+                    if (0 == $nesting_level) {# If end of current block.
+                        end_tag_run:
+                            my $block = join('', map { $_->[1] } @collected);
+                            #warn("BLOCK {$block}");
+                            my $key = _md5_utf8($block);
+                            $self->{_html_blocks}{$key} = $block;
+                            push(@output, ['text', "\n\n" . $key . "\n\n"]);
+                            @collected = ();
+                            $current_block_tag = $current_block_end_tag = undef;
+                            $care = 0; # Do not care about anything left on the line
+                    }
+                }
+                elsif ($token->[2] eq $current_block_tag && !$token->[3]) { # Another occurance of the same tag, but not self closed
+                    $nesting_level++;
+                }
+            }
+            else { # Not in tag already
+                #warn("Not in tag already");
+                #warn("Care $care, lspace $lspace block tag" . $block_tags{$token->[2]});
+                
+                # If we care about tags here, and we find a tag we care about
+                if ($care && ($current_block_end_tag = $block_tags{$token->[2]}) ) {
+                    #warn("IN TAG");
+                    if ($token->[3]) { #Self closing tag
+                        push(@collected, $token);
+                        goto end_tag_run;
+                    }
+                    $nesting_level++;
+                    $current_block_tag = $token->[2];
+                    push @collected, $token;
+                    if ($lspace) { # If we have space at the start of the line, we need to strip it at this point..
+                        pop @output; # Any whitespace will be 1 token max...
+                    }
+                }
+                else {
+                    push @output, $token;
+                }
+            }
+        }
+    }
 
-	use Text::Balanced qw(gen_extract_tagged);
-	my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
+    #warn(Dumper(\@output));
 
-	my @chunks;
-	while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
-		my $cur_line = $1;
-		if (defined $2) {
-			# current line could be start of code block
+	$text = join '', map { $_->[1] } @output;
 
-			my ($tag, $remainder) = $extract_block->($cur_line . $text);
-			if ($tag) {
-				my $key = _md5_utf8($tag);
-				$self->{_html_blocks}{$key} = $tag;
-				push @chunks, "\n\n" . $key . "\n\n";
-				$text = $remainder;
-			}
-			else {
-				# No tag match, so toss $cur_line into @chunks
-				push @chunks, $cur_line;
-			}
-		}
-		else {
-			# current line could NOT be start of code block
-			push @chunks, $cur_line;
-		}
-
-	}
-	push @chunks, $text; # Whatever is left.
-
-	$text = join '', @chunks;
+    #warn("{$text}");
 
 	# Special case just for <hr />. It was easier to make a special case than
 	# to make the other regex more complicated.	
@@ -357,6 +400,8 @@ sub _HashHTMLBlocks {
     $text = $self->_HashHTMLComments($text);
 
     $text = $self->_HashPHPASPBlocks($text);
+
+    #warn ("OUT _HashHTMLBlocks for text {$text}");
 
 	return $text;
 }
@@ -1381,33 +1426,74 @@ sub _TokenizeHTML {
 #               the second is the actual value.
 #
 #
-#   Derived from the _tokenize() subroutine from Brad Choate's MTRegex plugin.
+#   Was originally derived from the _tokenize() subroutine from Brad Choate's MTRegex plugin.
 #       <http://www.bradchoate.com/past/mtregex.php>
-#
+#   Re written to be faster and more accurate by Tomas Doran
 
     my ($self, $str) = @_;
     my $pos = 0;
     my $len = length $str;
     my @tokens;
 
-    my $depth = 6;
-    my $nested_tags = join('|', ('(?:<[a-z/!$](?:[^<>]') x $depth) . (')*>)' x  $depth);
-    my $match = qr/(?s: <! ( -- .*? -- \s* )+ > ) |  # comment
-                   (?s: <\? .*? \?> ) |              # processing instruction
-                   $nested_tags/iox;                   # nested tags
+    my $tag_attrs = qr{
+                       (?:             # Match one attr name/value pair
+                           \s+             # There needs to be at least some whitespace
+                                           # before each attribute name.
+                           [\w.:_-]+       # Attribute name
+                           \s*=\s*
+                           (?:
+                               ".+?"       # "Attribute value"
+                            |
+                               '.+?'       # 'Attribute value'
+                            |
+                               \w+?        # Attributevalue
+                           )
+                       )*              # Zero or more
+                   }x;
+
+    my $match =  qr{</? \w+ $tag_attrs \s* (/)?>}oxms;
+
 
     while ($str =~ m/($match)/og) {
         my $whole_tag = $1;
+        my $standalone = $2 ? 1 : 0;
         my $sec_start = pos $str;
         my $tag_start = $sec_start - length $whole_tag;
         if ($pos < $tag_start) {
-            push @tokens, ['text', substr($str, $pos, $tag_start - $pos)];
+            push @tokens, $self->_TokenizeText( substr($str, $pos, $tag_start - $pos) );
         }
-        push @tokens, ['tag', $whole_tag];
+        $whole_tag =~ /^<\/?([^> \/]+)/;
+        push @tokens, ['tag', $whole_tag, lc($1), $standalone];
         $pos = pos $str;
     }
-    push @tokens, ['text', substr($str, $pos, $len - $pos)] if $pos < $len;
-    \@tokens;
+    push @tokens, $self->_TokenizeText( substr($str, $pos, $len - $pos) ) if $pos < $len;
+    return \@tokens;
+}
+
+sub _TokenizeText {
+    my ($self, $text) = @_;
+
+    # FIXME - Can this just become a split, or am I being over complex for a reason?
+    my @tokens;
+
+    while (my $l = length $text) {
+        #warn("Tokenize $text");
+        my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
+        if (($i = index($text, "\n")) != -1) {
+            #warn("MEEP for {$text}");
+            push @tokens, ['text', substr($text, 0, $i)], ['text', "\n"];
+            $text = substr($text, $i+1, $l-($i+1));
+            #warn("REMAINING {$text}");
+            #use Data::Dumper;
+            #warn(Dumper(\@tokens));
+        }
+        else {
+            push @tokens => ['text', $text];
+            $text = '';
+        }
+        #warn("ABOUT TO LOOP {$text}");
+    }
+    return grep { length $_->[1] } @tokens;
 }
 
 sub _Outdent {

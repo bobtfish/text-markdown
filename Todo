@@ -1,4 +1,7 @@
 Todo pre 1.0.18:
+    . Make HashHTMLBlocks deal correctly with tags that are *never* closed.
+    . Tests for ignoring stuff.. What happens if I have, say <div /><div id="2">foobar</div> on a line?
+    . Add tests for entity declerations, doctypes and other things that we find?
     . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
       used, and also have docs on what options are available. Expose the other
       module options in the scripts.
@@ -26,10 +29,6 @@ Todo pre 1.0.20:
       and fix the list bug
       (see t/17ulolreportedonlist.t and Markdown mailing list)
       This probably involves the first draught of the new parser...
-    . Text::Balanced is the slowest thing ever. 
-      The syntax guide looks like this:
-        49.4   0.569  0.568    113   0.0050 0.0050  Text::Balanced::_match_tagged
-        18.1   0.209  0.791      3   0.0696 0.2637  Text::MultiMarkdown::_HashHTMLBlocks
 
 Todo pre 1.0.21:
    . Have a look at extra features in 
