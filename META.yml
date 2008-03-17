@@ -1,4 +1,4 @@
-abstract: Convert MultiMarkdown syntax to (X)HTML
+abstract: Convert Markdown syntax to (X)HTML
 author: Tomas Doran <bobtfish@bobtfish.net>
 build_requires: 
   File::Slurp: 0

@@ -100,9 +100,12 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
        
 1.0.17 2008-03-??T??:??:??
        - Add Markdown.pl and MultiMarkdown.pl, which work the same way as the 
-         original Markdown.pl.
+         original Markdown.pl. These scripts *are not* installed by default, 
+         but you will be prompted to install them when you run Makefile.PL
+          
        - Make _DeTab significantly quicker. Text::Balanced is still the main
          performance sore point however. :(
+       
        - Re-organise the module code so that Text::Markdown is a standalone 
          module which does not require Text::MultiMarkdown.     
          Text::MultiMarkdown now inherits from Text::Markdown and adds the

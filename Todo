@@ -4,9 +4,6 @@ Todo pre 1.0.17:
         . Link attributes
         . Header Xrefs
         . Image Xrefs
-    . If installed interactively, prompt the user if the Markdown.pl and 
-      MultiMarkdown.pl scripts should be installed. Make sure these are 
-      totally compatible with the 'original' versions.
     . Better test cases for Markdown.pl and MultiMarkdown.pl
 
 Todo pre 1.0.18:
