@@ -1,27 +1,37 @@
 Todo pre 1.0.18:
-    . Make HashHTMLBlocks deal correctly with tags that are *never* closed.
-    . Make all the tests pass again!
-    . Tests for ignoring stuff.. What happens if I have, say <div /><div id="2">foobar</div> on a line?
+    . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
+      used, and also have docs on what options are available. Expose the other
+      module options in the scripts.
+    . Remove the nasty hackery of all the locals in the markdown routine.
+    . Fix tests for the email address encoding. (Maybe call srand in the 
+      test?)
+    . Fix copy and pasted regexes (nested brackets and StripLinkDefinitions)
     . Make the merging of MDTest more obvious, and get back to the markdown
       mailing list about which tests a) I pass, b) I think should be added to 
       MDTest.
-    . Re-merge Movable Type and Bloxom compatibility, and add tests.
+    . Re-merge Movable Type and Bloxom compatibility to the scripts, and add 
+      tests.
     . Need a dingus, write a small / demo app then ask the catalyst guys to 
       host?
-      
-Todo pre 1.0.19:
-    . Generally sort out the code layout so that not all of the code lives in
-      MultiMarkdown.pm (i.e. Text::Markdown should stand on it's own, with 
-      Text::MultiMarkdown being a superset).
-    
+
 Todo pre 1.0.19:
     . http://rt.cpan.org/Ticket/Display.html?id=33443
-    . Document the markdown (and multimarkdown) syntaxes in the module.
-    . Stop perl shitting itself due to regex backreference when fixing the 
-      list bug (see t/17ulolreportedonlist.t and Markdown mailing list)
-      This probably involves the first draught of the new parser...
+    . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
+      feature on breaks things.
+    . Document the markdown (and multimarkdown) syntaxes in the module 
+      properly.
 
 Todo pre 1.0.20:
+    . Stop perl shitting itself due to regex backreference when doing lists
+      and fix the list bug
+      (see t/17ulolreportedonlist.t and Markdown mailing list)
+      This probably involves the first draught of the new parser...
+    . Text::Balanced is the slowest thing ever. 
+      The syntax guide looks like this:
+        49.4   0.569  0.568    113   0.0050 0.0050  Text::Balanced::_match_tagged
+        18.1   0.209  0.791      3   0.0696 0.2637  Text::MultiMarkdown::_HashHTMLBlocks
+
+Todo pre 1.0.21:
    . Have a look at extra features in 
      http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
      we consider useful on the roadmap.

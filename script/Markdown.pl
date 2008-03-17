@@ -33,26 +33,26 @@ else {
     $m = Text::Markdown->new;
 }
 
-my $fn = shift(@ARGV);
-
-my $f;
-if (defined $fn && length $fn) {
-    die("Cannot find file $fn") unless (-r $fn);
-
-    my $fh;
-    open($fh, '<', $fn) or die;
-    $f = join('', <$fh>);
-    close($fh) or die;
-}
-else { # STDIN
-    local $/;               # Slurp the whole file
-    $f = <>;
-}
-
 sub main {
+    my ($fn) = @_;
+    
+    my $f;
+    if (defined $fn && length $fn) {
+        die("Cannot find file $fn") unless (-r $fn);
+
+        my $fh;
+        open($fh, '<', $fn) or die;
+        $f = join('', <$fh>);
+        close($fh) or die;
+    }
+    else { # STDIN
+        local $/;               # Slurp the whole file
+        $f = <>;
+    }
+
     return markdown($f);
 }
 
-print main() unless caller();
+print main(shift(@ARGV)) unless caller();
 
 

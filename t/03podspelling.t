@@ -16,6 +16,8 @@ __DATA__
 Doran
 FIXME
 Gruber
+Gruber's
+daringfireball
 Kulp
 METADATA
 Metadata

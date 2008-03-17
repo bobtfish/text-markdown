@@ -1,3 +1,5 @@
+inc/Module/Install/Makefile.pm
+Makefile.PL
 Changes
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
@@ -7,18 +9,19 @@ inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Metadata.pm
-inc/Module/Install/Makefile.pm
+inc/Module/Install/Scripts.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Text/Markdown.pm
 lib/Text/MultiMarkdown.pm
 License.text
-Makefile.PL
 MANIFEST			This list of files
 MANIFEST.skip
 META.yml
 README
 Readme.text
+script/Markdown.pl
+script/MultiMarkdown.pl
 t/01use.t
 t/02pod.t
 t/03podcoverage.t
@@ -51,6 +54,10 @@ t/29fulldocs-maruku-unittest.t
 t/30disable_multimarkdown_features.t
 t/31angleedgecase.t
 t/32tabwidth.t
+t/33spaceinlinksandimages.t
+t/34commandlinemarkdown.t
+t/35commandlinemultimarkdown.t
+t/36multimarkdown_featurebleed.t
 t/docs-markdown-todo/.empty
 t/docs-markdown/Amps_and_angle_encoding.html
 t/docs-markdown/Amps_and_angle_encoding.text
