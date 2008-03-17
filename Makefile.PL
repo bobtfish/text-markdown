@@ -19,8 +19,8 @@ build_requires  'File::Slurp'     => undef;
 build_requires  'FindBin'         => undef;
 
 # Scripts I install
-prompt_script   'script/Markdown.pl';
-prompt_script   'script/MultiMarkdown.pl';
+prompt_script('script/Markdown.pl');
+prompt_script('script/MultiMarkdown.pl');
 
 auto_install;
 WriteAll;
