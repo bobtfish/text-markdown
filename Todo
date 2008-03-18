@@ -2,10 +2,8 @@ Todo pre 1.0.18:
     . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
       used, and also have docs on what options are available. Expose the other
       module options in the scripts.
-    . Remove the nasty hackery of all the locals in the markdown routine.
     . Fix tests for the email address encoding. (Maybe call srand in the 
       test?)
-    . Fix copy and pasted regexes (nested brackets and StripLinkDefinitions)
     . Make the merging of MDTest more obvious, and get back to the markdown
       mailing list about which tests a) I pass, b) I think should be added to 
       MDTest.
@@ -15,6 +13,7 @@ Todo pre 1.0.18:
       host?
 
 Todo pre 1.0.19:
+    . Clean up constructor / initialisation and markdown routine properly.
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
