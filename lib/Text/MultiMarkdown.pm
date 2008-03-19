@@ -196,11 +196,6 @@ A simple constructor, see the SYNTAX and OPTIONS sections for more information.
 
 =cut
 
-# Pull some symbols in direct from the Text::Markdown package.
-*g_nested_brackets = \$Text::Markdown::g_nested_brackets;
-*g_nested_parens = \$Text::Markdown::g_nested_parens;
-*g_escape_table = \%Text::Markdown::g_escape_table;
-
 sub new {
     my ($class, %p) = @_;
     
@@ -419,8 +414,9 @@ sub _StripLinkDefinitions {
 
     # Link defs are in the form: ^[id]: url "optional title"
     # FIXME - document attributes here.
+    my $re = _LinkDefinitionsRegex($less_than_tab);
     while ($text =~ s{
-                        $Text::Markdown::link_definition_re
+                        $re
                         
                         # MultiMarkdown addition for attribute support
                         \n?
