@@ -231,25 +231,6 @@ sub _CleanUpDoc {
     return $text;
 }
 
-our $link_definition_re = qr{
-    ^[ ]{0,$less_than_tab}\[(.+)\]: # id = $1
-      [ \t]*
-      \n?               # maybe *one* newline
-      [ \t]*
-    <?(\S+?)>?          # url = $2
-      [ \t]*
-      \n?               # maybe one newline
-      [ \t]*
-    (?:
-        (?<=\s)         # lookbehind for whitespace
-        ["(]
-        (.+?)           # title = $3
-        [")]
-        [ \t]*
-    )?  # title is optional
-    (?:\n+|\Z)
-};
-
 sub _StripLinkDefinitions {
 #
 # Strips link definitions from text, stores the URLs and titles in
@@ -260,9 +241,23 @@ sub _StripLinkDefinitions {
 
     # Link defs are in the form: ^[id]: url "optional title"
     while ($text =~ s{
-                        $link_definition_re
-                    }
-                    {}omx) {
+            ^[ ]{0,$less_than_tab}\[(.+)\]: # id = \$1
+              [ \t]*
+              \n?               # maybe *one* newline
+              [ \t]*
+            <?(\S+?)>?          # url = \$2
+              [ \t]*
+              \n?               # maybe one newline
+              [ \t]*
+            (?:
+                (?<=\s)         # lookbehind for whitespace
+                ["(]
+                (.+?)           # title = \$3
+                [")]
+                [ \t]*
+            )?  # title is optional
+            (?:\n+|\Z)
+        }{}omx) {
         $self->{_urls}{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
         if ($3) {
             $self->{_titles}{lc $1} = $3;

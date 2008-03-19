@@ -14,6 +14,7 @@ Todo pre 1.0.18:
       tests.
     . Need a dingus, write a small / demo app then ask the catalyst guys to 
       host?
+    . Merge latest MultiMarkdown work? http://groups.google.com/group/multimarkdown/t/4a4210b359065bed
 
 Todo pre 1.0.19:
     . Clean up constructor / initialisation and markdown routine properly.

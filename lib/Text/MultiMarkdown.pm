@@ -196,11 +196,6 @@ A simple constructor, see the SYNTAX and OPTIONS sections for more information.
 
 =cut
 
-# Pull some symbols in direct from the Text::Markdown package.
-*g_nested_brackets = \$Text::Markdown::g_nested_brackets;
-*g_nested_parens = \$Text::Markdown::g_nested_parens;
-*g_escape_table = \%Text::Markdown::g_escape_table;
-
 sub new {
     my ($class, %p) = @_;
     
@@ -420,17 +415,31 @@ sub _StripLinkDefinitions {
     # Link defs are in the form: ^[id]: url "optional title"
     # FIXME - document attributes here.
     while ($text =~ s{
-                        $Text::Markdown::link_definition_re
-                        
-                        # MultiMarkdown addition for attribute support
-                        \n?
-                        (               # Attributes = $4
-                            (?<=\s)         # lookbehind for whitespace
-                            (([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
-                        )?
-                        [ \t]*
-                        # /addition
-                        (?:\n+|\Z)
+                        ^[ ]{0,$less_than_tab}\[(.+)\]: # id = $1
+                         [ \t]*
+                         \n?               # maybe *one* newline
+                         [ \t]*
+                       <?(\S+?)>?          # url = $2
+                         [ \t]*
+                         \n?               # maybe one newline
+                         [ \t]*
+                       (?:
+                           (?<=\s)         # lookbehind for whitespace
+                           ["(]
+                           (.+?)           # title = $3
+                           [")]
+                           [ \t]*
+                       )?  # title is optional
+
+                       # MultiMarkdown addition for attribute support
+                       \n?
+                       (               # Attributes = $4
+                           (?<=\s)         # lookbehind for whitespace
+                           (([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
+                       )?
+                       [ \t]*
+                       # /addition
+                       (?:\n+|\Z)
                     }
                     {}mx) {
         $self->{_urls}{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
