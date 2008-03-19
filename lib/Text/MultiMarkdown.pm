@@ -414,19 +414,32 @@ sub _StripLinkDefinitions {
 
     # Link defs are in the form: ^[id]: url "optional title"
     # FIXME - document attributes here.
-    my $re = _LinkDefinitionsRegex($less_than_tab);
     while ($text =~ s{
-                        $re
-                        
-                        # MultiMarkdown addition for attribute support
-                        \n?
-                        (               # Attributes = $4
-                            (?<=\s)         # lookbehind for whitespace
-                            (([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
-                        )?
-                        [ \t]*
-                        # /addition
-                        (?:\n+|\Z)
+                        ^[ ]{0,$less_than_tab}\[(.+)\]: # id = $1
+                         [ \t]*
+                         \n?               # maybe *one* newline
+                         [ \t]*
+                       <?(\S+?)>?          # url = $2
+                         [ \t]*
+                         \n?               # maybe one newline
+                         [ \t]*
+                       (?:
+                           (?<=\s)         # lookbehind for whitespace
+                           ["(]
+                           (.+?)           # title = $3
+                           [")]
+                           [ \t]*
+                       )?  # title is optional
+
+                       # MultiMarkdown addition for attribute support
+                       \n?
+                       (               # Attributes = $4
+                           (?<=\s)         # lookbehind for whitespace
+                           (([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
+                       )?
+                       [ \t]*
+                       # /addition
+                       (?:\n+|\Z)
                     }
                     {}mx) {
         $self->{_urls}{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
