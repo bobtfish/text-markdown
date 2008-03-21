@@ -284,7 +284,7 @@ sub _md5_utf8 {
 my @block_tags = qw(
     	p           div       h1  h2 h3 h4 h5 h6  blockquote    pre         table  
 		dl          ol        ul        script        noscript    form   
-		fieldset    iframe    math      ins           del
+		fieldset    iframe    math      ins           del  hr
 );
 my %block_tags = map { ($_, '</' . $_ . '>') } @block_tags;
 
@@ -313,17 +313,25 @@ sub _HashHTMLBlocks {
     # Generate a closure for ending a tag run, which has scope to all the state variables above.
     # Then we can easilly call it within the state machine control structure below.
     my $end_tag_run = sub {
+        # If next token is only whitespace (before end of line), 
+        #  remove it, and hash it with the rest of the block.
+        if (exists $tokens->[0] && exists $tokens->[1] &&
+            $tokens->[0]->[0] eq 'text' && $tokens->[0]->[1] =~ /^ +$/ &&
+            $tokens->[1]->[0] eq 'text' && $tokens->[1]->[1] eq "\n"      ) {
+            push(@collected, shift(@$tokens));
+        }
         my $block = join('', map { $_->[1] } @collected);
         my $key = _md5_utf8($block);
         $self->{_html_blocks}{$key} = $block;
         push(@output, ['text', "\n\n" . $key . "\n\n"]);
         @collected = ();
         $current_block_tag = $current_block_end_tag = undef;
-        $care = 1; # Do not care about anything left on the line
+        use Data::Dumper;
+        $care = 1;
     };
     
     token_loop:
-    foreach my $token (@$tokens) {
+    while (my $token = shift(@$tokens)) {
         if ($token->[0] eq 'text') {
             
             if ($current_block_tag) { # In a block, push text and loop
@@ -360,17 +368,21 @@ sub _HashHTMLBlocks {
                 # If we care about tags here, and we find a tag we care about
                 if ($care && ($current_block_end_tag = $block_tags{$token->[2]}) ) {
                     if ($token->[3]) { #Self closing tag
-                        # Old behavior
-                        push(@output, $token);
-                        $care = 0;
-                        $current_block_end_tag = undef;
-                        next;
-                        
-                        # This would be much nicer, and we'd hash self closing tags correctly!
-                        # See t/39hashhtmlblocks.t
-                        push(@collected, $token);
-                        $end_tag_run->();
-                        next;
+                        if ($token->[2] ne 'hr') {
+                            # Old / normal behavior
+                            push(@output, $token);
+                            $care = 0;
+                            $current_block_end_tag = undef;
+                            next;
+                        }
+                        else {
+                            # This would be much nicer, and we'd hash self closing tags correctly!
+                            # See t/39hashhtmlblocks.t This is the special case for hr tags also.
+                            #warn("SELF CLOSING <HR />");
+                            push(@collected, $token);
+                            $end_tag_run->();
+                            next;
+                        }
                     }
                     $nesting_level++;
                     $current_block_tag = $token->[2];
@@ -390,6 +402,16 @@ sub _HashHTMLBlocks {
         # We shouldn't get to this condition if we have valid markup input, but if we do - try to do the right thing.
         # We just *ignore* the unclosed tag. I'm not sure if this is the best thing to do, but it's what
         # original Markdown does.
+        
+        # Note that HR is again a special case here..
+        if ($collected[0]->[2] eq 'hr') {
+            my $token = shift(@collected);
+            @$tokens = @collected;
+            @collected = ($token);
+            $end_tag_run->();
+            goto token_loop;
+        }
+        
         push(@output, shift(@collected)); # Remove first token, which will be our un-closed tag, and just allow that to go through
         @$tokens = @collected;
         $care = 0;
@@ -400,43 +422,11 @@ sub _HashHTMLBlocks {
     }
 
 	$text = join '', map { $_->[1] } @output;
-
-	# Special case just for <hr />. It was easier to make a special case than
-	# to make the other regex more complicated.	
-	$text = $self->_HashHR($text);
 	
     $text = $self->_HashHTMLComments($text);
 
     $text = $self->_HashPHPASPBlocks($text);
 
-	return $text;
-}
-
-sub _HashHR {
-    my ($self, $text) = @_;
-    my $less_than_tab = $self->{tab_width} - 1;
-    
-	$text =~ s{
-				(?:
-					(?<=\n\n)		# Starting after a blank line
-					|				# or
-					\A\n?			# the beginning of the doc
-				)
-				(						# save in $1
-					[ ]{0,$less_than_tab}
-					<(hr)				# start tag = $2
-					\b					# word break
-					([^<>])*?			# 
-					/?>					# the matching end tag
-					[ \t]*
-					(?=\n{2,}|\Z)		# followed by a blank line or end of document
-				)
-	}{
-		my $key = _md5_utf8($1);
-		$self->{_html_blocks}{$key} = $1;
-		"\n\n" . $key . "\n\n";
-	}egx;
-			
 	return $text;
 }
 
