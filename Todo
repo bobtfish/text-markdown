@@ -1,7 +1,7 @@
 Todo pre 1.0.18:
     . Make HashHTMLBlocks deal correctly with tags that are *never* closed.
     . Tests for ignoring stuff.. What happens if I have, say <div /><div id="2">foobar</div> on a line?
-    . Add tests for entity declerations, doctypes and other things that we find?
+    . Add tests for entity declarations, doctypes and other things that we find?
     . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
       used, and also have docs on what options are available. Expose the other
       module options in the scripts.
