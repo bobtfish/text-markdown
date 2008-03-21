@@ -373,6 +373,11 @@ sub _HashHTMLBlocks {
         }
     }
 
+    if (@collected) {
+        # We shouldn't get to this condition if we have valid markup input, but if we do - try to do the right thing
+        #goto end_tag_run;
+    }
+
 	$text = join '', map { $_->[1] } @output;
 
 	# Special case just for <hr />. It was easier to make a special case than
@@ -1455,6 +1460,14 @@ sub _TokenizeText {
 
     # FIXME - Can this just become a split, or am I being over complex for a reason?
     my @tokens;
+    @tokens = map { $_, "\n" } split(/\n/, $text);
+    pop @tokens unless $text =~ /\n$/; # Throw away last line break unless string ends in a line break.
+    @tokens = map { ['text', $_] } grep { length $_ } @tokens;
+
+    use Data::Dumper;
+    warn("INPUT {$text}, tokens ". Dumper($tokens));
+    
+    return @tokens;
 
     while (my $l = length $text) {
         my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
