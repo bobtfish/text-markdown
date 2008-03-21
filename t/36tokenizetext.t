@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Text::MultiMarkdown ();
-use Test::More tests => 6;
+use Test::More tests => 11;
 
 # Test the _TokenizeText routine This takes a chunk of text and splits it on line breaks, making
 # a number of tokens.
@@ -23,24 +23,55 @@ $instr = qq{foo\nbar};
 @out = $m->_TokenizeText($instr);
 is_deeply(\@out, \@exp, 'foo\nbar');
 
+$instr = qq{foo\n\n\n\nbar};
+@exp = ( ['text', 'foo'], ['text', "\n"], ['text', "\n"], ['text', "\n"], ['text', "\n"], ['text', 'bar'] );
+@out = $m->_TokenizeText($instr);
+is_deeply(\@out, \@exp, 'foo\n\n\n\nbar');
+
+$instr = qq{\n\n\n\n};
+@exp = ( ['text', "\n"], ['text', "\n"], ['text', "\n"], ['text', "\n"] );
+@out = $m->_TokenizeText($instr);
+is_deeply(\@out, \@exp, '\n\n\n\n');
+
+$instr = qq{\n\n\n\nfoo};
+@exp = ( ['text', "\n"], ['text', "\n"], ['text', "\n"], ['text', "\n"], ['text', 'foo'] );
+@out = $m->_TokenizeText($instr);
+is_deeply(\@out, \@exp, '\n\n\n\nfoo');
+
+$instr = qq{foo\n\n\n\n};
+@exp = ( ['text', 'foo'], ['text', "\n"], ['text', "\n"], ['text', "\n"], ['text', "\n"] );
+@out = $m->_TokenizeText($instr);
+is_deeply(\@out, \@exp, 'foo\n\n\n\n');
 
 $instr = qq{foo\nbar\n};
 @exp = ( ['text', 'foo'], ['text', "\n"], ['text', 'bar'], ['text', "\n"] );
 @out = $m->_TokenizeText($instr);
 is_deeply(\@out, \@exp, 'foo\nbar\n');
 
-$instr = qq{foo\n};
-@exp = ( ['text', 'foo'], ['text', "\n"]);
+$instr = qq{foo\n\n\n};
+@exp = ( ['text', 'foo'], ['text', "\n"], ['text', "\n"], ['text', "\n"]);
 @out = $m->_TokenizeText($instr);
-is_deeply(\@out, \@exp, 'foo\n');
+is_deeply(\@out, \@exp, 'foo\n\n\n');
 
-$instr = qq{\nbar};
-@exp = ( ['text', "\n"], ['text', 'bar'] );
+$instr = qq{\n\n\nbar};
+@exp = ( ['text', "\n"], ['text', "\n"], ['text', "\n"], ['text', 'bar'] );
 @out = $m->_TokenizeText($instr);
-is_deeply(\@out, \@exp, '\nbar');
+is_deeply(\@out, \@exp, '\n\n\nbar');
+
+$instr = q{code block
+
+
+with a blank line
+};
+@out = $m->_TokenizeText($instr);
+#use Data::Dumper;
+#warn(Dumper(\@out));
+@exp = map { ['text', $_] } ("code block", "\n", "\n", 
+                             "\n", "with a blank line","\n");
+is_deeply(\@out, \@exp, 'Real string (code block with blank line)');
 
 # Test that we can deal with a large document. The first version of this function died due to deep recursion
-my $itr = 10000;
+my $itr = 5000;
 $instr = qq{foo\n} x $itr;
 my @partexp = ( ['text', 'foo'], ['text', "\n"] );
 @exp = ();

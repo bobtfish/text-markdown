@@ -133,7 +133,7 @@ sub new {
     # Is markdown processed in HTML blocks? See t/15inlinehtmldonotturnoffmarkdown.t
     $p{markdown_in_html_blocks} = $p{markdown_in_html_blocks} ? 1 : 0;
     
-    my $self = { params => \%p };
+    my $self = { %p, params => \%p }; #Naaaasty hack.
     bless $self, ref($class) || $class;
     return $self;
 }
@@ -375,7 +375,10 @@ sub _HashHTMLBlocks {
 
     if (@collected) {
         # We shouldn't get to this condition if we have valid markup input, but if we do - try to do the right thing
-        #goto end_tag_run;
+        my $block = join('', map { $_->[1] } @collected);
+        my $key = _md5_utf8($block);
+        $self->{_html_blocks}{$key} = $block;
+        push(@output, ['text', "\n\n" . $key . "\n\n"]);
     }
 
 	$text = join '', map { $_->[1] } @output;
@@ -1458,16 +1461,29 @@ sub _TokenizeHTML {
 sub _TokenizeText {
     my ($self, $text) = @_;
 
+    #warn("RUNNING TOK FOR {$text}");
     # FIXME - Can this just become a split, or am I being over complex for a reason?
+    my $s = $text;
     my @tokens;
-    @tokens = map { $_, "\n" } split(/\n/, $text);
-    pop @tokens unless $text =~ /\n$/; # Throw away last line break unless string ends in a line break.
-    @tokens = map { ['text', $_] } grep { length $_ } @tokens;
-
-    use Data::Dumper;
-    warn("INPUT {$text}, tokens ". Dumper($tokens));
+    my @tokens2;
+    my @endtokens;
+    if ($text =~ /(\n+)$/s) {
+        #warn("Found " . length($1) . " trailing newlines ($1)");
+        for (my $i=1; $i <= length($1); $i++) {
+            push(@endtokens, "\n");
+        }
+    } 
+    @tokens2 = map { $_, "\n" } split(/\n/, $text);
+    pop @tokens2; # Throw away last line break.
+    push(@tokens2, @endtokens);
+    @tokens2 = map { ['text', $_] } grep { length $_ } @tokens2;
     
-    return @tokens;
+    #use Data::Dumper;
+    #warn("INPUT {$text}, tokens ". Dumper(\@tokens2));
+    return @tokens2;
+    
+    #return @tokens;
+    @tokens = ();
 
     while (my $l = length $text) {
         my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
@@ -1480,7 +1496,14 @@ sub _TokenizeText {
             $text = '';
         }
     }
-    return grep { length $_->[1] } @tokens;
+    @tokens = grep { length $_->[1] } @tokens;
+    
+    my $i = scalar(@tokens);
+    my $j = scalar(@tokens2);
+    #use Data::Dumper;
+    #warn("I$i J$j not the same". Dumper(\@tokens, \@tokens2) . "STRING {$s}") unless ($i == $j);
+    
+    return @tokens2;
 }
 
 sub _Outdent {
