@@ -1,5 +1,6 @@
 Todo pre 1.0.18:
-    . Tests for ignoring stuff.. What happens if I have, say <div /><div id="2">foobar</div> on a line?
+    . Think of more mental test cases for HTML Block hashing tests?
+    . Clean up constructor / initialisation and markdown routine properly.
     . Add tests for entity declarations, doctypes and other things that we find?
     . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
       used, and also have docs on what options are available. Expose the other
@@ -16,7 +17,6 @@ Todo pre 1.0.18:
     . Merge latest MultiMarkdown work? http://groups.google.com/group/multimarkdown/t/4a4210b359065bed
 
 Todo pre 1.0.19:
-    . Clean up constructor / initialisation and markdown routine properly.
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.

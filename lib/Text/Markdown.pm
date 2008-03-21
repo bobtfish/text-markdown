@@ -360,6 +360,14 @@ sub _HashHTMLBlocks {
                 # If we care about tags here, and we find a tag we care about
                 if ($care && ($current_block_end_tag = $block_tags{$token->[2]}) ) {
                     if ($token->[3]) { #Self closing tag
+                        # Old behavior
+                        push(@output, $token);
+                        $care = 0;
+                        $current_block_end_tag = undef;
+                        next;
+                        
+                        # This would be much nicer, and we'd hash self closing tags correctly!
+                        # See t/39hashhtmlblocks.t
                         push(@collected, $token);
                         $end_tag_run->();
                         next;
