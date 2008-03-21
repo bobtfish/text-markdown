@@ -595,7 +595,9 @@ sub _DoAnchors {
         if ($link_id eq "") {
             $link_id = lc $link_text;   # for shortcut links like [this][].
         }
-
+        
+        $link_id =~ s{[ ]?\n}{ }g; # turn embedded newlines into spaces
+        
         $self->_GenerateAnchor($whole_match, $link_text, $link_id);
     }xsge;
 
