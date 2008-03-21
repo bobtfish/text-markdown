@@ -1466,52 +1466,12 @@ sub _TokenizeHTML {
     return \@tokens;
 }
 
+# Splits text into tokens which are either \n, or runs of anything else..
+# This is the quickest way I can find to do it...
 sub _TokenizeText {
     my ($self, $text) = @_;
 
-    #warn("RUNNING TOK FOR {$text}");
-    # FIXME - Can this just become a split, or am I being over complex for a reason?
-    my $s = $text;
-    my @tokens;
-    my @tokens2;
-    my @endtokens;
-    if ($text =~ /(\n+)$/s) {
-        #warn("Found " . length($1) . " trailing newlines ($1)");
-        for (my $i=1; $i <= length($1); $i++) {
-            push(@endtokens, "\n");
-        }
-    } 
-    @tokens2 = map { $_, "\n" } split(/\n/, $text);
-    pop @tokens2; # Throw away last line break.
-    push(@tokens2, @endtokens);
-    @tokens2 = map { ['text', $_] } grep { length $_ } @tokens2;
-    
-    #use Data::Dumper;
-    #warn("INPUT {$text}, tokens ". Dumper(\@tokens2));
-    return @tokens2;
-    
-    #return @tokens;
-    @tokens = ();
-
-    while (my $l = length $text) {
-        my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
-        if (($i = index($text, "\n")) != -1) {
-            push @tokens, ['text', substr($text, 0, $i)], ['text', "\n"];
-            $text = substr($text, $i+1, $l-($i+1));
-        }
-        else {
-            push @tokens => ['text', $text];
-            $text = '';
-        }
-    }
-    @tokens = grep { length $_->[1] } @tokens;
-    
-    my $i = scalar(@tokens);
-    my $j = scalar(@tokens2);
-    #use Data::Dumper;
-    #warn("I$i J$j not the same". Dumper(\@tokens, \@tokens2) . "STRING {$s}") unless ($i == $j);
-    
-    return @tokens2;
+    return map { ['text', $_] } grep { length $_ } map { s/\n$// ? ( $_, "\n" ) : $_ } split /^/, $text;
 }
 
 sub _Outdent {

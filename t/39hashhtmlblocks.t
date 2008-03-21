@@ -97,8 +97,8 @@ is($callcounter, 2, 'md5 called twice for 2 tag blocks');
 is($out, "\n\n$token\n\n\n\n$token\n\n\n", 'run together HTML blocks output');
 
 # Check a whole run of blocks, all with trailing whitespace
-$indoc = qq{<hr>\n\n<hr/>  \n\n<hr />\n};
-my $expdoc = qq{\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n};
+$indoc = qq{<hr>  \n\n<hr/>  \n\n<hr />\n\n  <hr>\n\n  <hr/>\n\n<hr />\n};
+my $expdoc = qq{\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n};
 $out = $m->_HashHTMLBlocks($indoc);
 $out =~ s/\n/\\n/g; # Change things so errors are more obvious
 $out =~ s/ /~/g;
