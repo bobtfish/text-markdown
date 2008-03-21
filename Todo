@@ -17,6 +17,7 @@ Todo pre 1.0.18:
     . Merge latest MultiMarkdown work? http://groups.google.com/group/multimarkdown/t/4a4210b359065bed
 
 Todo pre 1.0.19:
+    . Clean up constructor / initialisation and markdown routine properly.
     . http://rt.cpan.org/Ticket/Display.html?id=33443
     . More tests in t/15inlinehtmldoesnoturnoffmarkdown.t, I bet turning this 
       feature on breaks things.
