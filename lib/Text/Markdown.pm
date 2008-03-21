@@ -310,6 +310,19 @@ sub _HashHTMLBlocks {
     my $current_block_end_tag;
     my $nesting_level = 0;
     
+    # Generate a closure for ending a tag run, which has scope to all the state variables above.
+    # Then we can easilly call it within the state machine control structure below.
+    my $end_tag_run = sub {
+        my $block = join('', map { $_->[1] } @collected);
+        my $key = _md5_utf8($block);
+        $self->{_html_blocks}{$key} = $block;
+        push(@output, ['text', "\n\n" . $key . "\n\n"]);
+        @collected = ();
+        $current_block_tag = $current_block_end_tag = undef;
+        $care = 1; # Do not care about anything left on the line
+    };
+    
+    token_loop:
     foreach my $token (@$tokens) {
         if ($token->[0] eq 'text') {
             
@@ -334,19 +347,10 @@ sub _HashHTMLBlocks {
         else { # Is a tag            
             if ($current_block_tag) { # If in tag already
                 push @collected, $token; # Always collect this token, even if it's the end tag
-            
+        
                 if ($token->[1] eq $current_block_end_tag) { # End tag for current block
-                    $nesting_level--;
-                    if (0 == $nesting_level) {# If end of current block.
-                        end_tag_run:
-                            my $block = join('', map { $_->[1] } @collected);
-                            my $key = _md5_utf8($block);
-                            $self->{_html_blocks}{$key} = $block;
-                            push(@output, ['text', "\n\n" . $key . "\n\n"]);
-                            @collected = ();
-                            $current_block_tag = $current_block_end_tag = undef;
-                            $care = 0; # Do not care about anything left on the line
-                    }
+                    $end_tag_run->() if (0 == --$nesting_level); # End of current block.
+                    next;
                 }
                 elsif ($token->[2] eq $current_block_tag && !$token->[3]) { # Another occurance of the same tag, but not self closed
                     $nesting_level++;
@@ -357,7 +361,8 @@ sub _HashHTMLBlocks {
                 if ($care && ($current_block_end_tag = $block_tags{$token->[2]}) ) {
                     if ($token->[3]) { #Self closing tag
                         push(@collected, $token);
-                        goto end_tag_run;
+                        $end_tag_run->();
+                        next;
                     }
                     $nesting_level++;
                     $current_block_tag = $token->[2];
@@ -374,11 +379,16 @@ sub _HashHTMLBlocks {
     }
 
     if (@collected) {
-        # We shouldn't get to this condition if we have valid markup input, but if we do - try to do the right thing
-        my $block = join('', map { $_->[1] } @collected);
-        my $key = _md5_utf8($block);
-        $self->{_html_blocks}{$key} = $block;
-        push(@output, ['text', "\n\n" . $key . "\n\n"]);
+        # We shouldn't get to this condition if we have valid markup input, but if we do - try to do the right thing.
+        # We just *ignore* the unclosed tag. I'm not sure if this is the best thing to do, but it's what
+        # original Markdown does.
+        push(@output, shift(@collected)); # Remove first token, which will be our un-closed tag, and just allow that to go through
+        @$tokens = @collected;
+        $care = 0;
+        @collected = ();
+        $current_block_tag = $current_block_end_tag = undef;
+        $nesting_level = 0;
+        goto token_loop; # See what you did with your bad markup? You killed a kitten. YOU BASTARD.
     }
 
 	$text = join '', map { $_->[1] } @output;

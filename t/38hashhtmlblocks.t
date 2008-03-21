@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 11;
 
 BEGIN: {
     use_ok('Text::Markdown');
@@ -33,8 +33,28 @@ is($out, "before\n\n\n$token\n\n\n", 'leading space on line stripped (output)');
 is($tomd5, "<div>\nfoo\n  </div>", 'leading space on line (tomd5)');
 
 # If you don't close a tag, we eat the rest of the document. Not great :(
-# What did this used to do?
+$tomd5 = 'foobarbaz';
 $indoc = qq{before\n<div>foo\n\nafter};
 $out = $m->_HashHTMLBlocks($indoc);
-is($out, "before\n\n\n$token\n\n", 'unclosed tag (output)');
-is($tomd5, "<div>foo\n\nafter",, 'unclosed tag (tomd5)');
+is($out, $indoc, 'unclosed tag (output verbatim)');
+is($tomd5, 'foobarbaz', 'unclosed tag (tomd5 not called)');
+
+# Check however that a non-closed tag doesn't stop us working for the rest of the document
+$indoc = qq{<div id=1>\nbefore\n<div id=2>foo\n\nafter</div>};
+$out = $m->_HashHTMLBlocks($indoc);
+is($out, "<div id=1>\nbefore\n\n\n$token\n\n", 'unclosed tag followed by normal (unclosed output verbatim, rest fine)');
+is($tomd5, "<div id=2>foo\n\nafter</div>", 'unclosed tag (tomd5 called for 2nd tag pair)');
+
+# Check what happens when you have 2 runs back to back.
+my $callcounter = 0;
+{
+    no warnings 'redefine'; 
+    *Text::Markdown::_md5_utf8 = sub {
+        $callcounter++;
+        $new_md5_sub->(@_);
+    };
+}
+$indoc = qq{<div /><div id="2">foobar</div>};
+$out = $m->_HashHTMLBlocks($indoc);
+is($callcounter, 2, 'md5 called twice for 2 tag blocks');
+is($out, "\n\n$token\n\n\n\n$token\n\n", 'run together HTML blocks output');
