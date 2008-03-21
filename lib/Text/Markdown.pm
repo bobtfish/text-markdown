@@ -290,10 +290,7 @@ my %block_tags = map { ($_, '</' . $_ . '>') } @block_tags;
 
 sub _HashHTMLBlocks {
     my ($self, $text) = @_;
-    #warn ("In _HashHTMLBlocks for text {$text}");
     my $less_than_tab = $self->{tab_width} - 1;
-
-    #warn("IN {$text}");
 
 	# Hashify HTML blocks:
 	# We only want to do this for block-level HTML tags, such as headers,
@@ -430,8 +427,6 @@ sub _HashHTMLBlocks {
     $text = $self->_HashHTMLComments($text);
 
     $text = $self->_HashPHPASPBlocks($text);
-
-    #warn ("OUT _HashHTMLBlocks for text {$text}");
 
 sub _HashHTMLComments {
     my ($self, $text) = @_;
