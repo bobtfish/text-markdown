@@ -290,10 +290,7 @@ my %block_tags = map { ($_, '</' . $_ . '>') } @block_tags;
 
 sub _HashHTMLBlocks {
     my ($self, $text) = @_;
-    #warn ("In _HashHTMLBlocks for text {$text}");
     my $less_than_tab = $self->{tab_width} - 1;
-
-    #warn("IN {$text}");
 
 	# Hashify HTML blocks:
 	# We only want to do this for block-level HTML tags, such as headers,
@@ -313,8 +310,6 @@ sub _HashHTMLBlocks {
     my $current_block_end_tag;
     my $nesting_level = 0;
     
-    #use Data::Dumper;
-    #warn(Dumper($tokens));
     foreach my $token (@$tokens) {
         if ($token->[0] eq 'text') {
             
@@ -336,9 +331,7 @@ sub _HashHTMLBlocks {
             }
             push @output, $token;
         }
-        else { # Is a tag
-            #warn("Got tag token: " . Dumper($token));
-            
+        else { # Is a tag            
             if ($current_block_tag) { # If in tag already
                 push @collected, $token; # Always collect this token, even if it's the end tag
             
@@ -347,7 +340,6 @@ sub _HashHTMLBlocks {
                     if (0 == $nesting_level) {# If end of current block.
                         end_tag_run:
                             my $block = join('', map { $_->[1] } @collected);
-                            #warn("BLOCK {$block}");
                             my $key = _md5_utf8($block);
                             $self->{_html_blocks}{$key} = $block;
                             push(@output, ['text', "\n\n" . $key . "\n\n"]);
@@ -361,12 +353,8 @@ sub _HashHTMLBlocks {
                 }
             }
             else { # Not in tag already
-                #warn("Not in tag already");
-                #warn("Care $care, lspace $lspace block tag" . $block_tags{$token->[2]});
-                
                 # If we care about tags here, and we find a tag we care about
                 if ($care && ($current_block_end_tag = $block_tags{$token->[2]}) ) {
-                    #warn("IN TAG");
                     if ($token->[3]) { #Self closing tag
                         push(@collected, $token);
                         goto end_tag_run;
@@ -385,11 +373,7 @@ sub _HashHTMLBlocks {
         }
     }
 
-    #warn(Dumper(\@output));
-
 	$text = join '', map { $_->[1] } @output;
-
-    #warn("{$text}");
 
 	# Special case just for <hr />. It was easier to make a special case than
 	# to make the other regex more complicated.	
@@ -398,8 +382,6 @@ sub _HashHTMLBlocks {
     $text = $self->_HashHTMLComments($text);
 
     $text = $self->_HashPHPASPBlocks($text);
-
-    #warn ("OUT _HashHTMLBlocks for text {$text}");
 
 	return $text;
 }
@@ -1475,21 +1457,15 @@ sub _TokenizeText {
     my @tokens;
 
     while (my $l = length $text) {
-        #warn("Tokenize $text");
         my $i; # Chop tokens so that new lines always get their own token, makes subsequent parsing easier.
         if (($i = index($text, "\n")) != -1) {
-            #warn("MEEP for {$text}");
             push @tokens, ['text', substr($text, 0, $i)], ['text', "\n"];
             $text = substr($text, $i+1, $l-($i+1));
-            #warn("REMAINING {$text}");
-            #use Data::Dumper;
-            #warn(Dumper(\@tokens));
         }
         else {
             push @tokens => ['text', $text];
             $text = '';
         }
-        #warn("ABOUT TO LOOP {$text}");
     }
     return grep { length $_->[1] } @tokens;
 }
