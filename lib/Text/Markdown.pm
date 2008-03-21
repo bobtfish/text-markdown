@@ -320,14 +320,18 @@ sub _HashHTMLBlocks {
             $tokens->[1]->[0] eq 'text' && $tokens->[1]->[1] eq "\n"      ) {
             push(@collected, shift(@$tokens));
         }
+        # If last token output is just whitespace, it must be at the start of the line, strip it..
+        my $lasttoken = $output[$#output];
+        if ($lasttoken && $lasttoken->[0] eq 'text' && $lasttoken->[1] =~ /^ +$/) {
+            pop @output;
+        }
         my $block = join('', map { $_->[1] } @collected);
         my $key = _md5_utf8($block);
         $self->{_html_blocks}{$key} = $block;
         push(@output, ['text', "\n\n" . $key . "\n\n"]);
         @collected = ();
         $current_block_tag = $current_block_end_tag = undef;
-        use Data::Dumper;
-        $care = 1;
+        $care = 1; # Do the correct thing with blocks which are next to each other.
     };
     
     token_loop:
@@ -387,9 +391,6 @@ sub _HashHTMLBlocks {
                     $nesting_level++;
                     $current_block_tag = $token->[2];
                     push @collected, $token;
-                    if ($lspace) { # If we have space at the start of the line, we need to strip it at this point..
-                        pop @output; # Any whitespace will be 1 token max...
-                    }
                 }
                 else {
                     push @output, $token;
@@ -400,8 +401,6 @@ sub _HashHTMLBlocks {
 
     if (@collected) {
         # We shouldn't get to this condition if we have valid markup input, but if we do - try to do the right thing.
-        # We just *ignore* the unclosed tag. I'm not sure if this is the best thing to do, but it's what
-        # original Markdown does.
         
         # Note that HR is again a special case here..
         if ($collected[0]->[2] eq 'hr') {
@@ -412,6 +411,8 @@ sub _HashHTMLBlocks {
             goto token_loop;
         }
         
+        # We just *ignore* the unclosed tag. I'm not sure if this is the best thing to do, but it's what
+        # original Markdown does.
         push(@output, shift(@collected)); # Remove first token, which will be our un-closed tag, and just allow that to go through
         @$tokens = @collected;
         $care = 0;
@@ -421,7 +422,7 @@ sub _HashHTMLBlocks {
         goto token_loop; # See what you did with your bad markup? You killed a kitten. YOU BASTARD.
     }
 
-	$text = join '', map { $_->[1] } @output;
+    $text = join '', map { $_->[1] } @output;
 	
     $text = $self->_HashHTMLComments($text);
 

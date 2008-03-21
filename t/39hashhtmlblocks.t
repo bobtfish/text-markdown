@@ -97,8 +97,8 @@ is($callcounter, 2, 'md5 called twice for 2 tag blocks');
 is($out, "\n\n$token\n\n\n\n$token\n\n\n", 'run together HTML blocks output');
 
 # Check a whole run of blocks, all with trailing whitespace
-$indoc = qq{<hr>  \n\n<hr/>  \n\n<hr />\n\n  <hr>\n\n  <hr/>\n\n<hr />\n};
-my $expdoc = qq{\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n};
+$indoc = qq{<hr>  \n\n<hr/>  \n\n<hr />\n\n<hr>\n\n  <hr/>\n\n<hr />\n};
+my $expdoc = qq{\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n\n\n\n$token\n\n\n};
 $out = $m->_HashHTMLBlocks($indoc);
 $out =~ s/\n/\\n/g; # Change things so errors are more obvious
 $out =~ s/ /~/g;
@@ -116,6 +116,7 @@ is($out, $expdoc, 'whole pile of hr tags with trailing whitespace');
 $out = $m->markdown($indoc);
 $out =~ s/\n/\\n/g;
 $out =~ s/ /~/g;
-$indoc =~ s/\n/\\n/g;
-$indoc =~ s/ /~/g;
-is($out, $indoc, 'multiple blocks do not add extra crap when we have trailing whitespace');
+$expdoc = qq{<hr>  \n\n<hr/>  \n\n<hr />\n\n<hr>\n\n<hr/>\n\n<hr />\n};
+$expdoc =~ s/\n/\\n/g;
+$expdoc =~ s/ /~/g;
+is($out, $expdoc, 'multiple blocks do not add extra crap when we have trailing whitespace');
