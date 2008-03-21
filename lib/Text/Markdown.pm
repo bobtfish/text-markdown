@@ -428,6 +428,9 @@ sub _HashHTMLBlocks {
 
     $text = $self->_HashPHPASPBlocks($text);
 
+    return $text;
+}
+
 sub _HashHTMLComments {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
