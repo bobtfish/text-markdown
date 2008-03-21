@@ -146,7 +146,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 1.0.18 2008-03-??T??:??:??
         -  Totally rewrite HTML block hashing to be *a lot* quicker. No longer
            uses Text::Balanced, which was the main performance sore point in
-           the module. These performance improvements make us around 48% 
+           the module. These performance improvements make us around 40% 
            faster on t/21fulldocs-markdown.t
         - Clean up local stuff for settings.
         - Do a little cleanup of intialisation (more needed)
