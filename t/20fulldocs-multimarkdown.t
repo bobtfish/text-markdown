@@ -59,7 +59,7 @@ sub get_files {
     my ($docsdir) = @_;
     my $DH;
     opendir($DH, $docsdir) or die("Could not open $docsdir");
-    my @files = uniq map { s/\.(html|text)$// ? $_ : (); } readdir($DH);
+    my @files = uniq map { s/\.(xhtml|html|text)$// ? $_ : (); } readdir($DH);
     closedir($DH);
     return @files;
 }
@@ -69,7 +69,12 @@ sub run_tests {
     foreach my $test (@files) {
         my ($input, $output);
         eval {
-            $output = slurp("$docsdir/$test.html");
+            if (-f "$docsdir/$test.html") {
+                $output = slurp("$docsdir/$test.html");
+            }
+            else {
+                $output = slurp("$docsdir/$test.xhtml");
+            }
             $input  = slurp("$docsdir/$test.text");
         };
         $input .= "\n\n";

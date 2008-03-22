@@ -146,5 +146,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 1.0.18 2008-03-??T??:??:??
         - Clean up local stuff for settings.
         - Do a little cleanup of intialisation (more needed)
-        - Remove copy pasted regexes from Text::MultiMarkdown by tieing 
-          relevant typeglobs, and removing the big regex from _StripLinkDefinitions
+        - Remove copy pasted regexes from Text::MultiMarkdown
+        - Fix bug with line breaks in links - http://bugs.debian.org/459885,
+          thanks to patches and test input / output provided by Adeodato Simó.
+          (See t/37anchormultilinebugs.t)
