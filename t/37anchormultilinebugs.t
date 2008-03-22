@@ -1,7 +1,7 @@
 # http://bugs.debian.org/459885
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use_ok('Text::Markdown');
 
