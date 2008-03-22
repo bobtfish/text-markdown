@@ -596,7 +596,7 @@ sub _DoAnchors {
             $link_id = lc $link_text;   # for shortcut links like [this][].
         }
         
-        $link_id =~ s{[ ]?\n}{ }g; # turn embedded newlines into spaces
+        $link_id =~ s{[ ]*\n}{ }g; # turn embedded newlines into spaces
         
         $self->_GenerateAnchor($whole_match, $link_text, $link_id);
     }xsge;
@@ -646,7 +646,7 @@ sub _DoAnchors {
 		my $result;
 		my $whole_match = $1;
 		my $link_text   = $2;
-		(my $link_id = lc $2) =~ s{[ ]?\n}{ }g; # lower-case and turn embedded newlines into spaces
+		(my $link_id = lc $2) =~ s{[ ]*\n}{ }g; # lower-case and turn embedded newlines into spaces
 
         $self->_GenerateAnchor($whole_match, $link_text, $link_id);
 	}xsge;

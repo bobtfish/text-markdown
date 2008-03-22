@@ -19,19 +19,24 @@ text</a></p>
 
 is($m->markdown($in), $ex, 'http://bugs.debian.org/459885 - Line breaks in reference link ids (single line breaks)');
 
-{
-    local $TODO = 'This should probably also pass';
-$in = q{[link 
-text] [link
+$in = qq{Bla, bla, bla, bla, bla, bla, bla, bla, bla, bla bla. This is [my  \nUniversity][].
 
-id]
-
-[link  id]: /someurl/
+  [my university]: http://www.ua.es
 };
-$ex = q{<p><a href="/someurl/">link 
-text</a></p>
+$ex = q{<p>Bla, bla, bla, bla, bla, bla, bla, bla, bla, bla bla. This is <a href="http://www.ua.es">my <br />
+University</a>.</p>
 };
 
-is($m->markdown($in), $ex, 'http://bugs.debian.org/459885 - Line breaks in reference link ids (multi line breaks)');
+is($m->markdown($in), $ex, 'http://bugs.debian.org/459885 - Line breaks in reference link ids (multiple trailing spaces and line breaks)');
 
+$in = qq{Bla, bla, bla, bla, bla, bla, bla, bla, bla, bla bla. This is [my  \nUniversity].
+
+  [my university]: http://www.ua.es
 };
+$ex = q{<p>Bla, bla, bla, bla, bla, bla, bla, bla, bla, bla bla. This is <a href="http://www.ua.es">my <br />
+University</a>.</p>
+};
+
+is($m->markdown($in), $ex, 'http://bugs.debian.org/459885 - Line breaks in shortcut reference link ids (multiple trailing spaces and line breaks)');
+
+
