@@ -34,7 +34,7 @@ else {
 ### being run when this file is required by other tests
 
 unless (caller) {
-    my $docsdir = "$Bin/docs-multimarkdown";
+    my $docsdir = "$Bin/Text-MultiMarkdown.mdtest";
     my @files = get_files($docsdir);
 
     plan tests => scalar(@files) + 2;

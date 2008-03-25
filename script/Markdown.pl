@@ -11,6 +11,7 @@ GetOptions(\%cli_opts,
     'version',
     'shortversion',
     'html4tags',
+    'help',
 );
 if ($cli_opts{'version'}) {     # Version info
     print "\nThis is Markdown, version $Text::Markdown::VERSION.\n";
@@ -24,6 +25,7 @@ if ($cli_opts{'shortversion'}) {        # Just the version number string.
     print $Text::Markdown::VERSION;
     exit 0;
 }
+if ($cli_opts{'help'})
 
 my $m;
 if ($cli_opts{'html4tags'}) {           # Use HTML tag style instead of XHTML

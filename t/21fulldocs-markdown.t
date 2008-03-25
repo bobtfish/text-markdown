@@ -5,7 +5,7 @@ use FindBin qw($Bin);
 
 require "$Bin/20fulldocs-multimarkdown.t";
 
-my $docsdir = "$Bin/docs-markdown";
+my $docsdir = "$Bin/Text-Markdown.mdtest";
 my @files = get_files($docsdir);
 
 plan tests => scalar(@files) + 1;

@@ -3,14 +3,14 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>Text-MultiMarkdown/lib/Text/MultiMarkdown.pm</string>
+	<string>t/37anchormultilinebugs.t</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>Changes</string>
 			<key>lastUsed</key>
-			<date>2008-03-16T23:00:23Z</date>
+			<date>2008-03-22T23:10:04Z</date>
 		</dict>
 		<dict>
 			<key>name</key>
@@ -44,19 +44,19 @@
 			<key>filename</key>
 			<string>Makefile.PL</string>
 			<key>lastUsed</key>
-			<date>2008-03-16T21:41:27Z</date>
+			<date>2008-03-21T15:29:57Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>MANIFEST</string>
 			<key>lastUsed</key>
-			<date>2008-02-26T19:40:12Z</date>
+			<date>2008-03-17T01:54:27Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>MANIFEST.skip</string>
 			<key>lastUsed</key>
-			<date>2008-01-28T19:24:30Z</date>
+			<date>2008-03-17T00:04:57Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -81,6 +81,8 @@
 			<string>Readme.text</string>
 		</dict>
 		<dict>
+			<key>expanded</key>
+			<true/>
 			<key>name</key>
 			<string>script</string>
 			<key>regexFolderFilter</key>
@@ -102,98 +104,130 @@
 			<key>filename</key>
 			<string>Todo</string>
 			<key>lastUsed</key>
-			<date>2008-03-16T22:56:49Z</date>
+			<date>2008-03-22T12:00:56Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
 	<integer>368</integer>
 	<key>metaData</key>
 	<dict>
-		<key>Text-MultiMarkdown/Changes</key>
+		<key>Changes</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>144</integer>
+				<integer>152</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>99</integer>
+			<integer>106</integer>
 		</dict>
-		<key>Text-MultiMarkdown/Makefile.PL</key>
+		<key>Todo</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
+				<integer>15</integer>
+				<key>line</key>
 				<integer>0</integer>
-				<key>line</key>
-				<integer>12</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>Text-MultiMarkdown/Todo</key>
+		<key>lib/Text/Markdown.pm</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>33</integer>
 				<key>line</key>
+				<integer>648</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>611</integer>
+		</dict>
+		<key>lib/Text/MultiMarkdown.pm</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>32</integer>
+				<key>line</key>
+				<integer>585</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>538</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
 				<integer>28</integer>
+				<key>line</key>
+				<integer>585</integer>
 			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>32</integer>
+				<key>line</key>
+				<integer>585</integer>
+			</dict>
 		</dict>
-		<key>Text-MultiMarkdown/lib/Text/Markdown.pm</key>
+		<key>t/37anchormultilinebugs.t</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>24</integer>
+				<integer>25</integer>
 				<key>line</key>
-				<integer>75</integer>
+				<integer>3</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>70</integer>
+			<integer>0</integer>
 		</dict>
-		<key>Text-MultiMarkdown/lib/Text/MultiMarkdown.pm</key>
+		<key>t/docs-markdown/Links_reference_style.text</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>44</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>55</integer>
+				<integer>70</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>33</integer>
-		</dict>
-		<key>Text-MultiMarkdown/t/07fulldoc.t</key>
-		<dict>
-			<key>caret</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>111</integer>
+				<integer>20</integer>
 				<key>line</key>
-				<integer>179</integer>
+				<integer>70</integer>
 			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>135</integer>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>70</integer>
+			</dict>
 		</dict>
-		<key>Text-MultiMarkdown/t/docs-markdown/Ordered_and_unordered_lists.text</key>
+		<key>t/docs-markdown/Ordered_and_unordered_lists.text</key>
 		<dict>
 			<key>caret</key>
 			<dict>
@@ -226,12 +260,12 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>Text-MultiMarkdown/lib/Text/MultiMarkdown.pm</string>
-		<string>Text-MultiMarkdown/lib/Text/Markdown.pm</string>
-		<string>Text-MultiMarkdown/Todo</string>
-		<string>Text-MultiMarkdown/Changes</string>
-		<string>Text-MultiMarkdown/t/07fulldoc.t</string>
-		<string>Text-MultiMarkdown/Makefile.PL</string>
+		<string>lib/Text/MultiMarkdown.pm</string>
+		<string>lib/Text/Markdown.pm</string>
+		<string>t/37anchormultilinebugs.t</string>
+		<string>t/docs-markdown/Links_reference_style.text</string>
+		<string>Changes</string>
+		<string>Todo</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
