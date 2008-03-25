@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 use Test::More tests => 4;
+# This is also tested in the Links Reference style test case.
+
 
 use_ok('Text::Markdown');
 

@@ -29,3 +29,19 @@ Indented [four][] times.
 
 
 [b]: /url/
+
+More multi line edge cases. First a broken link id
+
+[link 
+text] [link
+id]
+
+[link id]: /someurl/
+
+Then a line with 2 chars of trailing whitespace and a line break [my  
+University][].
+
+The a shortcut reference link with 2 chars of trailing whitespace and a line break [my  
+University].
+
+  [my university]: http://www.ua.es

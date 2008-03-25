@@ -5,8 +5,8 @@ use File::Slurp qw(slurp);
 use Test::More tests => 2;
 use Test::Exception;
 
-unshift(@ARGV, "$Bin/docs-markdown/Markdown_Documentation_-_Syntax.text");
-my $expected = slurp("$Bin/docs-markdown/Markdown_Documentation_-_Syntax.html");
+unshift(@ARGV, "$Bin/Text-Markdown.mdtest/Markdown_Documentation_-_Syntax.text");
+my $expected = slurp("$Bin/Text-Markdown.mdtest/Markdown_Documentation_-_Syntax.html");
 
 lives_ok {
     require "$Bin/../script/Markdown.pl";

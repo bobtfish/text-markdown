@@ -2,6 +2,7 @@ use utf8;
 use strict;
 use warnings;
 use Test::More tests => 3;
+# This also has a test case in the .mdtest directory.
 
 use_ok('Text::MultiMarkdown', 'markdown');
 
