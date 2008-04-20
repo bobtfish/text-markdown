@@ -143,10 +143,14 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
            attribute ordering (which is meant to be unimportant in HTML), and 
            allows for simplification of the unified code.
 
-1.0.18 2008-03-??T??:??:??
+1.0.18 2008-04-20T18:54:50
         - Clean up local stuff for settings.
         - Do a little cleanup of intialisation (more needed)
         - Remove copy pasted regexes from Text::MultiMarkdown
         - Fix bug with line breaks in links - http://bugs.debian.org/459885,
           thanks to patches and test input / output provided by Adeodato Simó.
           (See t/37anchormultilinebugs.t)
+        - Incorperated MDTest1.1's tests, and made most of the Text-Markdown
+          and Text-MultiMarkdown tests in MDTest format.
+        - Add and document an accessor for the parsed markdown URLs.
+        - Fix html4tags option in Markdown.pl and MultiMarkdown.pl

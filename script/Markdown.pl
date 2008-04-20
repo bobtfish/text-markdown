@@ -25,7 +25,6 @@ if ($cli_opts{'shortversion'}) {        # Just the version number string.
     print $Text::Markdown::VERSION;
     exit 0;
 }
-if ($cli_opts{'help'})
 
 my $m;
 if ($cli_opts{'html4tags'}) {           # Use HTML tag style instead of XHTML
@@ -52,7 +51,7 @@ sub main {
         $f = <>;
     }
 
-    return markdown($f);
+    return $m->markdown($f);
 }
 
 print main(shift(@ARGV)) unless caller();

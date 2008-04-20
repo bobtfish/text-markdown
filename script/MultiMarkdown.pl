@@ -51,7 +51,7 @@ sub main {
         $f = <>;
     }
 
-    return markdown($f);
+    return $m->markdown($f);
 }
 
 print main(shift(@ARGV)) unless caller();

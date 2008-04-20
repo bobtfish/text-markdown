@@ -6,7 +6,7 @@ use Test::More tests => 2;
 use Test::Exception;
 
 unshift(@ARGV, "$Bin/Text-MultiMarkdown.mdtest/Markdown_Documentation_-_Syntax.text");
-my $expected = slurp("$Bin/Text-MultiMarkdown.mdtest/Markdown_Documentation_-_Syntax.html");
+my $expected = slurp("$Bin/Text-MultiMarkdown.mdtest/Markdown_Documentation_-_Syntax.xhtml");
 
 lives_ok {
     require "$Bin/../script/MultiMarkdown.pl";

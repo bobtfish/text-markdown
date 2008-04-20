@@ -209,6 +209,21 @@ sub _Markdown {
     return $text . "\n";
 }
 
+=head2 urls
+
+Returns a reference to a hash with the key being the markdown reference and the value being the URL.
+
+Useful for building scripts which preprocess a list of links before the main content. See t/05options.t
+for an example of this hashref being passed back into the markdown method to create links.
+
+=cut
+
+sub urls {
+    my ( $self ) = @_;
+    
+    return $self->{_urls};
+}
+
 sub _CleanUpDoc {
     my ($self, $text) = @_;
     

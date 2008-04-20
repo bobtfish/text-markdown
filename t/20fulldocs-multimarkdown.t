@@ -5,6 +5,8 @@ use FindBin qw($Bin);
 use List::MoreUtils qw(uniq);
 use File::Slurp qw(slurp);
 
+our $TIDY = 0;
+
 ### Generate difftest subroutine, pretty prints diffs if you have Text::Diff, use uses
 ### Test::More::is otherwise.
 
@@ -28,6 +30,15 @@ if (!$@) {
 else {
     warn("Install Text::Diff for more helpful failure messages! ($@)");
     *difftest = \&Test::More::is;
+}
+
+sub tidy {
+    $TIDY = 1;
+    eval "use HTML::Tidy; ";
+    if ($@) {
+        plan skip_all => 'This test needs HTML::Tidy installed to pass correctly, skipping';
+        exit;
+    }
 }
 
 ### Actual code for this test - unless(caller) stops it
@@ -87,6 +98,12 @@ sub run_tests {
         my $processed = $m->markdown($input);
         $processed =~ s/\s+\z//; # trim trailing whitespace
     
+        if ($TIDY) {
+            my $t = HTML::Tidy->new;
+            $output = $t->clean($output);
+            $processed = $t->clean($processed);
+        }
+
         # Un-comment for debugging if you have space diffs you can't see..
         #$output =~ s/ /&nbsp;/g;
         #$output =~ s/\t/&tab;/g;
