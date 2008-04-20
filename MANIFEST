@@ -45,7 +45,6 @@ t/19exporter-markdown.t
 t/20fulldocs-multimarkdown.t
 t/21fulldocs-markdown.t
 t/22fulldocs-multimarkdown-todo.t
-t/23fulldocs-markdown-todo.t
 t/24fulldocs-pythonmarkdown2-tm.t
 t/26fulldocs-php-markdown.t
 t/27fulldocs-php-markdown-fails.t
@@ -61,7 +60,6 @@ t/36multimarkdown_featurebleed.t
 t/37anchormultilinebugs.t
 t/50mdtest-markdown.t
 t/51mdtest-phpmarkdown.t
-t/docs-markdown-todo/.empty
 t/docs-maruku-unittest/abbreviations.html
 t/docs-maruku-unittest/abbreviations.text
 t/docs-maruku-unittest/alt.html
@@ -205,7 +203,7 @@ t/docs-php-markdown-todo/Emphasis.html
 t/docs-php-markdown-todo/Emphasis.text
 t/docs-php-markdown-todo/Inline_HTML_(Span).html
 t/docs-php-markdown-todo/Inline_HTML_(Span).text
-t/docs-php-markdown-todo/Ins_and_del.html
+t/docs-php-markdown-todo/Ins_and_del.xhtml
 t/docs-php-markdown-todo/Ins_and_del.text
 t/docs-php-markdown-todo/Links_inline_style.html
 t/docs-php-markdown-todo/Links_inline_style.text
@@ -387,7 +385,6 @@ t/Markdown-from-MDTest1.1.mdtest/Tidyness.text
 t/Markdown-from-MDTest1.1.mdtest/Tidyness.xhtml
 t/PHP_Markdown-from-MDTest1.1.mdtest/Backslash_escapes.text
 t/PHP_Markdown-from-MDTest1.1.mdtest/Backslash_escapes.xhtml
-t/PHP_Markdown-from-MDTest1.1.mdtest/Code_block_in_a_list item.xhtml
 t/PHP_Markdown-from-MDTest1.1.mdtest/Code_block_in_a_list_item.text
 t/PHP_Markdown-from-MDTest1.1.mdtest/Code_block_in_a_list_item.xhtml
 t/PHP_Markdown-from-MDTest1.1.mdtest/Code_Spans.text
