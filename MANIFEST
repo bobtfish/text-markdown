@@ -58,6 +58,9 @@ t/33spaceinlinksandimages.t
 t/34commandlinemarkdown.t
 t/35commandlinemultimarkdown.t
 t/36multimarkdown_featurebleed.t
+t/37anchormultilinebugs.t
+t/50mdtest-markdown.t
+t/51mdtest-phpmarkdown.t
 t/docs-markdown-todo/.empty
 t/docs-markdown/Amps_and_angle_encoding.html
 t/docs-markdown/Amps_and_angle_encoding.text
@@ -430,4 +433,192 @@ t/docs-pythonmarkdown2-tm-cases-pass/tricky_anchors.html
 t/docs-pythonmarkdown2-tm-cases-pass/tricky_anchors.text
 t/docs-pythonmarkdown2-tm-cases-pass/underline_in_autolink.html
 t/docs-pythonmarkdown2-tm-cases-pass/underline_in_autolink.text
+t/Markdown-from-MDTest1.1.mdtest/Amps and angle encoding.text
+t/Markdown-from-MDTest1.1.mdtest/Amps and angle encoding.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Auto links.text
+t/Markdown-from-MDTest1.1.mdtest/Auto links.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Backslash escapes.text
+t/Markdown-from-MDTest1.1.mdtest/Backslash escapes.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Blockquotes with code blocks.text
+t/Markdown-from-MDTest1.1.mdtest/Blockquotes with code blocks.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Code Blocks.text
+t/Markdown-from-MDTest1.1.mdtest/Code Blocks.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Code Spans.text
+t/Markdown-from-MDTest1.1.mdtest/Code Spans.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Hard-wrapped paragraphs with list-like lines.text
+t/Markdown-from-MDTest1.1.mdtest/Hard-wrapped paragraphs with list-like lines.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Horizontal rules.text
+t/Markdown-from-MDTest1.1.mdtest/Horizontal rules.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Images.text
+t/Markdown-from-MDTest1.1.mdtest/Images.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Inline HTML (Advanced).text
+t/Markdown-from-MDTest1.1.mdtest/Inline HTML (Advanced).xhtml
+t/Markdown-from-MDTest1.1.mdtest/Inline HTML (Simple).html
+t/Markdown-from-MDTest1.1.mdtest/Inline HTML (Simple).text
+t/Markdown-from-MDTest1.1.mdtest/Inline HTML comments.html
+t/Markdown-from-MDTest1.1.mdtest/Inline HTML comments.text
+t/Markdown-from-MDTest1.1.mdtest/Links, inline style.text
+t/Markdown-from-MDTest1.1.mdtest/Links, inline style.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Links, reference style.text
+t/Markdown-from-MDTest1.1.mdtest/Links, reference style.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Links, shortcut references.text
+t/Markdown-from-MDTest1.1.mdtest/Links, shortcut references.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Literal quotes in titles.text
+t/Markdown-from-MDTest1.1.mdtest/Literal quotes in titles.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Markdown Documentation - Basics.text
+t/Markdown-from-MDTest1.1.mdtest/Markdown Documentation - Basics.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Markdown Documentation - Syntax.text
+t/Markdown-from-MDTest1.1.mdtest/Markdown Documentation - Syntax.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Nested blockquotes.text
+t/Markdown-from-MDTest1.1.mdtest/Nested blockquotes.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Ordered and unordered lists.text
+t/Markdown-from-MDTest1.1.mdtest/Ordered and unordered lists.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Strong and em together.text
+t/Markdown-from-MDTest1.1.mdtest/Strong and em together.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Tabs.text
+t/Markdown-from-MDTest1.1.mdtest/Tabs.xhtml
+t/Markdown-from-MDTest1.1.mdtest/Tidyness.text
+t/Markdown-from-MDTest1.1.mdtest/Tidyness.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Backslash escapes.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Backslash escapes.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Code block in a list item.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Code block in a list item.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Code Spans.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Code Spans.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Email auto links.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Email auto links.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Emphasis.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Emphasis.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Headers.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Headers.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Horizontal Rules.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Horizontal Rules.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Inline HTML (Simple).html
+t/PHP_Markdown-from-MDTest1.1.mdtest/Inline HTML (Simple).text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Inline HTML (Span).text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Inline HTML (Span).xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Inline HTML comments.html
+t/PHP_Markdown-from-MDTest1.1.mdtest/Inline HTML comments.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Ins & del.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Ins & del.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Links, inline style.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Links, inline style.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/MD5 Hashes.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/MD5 Hashes.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Nesting.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Nesting.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Parens in URL.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Parens in URL.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/PHP-Specific Bugs.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/PHP-Specific Bugs.xhtml
+t/PHP_Markdown-from-MDTest1.1.mdtest/Tight blocks.text
+t/PHP_Markdown-from-MDTest1.1.mdtest/Tight blocks.xhtml
+t/Text-Markdown.mdtest/Amps_and_angle_encoding.text
+t/Text-Markdown.mdtest/Amps_and_angle_encoding.xhtml
+t/Text-Markdown.mdtest/Auto_links.text
+t/Text-Markdown.mdtest/Auto_links.xhtml
+t/Text-Markdown.mdtest/Backslash_escapes.text
+t/Text-Markdown.mdtest/Backslash_escapes.xhtml
+t/Text-Markdown.mdtest/Blockquotes_with_code_blocks.text
+t/Text-Markdown.mdtest/Blockquotes_with_code_blocks.xhtml
+t/Text-Markdown.mdtest/Code_Blocks.text
+t/Text-Markdown.mdtest/Code_Blocks.xhtml
+t/Text-Markdown.mdtest/Code_Spans.text
+t/Text-Markdown.mdtest/Code_Spans.xhtml
+t/Text-Markdown.mdtest/Hard-wrapped_paragraphs_with_list-like_lines.text
+t/Text-Markdown.mdtest/Hard-wrapped_paragraphs_with_list-like_lines.xhtml
+t/Text-Markdown.mdtest/Horizontal_rules.text
+t/Text-Markdown.mdtest/Horizontal_rules.xhtml
+t/Text-Markdown.mdtest/Images.text
+t/Text-Markdown.mdtest/Images.xhtml
+t/Text-Markdown.mdtest/Inline_HTML_(Advanced).text
+t/Text-Markdown.mdtest/Inline_HTML_(Advanced).xhtml
+t/Text-Markdown.mdtest/Inline_HTML_(Simple).text
+t/Text-Markdown.mdtest/Inline_HTML_(Simple).xhtml
+t/Text-Markdown.mdtest/Inline_HTML_comments.text
+t/Text-Markdown.mdtest/Inline_HTML_comments.xhtml
+t/Text-Markdown.mdtest/Links_inline_style.text
+t/Text-Markdown.mdtest/Links_inline_style.xhtml
+t/Text-Markdown.mdtest/Links_reference_style.text
+t/Text-Markdown.mdtest/Links_reference_style.xhtml
+t/Text-Markdown.mdtest/Links_shortcut_references.text
+t/Text-Markdown.mdtest/Links_shortcut_references.xhtml
+t/Text-Markdown.mdtest/Literal_quotes_in_titles.text
+t/Text-Markdown.mdtest/Literal_quotes_in_titles.xhtml
+t/Text-Markdown.mdtest/Markdown_Documentation_-_Basics.text
+t/Text-Markdown.mdtest/Markdown_Documentation_-_Basics.xhtml
+t/Text-Markdown.mdtest/Markdown_Documentation_-_Syntax.text
+t/Text-Markdown.mdtest/Markdown_Documentation_-_Syntax.xhtml
+t/Text-Markdown.mdtest/Nested_blockquotes.text
+t/Text-Markdown.mdtest/Nested_blockquotes.xhtml
+t/Text-Markdown.mdtest/Ordered_and_unordered_lists.text
+t/Text-Markdown.mdtest/Ordered_and_unordered_lists.xhtml
+t/Text-Markdown.mdtest/Strong_and_em_together.text
+t/Text-Markdown.mdtest/Strong_and_em_together.xhtml
+t/Text-Markdown.mdtest/Tabs.text
+t/Text-Markdown.mdtest/Tabs.xhtml
+t/Text-Markdown.mdtest/Unicode.text
+t/Text-Markdown.mdtest/Unicode.xhtml
+t/Text-MultiMarkdown.mdtest/Amps_and_angle_encoding.html
+t/Text-MultiMarkdown.mdtest/Amps_and_angle_encoding.text
+t/Text-MultiMarkdown.mdtest/Amps_and_angles_encoding-advanced.text
+t/Text-MultiMarkdown.mdtest/Amps_and_angles_encoding-advanced.xhtml
+t/Text-MultiMarkdown.mdtest/Auto_links.text
+t/Text-MultiMarkdown.mdtest/Auto_links.xhtml
+t/Text-MultiMarkdown.mdtest/Backslash_escapes.html
+t/Text-MultiMarkdown.mdtest/Backslash_escapes.text
+t/Text-MultiMarkdown.mdtest/Blockquotes_with_code_blocks.html
+t/Text-MultiMarkdown.mdtest/Blockquotes_with_code_blocks.text
+t/Text-MultiMarkdown.mdtest/Citations.text
+t/Text-MultiMarkdown.mdtest/Citations.xhtml
+t/Text-MultiMarkdown.mdtest/complex_escaping.text
+t/Text-MultiMarkdown.mdtest/complex_escaping.xhtml
+t/Text-MultiMarkdown.mdtest/Cross-References.text
+t/Text-MultiMarkdown.mdtest/Cross-References.xhtml
+t/Text-MultiMarkdown.mdtest/Footnotes.text
+t/Text-MultiMarkdown.mdtest/Footnotes.xhtml
+t/Text-MultiMarkdown.mdtest/Hard-wrapped_paragraphs_with_list-like_lines.text
+t/Text-MultiMarkdown.mdtest/Hard-wrapped_paragraphs_with_list-like_lines.xhtml
+t/Text-MultiMarkdown.mdtest/Horizontal_rules.text
+t/Text-MultiMarkdown.mdtest/Horizontal_rules.xhtml
+t/Text-MultiMarkdown.mdtest/Images.text
+t/Text-MultiMarkdown.mdtest/Images.xhtml
+t/Text-MultiMarkdown.mdtest/Inline_HTML_(Advanced).text
+t/Text-MultiMarkdown.mdtest/Inline_HTML_(Advanced).xhtml
+t/Text-MultiMarkdown.mdtest/Inline_HTML_(Simple).text
+t/Text-MultiMarkdown.mdtest/Inline_HTML_(Simple).xhtml
+t/Text-MultiMarkdown.mdtest/Inline_HTML_comments.text
+t/Text-MultiMarkdown.mdtest/Inline_HTML_comments.xhtml
+t/Text-MultiMarkdown.mdtest/Link_Attributes.text
+t/Text-MultiMarkdown.mdtest/Link_Attributes.xhtml
+t/Text-MultiMarkdown.mdtest/Links_inline_style.text
+t/Text-MultiMarkdown.mdtest/Links_inline_style.xhtml
+t/Text-MultiMarkdown.mdtest/Links_reference_style.text
+t/Text-MultiMarkdown.mdtest/Links_reference_style.xhtml
+t/Text-MultiMarkdown.mdtest/Lists.text
+t/Text-MultiMarkdown.mdtest/Lists.xhtml
+t/Text-MultiMarkdown.mdtest/Literal_quotes_in_titles.text
+t/Text-MultiMarkdown.mdtest/Literal_quotes_in_titles.xhtml
+t/Text-MultiMarkdown.mdtest/Markdown_Documentation_-_Basics.text
+t/Text-MultiMarkdown.mdtest/Markdown_Documentation_-_Basics.xhtml
+t/Text-MultiMarkdown.mdtest/Markdown_Documentation_-_Syntax.text
+t/Text-MultiMarkdown.mdtest/Markdown_Documentation_-_Syntax.xhtml
+t/Text-MultiMarkdown.mdtest/Metadata_(Complete).text
+t/Text-MultiMarkdown.mdtest/Metadata_(Complete).xhtml
+t/Text-MultiMarkdown.mdtest/Metadata_(Snippet).html
+t/Text-MultiMarkdown.mdtest/Metadata_(Snippet).text
+t/Text-MultiMarkdown.mdtest/Nested_blockquotes.text
+t/Text-MultiMarkdown.mdtest/Nested_blockquotes.xhtml
+t/Text-MultiMarkdown.mdtest/Ordered_and_unordered_lists.text
+t/Text-MultiMarkdown.mdtest/Ordered_and_unordered_lists.xhtml
+t/Text-MultiMarkdown.mdtest/Special_Characters.text
+t/Text-MultiMarkdown.mdtest/Special_Characters.xhtml
+t/Text-MultiMarkdown.mdtest/Strong_and_em_together.text
+t/Text-MultiMarkdown.mdtest/Strong_and_em_together.xhtml
+t/Text-MultiMarkdown.mdtest/Tables.text
+t/Text-MultiMarkdown.mdtest/Tables.xhtml
+t/Text-MultiMarkdown.mdtest/Tabs.text
+t/Text-MultiMarkdown.mdtest/Tabs.xhtml
+t/Text-MultiMarkdown.mdtest/Wiki_Features.text
+t/Text-MultiMarkdown.mdtest/Wiki_Features.xhtml
 Todo
