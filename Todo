@@ -1,4 +1,4 @@
-Todo pre 1.0.19:
+Todo pre 1.0.20:
     . Allow scripts to be used on multiple input files at once (processing in 
       command line order)
     . Fix nasty corner cases which other people have fixed (babelmark links)
@@ -10,7 +10,7 @@ Todo pre 1.0.19:
       host?
     . Merge latest MultiMarkdown work http://groups.google.com/group/multimarkdown/t/4a4210b359065bed
 
-Todo pre 1.0.20:
+Todo pre 1.0.21:
     . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
       used, and also have docs on what options are available. Expose the other
       module options in the scripts.
@@ -20,7 +20,7 @@ Todo pre 1.0.20:
     . Document the markdown (and multimarkdown) syntaxes in the module 
       properly.
 
-Todo pre 1.0.21:
+Todo pre 1.0.22:
     . Stop perl shitting itself due to regex backreference when doing lists
       and fix the list bug
       (see t/17ulolreportedonlist.t and Markdown mailing list)
@@ -30,7 +30,7 @@ Todo pre 1.0.21:
         49.4   0.569  0.568    113   0.0050 0.0050  Text::Balanced::_match_tagged
         18.1   0.209  0.791      3   0.0696 0.2637  Text::MultiMarkdown::_HashHTMLBlocks
 
-Todo pre 1.0.22:
+Todo pre 1.0.23:
    . Have a look at extra features in 
      http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
      we consider useful on the roadmap.

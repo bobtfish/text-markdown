@@ -154,3 +154,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           and Text-MultiMarkdown tests in MDTest format.
         - Add and document an accessor for the parsed markdown URLs.
         - Fix html4tags option in Markdown.pl and MultiMarkdown.pl
+
+1.0.19 2008-04-22T18:34:00
+        - Remove auto_install from Makefile.PL, this is a deprecated feature 
+          and it shouldn't be being used at all.
