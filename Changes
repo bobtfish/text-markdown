@@ -158,3 +158,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 1.0.19 2008-04-22T18:34:00
         - Remove auto_install from Makefile.PL, this is a deprecated feature 
           and it shouldn't be being used at all.
+
+1.0.20 2008-04-??T??:??:??
+        - Allow scripts to be used on multiple input files at once (processing 
+          in command line order)

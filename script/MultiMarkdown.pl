@@ -35,23 +35,25 @@ else {
 }
 
 sub main {
-    my ($fn) = @_;
+    my (@fns) = @_;
     
     my $f;
-    if (defined $fn && length $fn) {
-        die("Cannot find file $fn") unless (-r $fn);
+    if (scalar @fns) {
+        foreach my $fn (@fns) {
+            die("Cannot find file $fn") unless (-r $fn);
 
-        my $fh;
-        open($fh, '<', $fn) or die;
-        $f = join('', <$fh>);
-        close($fh) or die;
+            my $fh;
+            open($fh, '<', $fn) or die;
+            $f = join('', <$fh>);
+            close($fh) or die;
+        }
     }
     else { # STDIN
         local $/;               # Slurp the whole file
         $f = <>;
     }
-
+    
     return $m->markdown($f);
 }
 
-print main(shift(@ARGV)) unless caller();
+print main(@ARGV) unless caller();

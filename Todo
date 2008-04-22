@@ -1,6 +1,4 @@
 Todo pre 1.0.20:
-    . Allow scripts to be used on multiple input files at once (processing in 
-      command line order)
     . Fix nasty corner cases which other people have fixed (babelmark links)
     . Add an option to Text::Markdown to have original brand markdown style 
       emphasis within words support.

@@ -8,7 +8,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        qw(Text::Markdown);
 
-our $VERSION   = '1.0.19';
+our $VERSION   = '1.0.20';
 our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
