@@ -1,4 +1,5 @@
 Todo pre 1.0.20:
+    . Update README.txt
     . Fix nasty corner cases which other people have fixed (babelmark links)
     . Add an option to Text::Markdown to have original brand markdown style 
       emphasis within words support.
