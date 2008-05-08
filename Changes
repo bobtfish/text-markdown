@@ -159,6 +159,11 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Remove auto_install from Makefile.PL, this is a deprecated feature 
           and it shouldn't be being used at all.
 
-1.0.20 2008-04-??T??:??:??
+1.0.20 2008-05-??T??:??:??
         - Allow scripts to be used on multiple input files at once (processing 
           in command line order)
+	    - Update footnote behavior of Text::MutliMarkdown to be consistent 
+	      with the latest version of MultiMarkdown
+	    - Added tests for the new footnote functionality.
+	    - Added tests for all the MDTest corner cases brought up on the list. 
+	      Noted why / how I differ from original Markdown. 

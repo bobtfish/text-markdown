@@ -633,10 +633,10 @@ sub _StripFootnoteDefinitions {
     my $less_than_tab = $self->{tab_width} - 1;
 
     while ($text =~ s{
-		\n\[\^([^\n]+?)\]\:[ \t]*# id = $1
-		\n?
-		(.*?)\n{1,2}		# end at new paragraph
-		((?=\n[ ]{0,$less_than_tab}\S)|\Z)	# Lookahead for non-space at line-start, or end of doc
+	  \n\[\^([^\n]+?)\]\:[ \t]*# id = $1
+	  \n?
+	  (.*?)\n{1,2}		# end at new paragraph
+	  ((?=\n[ ]{0,$less_than_tab}\S)|\Z)	# Lookahead for non-space at line-start, or end of doc
     }
     {\n}sx)
     {
@@ -644,7 +644,7 @@ sub _StripFootnoteDefinitions {
         my $footnote = "$2\n";
         $footnote =~ s/^[ ]{0,$self->{tab_width}}//gm;
     
-        $self->{_footnotes}{$self->_Header2Label($id)} = $footnote;
+        $self->{_footnotes}{$self->_Id2Footnote($id)} = $footnote;
     }
     
     return $text;
@@ -659,9 +659,6 @@ sub _DoFootnotes {
     foreach my $label (sort keys %{ $self->{_footnotes} }) {
         my $footnote = $self->_RunBlockGamut($self->{_footnotes}{$label});
 
-        # strip leading and trailing <p> tags (they will be added later)
-        $footnote =~ s/^<p>//s;
-        $footnote =~ s/<\/p>$//s;
         $footnote = $self->_DoMarkdownCitations($footnote);
         $self->{_footnotes}{$label} = $footnote;
     }
@@ -671,12 +668,17 @@ sub _DoFootnotes {
     $text =~ s{
         \[\^(.*?)\]     # id = $1
     }{
-        my $result;
-        my $id = $self->_Header2Label($1);
+        my $result = '';
+        my $id = $self->_Id2Footnote($1);
         
         if (defined $self->{_footnotes}{$id} ) {
             $footnote_counter++;
-            $result = qq{<a href="#$id" id="f$id" class="footnote">$footnote_counter</a>};
+            if ($self->{_footnotes}{$id} =~ /^glossary:/i) {
+                $result = qq{<a href="#fn:$id" id="fnref:$id" class="footnote glossary">$footnote_counter</a>};
+            } 
+            else {
+                $result = qq{<a href="#fn:$id" id="fnref:$id" class="footnote">$footnote_counter</a>};
+            }
             push (@{ $self->{_used_footnotes} }, $id);
         }
         $result;
@@ -700,13 +702,41 @@ sub _PrintFootnotes {
     
     foreach my $id (@{ $self->{_used_footnotes} }) {
         $footnote_counter++;
-        #$result .= qq[<div id="$id"><p><a href="#f$id" class="reversefootnote">$footnote_counter.</a> $self->{_footnotes}{$id}</div>\n\n];
-        $result .= qq[<li id="$id"><p>$self->{_footnotes}{$id}<a href="#f$id" class="reversefootnote">&#160;&#8617;</a></p></li>\n\n];
+        my $footnote = $self->{_footnotes}{$id};
+        my $footnote_closing_tag = '';
+ 
+        $footnote =~ s/(\<\/(p(re)?|ol|ul)\>)$//;
+        $footnote_closing_tag = $1;
+        
+        if ($footnote =~ s/^glossary:\s*//i) {
+            # Add some formatting for glossary entries
+ 
+            $footnote =~ s{
+                ^(.*?)              # $1 = term
+                \s*
+                (?:\(([^\(\)]*)\)[^\n]*)?       # $2 = optional sort key
+                \n
+            }{
+                my $glossary = qq{<span class="glossary name">$1</span>};
+                
+                if ($2) {
+                    $glossary.= qq{<span class="glossary sort" style="display:none">$2</span>};
+                };
+                
+                $glossary . q{:<p>}; 
+            }egsx;
+ 
+            $result .= qq{<li id="fn:$id">$footnote<a href="#fnref:$id" class="reversefootnote">&#160;&#8617;</a>$footnote_closing_tag</li>\n\n};
+        } 
+        else {
+            $result .= qq{<li id="fn:$id">$footnote<a href="#fnref:$id" class="reversefootnote">&#160;&#8617;</a>$footnote_closing_tag</li>\n\n};
+        }
     }
 
     if ($footnote_counter > 0) {
         $result = qq[\n\n<div class="footnotes">\n<hr$self->{empty_element_suffix}\n<ol>\n\n] . $result . "</ol>\n</div>";
-    } else {
+    } 
+    else {
         $result = "";
     }   
     
@@ -720,6 +750,14 @@ sub _Header2Label {
     while ($label =~ s/^[^A-Za-z]//g)
         {};     # Strip illegal leading characters
     return $label;
+}
+
+sub _Id2Footnote {
+    # Since we prepend "fn:", we can allow leading digits in footnotes
+    my ($self, $id) = @_;
+    my $footnote = lc $id;
+    $footnote =~ s/[^A-Za-z0-9:_.-]//g;     # Strip illegal characters
+    return $footnote;
 }
 
 sub _xhtmlMetaData {

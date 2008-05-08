@@ -1,6 +1,7 @@
 Todo pre 1.0.20:
     . Update README.txt
-    . Fix nasty corner cases which other people have fixed (babelmark links)
+    . Tests for $footnote =~ s/^glossary:\s*//i
+	. Tests for $footnote_closing_tag
     . Add an option to Text::Markdown to have original brand markdown style 
       emphasis within words support.
     . Re-merge Movable Type and Bloxom compatibility to the scripts, and add 
