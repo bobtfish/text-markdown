@@ -8,6 +8,8 @@ require "$Bin/20fulldocs-multimarkdown.t";
 my $docsdir = "$Bin/docs-maruku-unittest";
 my @files = get_files($docsdir);
 
+tidy();
+
 plan tests => scalar(@files) + 1;
 
 use_ok('Text::MultiMarkdown');

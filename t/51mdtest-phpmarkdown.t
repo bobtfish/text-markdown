@@ -4,6 +4,7 @@ use Test::More;
 use FindBin qw($Bin);
 
 require "$Bin/20fulldocs-multimarkdown.t";
+
 tidy();
 
 my $docsdir = "$Bin/PHP_Markdown-from-MDTest1.1.mdtest";
