@@ -160,6 +160,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           and it shouldn't be being used at all.
 
 1.0.20 2008-05-??T??:??:??
+        - Update README.txt
         - Allow scripts to be used on multiple input files at once (processing 
           in command line order)
 	    - Update footnote behavior of Text::MutliMarkdown to be consistent 
