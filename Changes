@@ -166,4 +166,10 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 	      with the latest version of MultiMarkdown
 	    - Added tests for the new footnote functionality.
 	    - Added tests for all the MDTest corner cases brought up on the list. 
-	      Noted why / how I differ from original Markdown. 
+	      Noted why / how I differ from original Markdown.
+	    - Moved all the document tests to MDTest format. I have made MDTest 
+	      test suites for Text::Markdown and Text::MultiMarkdown, containing 
+	      **only** the bug fixes and behavior changes I've made, I've imported 
+	      the Markdown test suite from MDTest1.1, and the MultiMarkdown test
+	      suite.
+

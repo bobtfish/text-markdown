@@ -8,7 +8,6 @@ Todo pre 1.0.20:
       tests.
     . Need a dingus, write a small / demo app then ask the catalyst guys to 
       host?
-    . Merge latest MultiMarkdown work http://groups.google.com/group/multimarkdown/t/4a4210b359065bed
 
 Todo pre 1.0.21:
     . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 

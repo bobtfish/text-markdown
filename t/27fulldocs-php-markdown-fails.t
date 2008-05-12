@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use FindBin qw($Bin);
 
-require "$Bin/20fulldocs-multimarkdown.t";
+require "$Bin/20fulldocs-text-multimarkdown.t";
 
 my $docsdir = "$Bin/docs-php-markdown-todo";
 my @files = get_files($docsdir);

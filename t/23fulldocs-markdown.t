@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use FindBin qw($Bin);
 
-require "$Bin/20fulldocs-multimarkdown.t";
+require "$Bin/20fulldocs-text-multimarkdown.t";
 tidy();
 
 my $docsdir = "$Bin/Markdown-from-MDTest1.1.mdtest";
