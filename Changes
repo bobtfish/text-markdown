@@ -172,5 +172,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 	      test suites for Text::Markdown and Text::MultiMarkdown, containing 
 	      **only** the bug fixes and behavior changes I've made, I've imported 
 	      the Markdown test suite from MDTest1.1, and the MultiMarkdown test
-	      suite.
+          suite.
+	    - RT#36537 doc patch to add POD to the scripts from Debian's Gunnar 
+	      Wolf.
 
