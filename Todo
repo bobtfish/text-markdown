@@ -1,4 +1,4 @@
-Todo pre 1.0.20:
+Todo pre 1.0.21:
     . Tests for $footnote =~ s/^glossary:\s*//i
 	. Tests for $footnote_closing_tag
     . Add an option to Text::Markdown to have original brand markdown style 
@@ -7,8 +7,9 @@ Todo pre 1.0.20:
       tests.
     . Need a dingus, write a small / demo app then ask the catalyst guys to 
       host?
+    . Re-write this Todo list.
 
-Todo pre 1.0.21:
+Todo pre 1.0.22:
     . Make Markdown.pl and MultiMarkdown.pl warn if unexpected options are 
       used, and also have docs on what options are available. Expose the other
       module options in the scripts.
@@ -18,24 +19,21 @@ Todo pre 1.0.21:
     . Document the markdown (and multimarkdown) syntaxes in the module 
       properly.
 
-Todo pre 1.0.22:
-    . Stop perl shitting itself due to regex backreference when doing lists
-      and fix the list bug
-      (see t/17ulolreportedonlist.t and Markdown mailing list)
-      This probably involves the first draught of the new parser...
+Todo pre 1.0.23:
+    . Fix the list bug (see t/17ulolreportedonlist.t and Markdown mailing 
+      list) This probably involves the first draught of the new parser...
     . Text::Balanced is the slowest thing ever. 
       The syntax guide looks like this:
         49.4   0.569  0.568    113   0.0050 0.0050  Text::Balanced::_match_tagged
         18.1   0.209  0.791      3   0.0696 0.2637  Text::MultiMarkdown::_HashHTMLBlocks
 
-Todo pre 1.0.23:
+Todo pre 1.0.24:
    . Have a look at extra features in 
      http://code.google.com/p/python-markdown2/wiki/Extras and put anything 
      we consider useful on the roadmap.
    . Integrate maruku (ruby port) test cases properly, and go looking for 
      more.
-   . Have a look at the php markdown extra tests to see if we want to steal 
-     any of those features.
+   . Make a Text::Markdown::Extra with the Markdown extra features?
      
 Todo pre 1.1:
    . Build a parse tree when parsing (which can be returned), rather than just 

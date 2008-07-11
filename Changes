@@ -159,7 +159,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Remove auto_install from Makefile.PL, this is a deprecated feature 
           and it shouldn't be being used at all.
 
-1.0.20 2008-05-??T??:??:??
+1.0.20 2008-07-11T23:30:00
         - Update README.txt
         - Allow scripts to be used on multiple input files at once (processing 
           in command line order)
@@ -175,4 +175,8 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           suite.
 	    - RT#36537 doc patch to add POD to the scripts from Debian's Gunnar 
 	      Wolf.
+	    - Mutilate the list processing somewhat to reduce the compilation
+	      of recursive regexes, and so stop perl (<5.10) crapping itself
+	      on lots of input. This isn't the full fix - really shouldn't be
+	      usng recursive regexes at all. RT#37297
 
