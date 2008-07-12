@@ -42,3 +42,8 @@ API
 MDTest
 preprocess
 urls
+STDIN
+STDOUT
+XHTML
+html
+shortversion

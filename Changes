@@ -183,5 +183,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 1.0.21 2008-XX-XXTXX:XX:XX
        - Fix hard tabs in changelog
        - Add unit test for coredumps issue from RT#36203
+       - Fix POD spelling.
+       - Fix warning from RT#34856.
 
  

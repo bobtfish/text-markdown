@@ -1054,6 +1054,7 @@ sub _DoTables {
             my $count=0;
             while ($line =~ /\|?\s*([^\|]+?)\s*(\|+|\Z)/gs) {
                 # process contents of each cell
+                no warnings 'uninitialized';
                 my $cell = $self->_RunSpanGamut($1);
                 my $ending = $2;
                 my $colspan = "";

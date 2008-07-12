@@ -5,7 +5,7 @@ use Text::MultiMarkdown qw(markdown);
 
 =head1 NAME
 
-MultimMarkdown.pl - Convert MultiMarkdown syntax to (X)HTML
+MultiMarkdown.pl - Convert MultiMarkdown syntax to (X)HTML
 
 =head1 DESCRIPTION
 
