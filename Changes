@@ -163,20 +163,25 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Update README.txt
         - Allow scripts to be used on multiple input files at once (processing 
           in command line order)
-	    - Update footnote behavior of Text::MutliMarkdown to be consistent 
-	      with the latest version of MultiMarkdown
-	    - Added tests for the new footnote functionality.
-	    - Added tests for all the MDTest corner cases brought up on the list. 
-	      Noted why / how I differ from original Markdown.
-	    - Moved all the document tests to MDTest format. I have made MDTest 
-	      test suites for Text::Markdown and Text::MultiMarkdown, containing 
-	      **only** the bug fixes and behavior changes I've made, I've imported 
-	      the Markdown test suite from MDTest1.1, and the MultiMarkdown test
+        - Update footnote behavior of Text::MutliMarkdown to be consistent 
+          with the latest version of MultiMarkdown
+        - Added tests for the new footnote functionality.
+        - Added tests for all the MDTest corner cases brought up on the list. 
+          Noted why / how I differ from original Markdown.
+        - Moved all the document tests to MDTest format. I have made MDTest 
+          test suites for Text::Markdown and Text::MultiMarkdown, containing 
+          **only** the bug fixes and behavior changes I've made, I've imported 
+          the Markdown test suite from MDTest1.1, and the MultiMarkdown test
           suite.
-	    - RT#36537 doc patch to add POD to the scripts from Debian's Gunnar 
-	      Wolf.
-	    - Mutilate the list processing somewhat to reduce the compilation
-	      of recursive regexes, and so stop perl (<5.10) crapping itself
-	      on lots of input. This isn't the full fix - really shouldn't be
-	      usng recursive regexes at all. RT#37297
+        - RT#36537 doc patch to add POD to the scripts from Debian's Gunnar 
+          Wolf.
+        - Mutilate the list processing somewhat to reduce the compilation
+          of recursive regexes, and so stop perl (<5.10) crapping itself
+          on lots of input. This isn't the full fix - really shouldn't be
+          usng recursive regexes at all. RT#37297
 
+1.0.21 2008-XX-XXTXX:XX:XX
+       - Fix hard tabs in changelog
+       - Add unit test for coredumps issue from RT#36203
+
+ 
