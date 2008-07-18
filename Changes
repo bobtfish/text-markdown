@@ -181,9 +181,10 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           usng recursive regexes at all. RT#37297
 
 1.0.21 2008-XX-XXTXX:XX:XX
-       - Fix hard tabs in changelog
-       - Add unit test for coredumps issue from RT#36203
-       - Fix POD spelling.
-       - Fix warning from RT#34856.
+        - Fix hard tabs in Changelog
+        - Add unit test for core dumps issue from RT#36203
+        - Fix POD spelling.
+        - Fix warning from RT#34856.
+        - Add test for another tab width issue (related to <hr> generation)
+          from RT#37769. Fix this issue.
 
- 
