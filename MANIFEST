@@ -1,3 +1,4 @@
+inc/Module/Install/Makefile.pm
 Makefile.PL
 Changes
 inc/Module/Install.pm
@@ -8,7 +9,6 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/Scripts.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/Module/Install/Makefile.pm
 lib/Text/Markdown.pm
 lib/Text/MultiMarkdown.pm
 License.text
@@ -60,6 +60,7 @@ t/36multimarkdown_featurebleed.t
 t/37anchormultilinebugs.t
 t/38listshorizontalrule.t
 t/39listsindentededgecase.t
+t/code-hr.t
 t/docs-maruku-unittest/abbreviations.html
 t/docs-maruku-unittest/abbreviations.text
 t/docs-maruku-unittest/alt.html
@@ -373,6 +374,8 @@ t/Markdown-from-MDTest1.1.mdtest/Tidyness.text
 t/Markdown-from-MDTest1.1.mdtest/Tidyness.xhtml
 t/MultiMarkdown.mdtest/Backslash_escapes.text
 t/MultiMarkdown.mdtest/Backslash_escapes.xhtml
+t/MultiMarkdown.mdtest/Footnotes.text
+t/MultiMarkdown.mdtest/Footnotes.xhtml
 t/MultiMarkdown.mdtest/Inline_HTML_(Advanced).text
 t/MultiMarkdown.mdtest/Inline_HTML_(Advanced).xhtml
 t/MultiMarkdown.mdtest/Inline_HTML_(Simple).text
@@ -423,6 +426,8 @@ t/PHP_Markdown-from-MDTest1.1.mdtest/PHP-Specific_Bugs.text
 t/PHP_Markdown-from-MDTest1.1.mdtest/PHP-Specific_Bugs.xhtml
 t/PHP_Markdown-from-MDTest1.1.mdtest/Tight_blocks.text
 t/PHP_Markdown-from-MDTest1.1.mdtest/Tight_blocks.xhtml
+t/Text-Markdown.mdtest/CoreDumps5.8.text
+t/Text-Markdown.mdtest/CoreDumps5.8.xhtml
 t/Text-Markdown.mdtest/Emphasis.text
 t/Text-Markdown.mdtest/Emphasis.xhtml
 t/Text-Markdown.mdtest/HTML-Comment-encoding.text
@@ -515,6 +520,8 @@ t/Text-MultiMarkdown.mdtest/Tables.text
 t/Text-MultiMarkdown.mdtest/Tables.xhtml
 t/Text-MultiMarkdown.mdtest/Tabs.text
 t/Text-MultiMarkdown.mdtest/Tabs.xhtml
+t/Text-MultiMarkdown.mdtest/Warnings-rt34856.text
+t/Text-MultiMarkdown.mdtest/Warnings-rt34856.xhtml
 t/Text-MultiMarkdown.mdtest/Wiki_Features.text
 t/Text-MultiMarkdown.mdtest/Wiki_Features.xhtml
 Todo
