@@ -631,7 +631,7 @@ sub _GenerateImageCrossRefs {
 sub _StripFootnoteDefinitions {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
-
+    
     while ($text =~ s{
 	  \n\[\^([^\n]+?)\]\:[ \t]*# id = $1
 	  \n?
