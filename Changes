@@ -190,3 +190,5 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - More test additions and more splitting the test suites into MDTest 
           modules.
 
+1.0.22 2008-XX-XXTXX:XX:XX
+        - RT#37909
