@@ -4,6 +4,7 @@ use Test::More;
 use FindBin qw($Bin);
 use List::MoreUtils qw(uniq);
 use File::Slurp qw(slurp);
+use Encode;
 
 our $TIDY = 0;
 
@@ -23,7 +24,7 @@ if (!$@) {
             return;
         }
         print "=" x 80 . "\nDIFFERENCES: + = processed version from .text, - = template from .html\n";
-        print Text::Diff::diff(\$expected => \$got, { STYLE => "Unified" }) . "\n";
+        print encode('utf8', Text::Diff::diff(\$expected => \$got, { STYLE => "Unified" }) . "\n");
         fail($testname);
     };
 }
