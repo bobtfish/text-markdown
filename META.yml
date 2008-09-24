@@ -1,22 +1,27 @@
-abstract: Convert Markdown syntax to (X)HTML
-author: Tomas Doran <bobtfish@bobtfish.net>
-build_requires: 
+---
+abstract: 'Convert Markdown syntax to (X)HTML'
+author:
+  - 'Tomas Doran <bobtfish@bobtfish.net>'
+build_requires:
   File::Slurp: 0
   FindBin: 0
   List::MoreUtils: 0
   Test::Exception: 0
   Test::More: 0.42
 distribution_type: module
-generated_by: Module::Install version 0.64
+generated_by: 'Module::Install version 0.75'
 license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
 name: Text-Markdown
-no_index: 
-  directory: 
+no_index:
+  directory:
     - inc
     - t
-requires: 
+requires:
   Digest::MD5: 0
   Encode: 0
   Text::Balanced: 0
   perl: 5.8.0
-version: 1.0.20
+version: 1.0.22
