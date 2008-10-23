@@ -1,5 +1,3 @@
-inc/Module/Install/Makefile.pm
-Makefile.PL
 Changes
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -426,6 +424,7 @@ t/PHP_Markdown-from-MDTest1.1.mdtest/PHP-Specific_Bugs.text
 t/PHP_Markdown-from-MDTest1.1.mdtest/PHP-Specific_Bugs.xhtml
 t/PHP_Markdown-from-MDTest1.1.mdtest/Tight_blocks.text
 t/PHP_Markdown-from-MDTest1.1.mdtest/Tight_blocks.xhtml
+t/rt37909.t
 t/Text-Markdown.mdtest/CoreDumps5.8.text
 t/Text-Markdown.mdtest/CoreDumps5.8.xhtml
 t/Text-Markdown.mdtest/Emphasis.text

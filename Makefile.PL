@@ -6,6 +6,7 @@ name            'Text-Markdown';
 author          'Tomas Doran <bobtfish@bobtfish.net>';
 license			'bsd';
 all_from        'lib/Text/Markdown.pm';
+resources repository => 'http://svn.kulp.ch/cpan/text_multimarkdown';
 
 # Specific dependencies
 perl_version    '5.008';

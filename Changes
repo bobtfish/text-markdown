@@ -190,5 +190,9 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - More test additions and more splitting the test suites into MDTest 
           modules.
 
-1.0.22 2008-XX-XXTXX:XX:XX
-        - RT#37909
+1.0.22 2008-10-23T18:24:44
+        - RT#37909 - Fix + in email addresses.
+        - RT#40303 - Fix use in Mason by adding "use re 'eval'" to both files.
+        - Add SVN repository to Makefile.PL
+        - Remove META.yml from source control so it is regenerated 
+          automatically.

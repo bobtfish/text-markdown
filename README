@@ -40,7 +40,7 @@ SYNTAX
 
 OPTIONS
     Text::Markdown supports a number of options to it's processor which
-    control the behavior of the output document.
+    control the behaviour of the output document.
 
     These options can be supplied to the constructor, on in a hash with the
     individual calls to the markdown method. See the synopsis for examples
@@ -143,7 +143,7 @@ THIS DISTRIBUTION
     Whilst this code aims to be compatible with the original Markdown.pl
     (and incorporates and passes the Markdown test suite) whilst fixing a
     number of bugs in the original - there may be differences between the
-    behavior of this module and Markdown.pl. If you find any differences
+    behaviour of this module and Markdown.pl. If you find any differences
     where you believe Text::Markdown behaves contrary to the Markdown spec,
     please report them as bugs.
 

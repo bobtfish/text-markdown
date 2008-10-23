@@ -2,6 +2,7 @@ package Text::MultiMarkdown;
 require 5.008_000;
 use strict;
 use warnings;
+use re 'eval';
 
 use Digest::MD5 qw(md5_hex);
 use Encode      qw();
@@ -53,7 +54,7 @@ HTML tags (like <div> and <table> as well).
 
 This module implements the MultiMarkdown markdown syntax extensions from:
 
-    http://fletcherpenney.net/MultiMarkdown/
+    http://fletcherpenney.net/multimarkdown/
 
 =head1 SYNTAX
 
@@ -65,7 +66,7 @@ This module implements MultiMarkdown, which is an extension to Markdown..
 
 The extension is documented at:
 
-    http://fletcherpenney.net/MultiMarkdown/
+    http://fletcherpenney.net/multimarkdown/
 
 and borrows from php-markdown, which lives at:
 
@@ -75,7 +76,7 @@ This documentation is going to be moved/copied into this module for clearer read
 
 =head1 OPTIONS
 
-MultiMarkdown supports a number of options to it's processor which control the behavior of the output document.
+MultiMarkdown supports a number of options to it's processor which control the behaviour of the output document.
 
 These options can be supplied to the constructor, on in a hash with the individual calls to the markdown method.
 See the synopsis for examples of both of the above styles.
@@ -331,7 +332,7 @@ sub _Markdown {
 }
 
 #
-# Routines which are overridden for slightly different behavior in MultiMarkdown
+# Routines which are overridden for slightly different behaviour in MultiMarkdown
 #
 
 # Delegate to super class, then do wiki links
@@ -369,7 +370,7 @@ sub _DoHeaders {
 
 # Generating headers automatically generates X-refs in MultiMarkdown (always)
 # Also, by default, you get id attributes added to your headers, you can turn this
-# part of the MultiMarkdown behavior off with the heading_ids flag.
+# part of the MultiMarkdown behaviour off with the heading_ids flag.
 sub _GenerateHeader {
     my ($self, $level, $id) = @_;
     
@@ -1259,7 +1260,7 @@ and it *is not* in any way blessed by him.
 
 Whilst this code aims to be compatible with the original MultiMarkdown (and incorporates 
 and passes the MultiMarkdown test suite) whilst fixing a number of bugs in the original - 
-there may be differences between the behavior of this module and MultiMarkdown. If you find
+there may be differences between the behaviour of this module and MultiMarkdown. If you find
 any differences where you believe Text::MultiMarkdown behaves contrary to the MultiMarkdown spec, 
 please report them as bugs.
 
