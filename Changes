@@ -196,3 +196,6 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Add SVN repository to Makefile.PL
         - Remove META.yml from source control so it is regenerated 
           automatically.
+          
+1.0.23 2008-11-02T18:24:30
+        - Ship a release with the correct contents so that the tests pass.
