@@ -67,7 +67,7 @@ The options for the processor are:
 
 =over
 
-=item empty element suffix
+=item empty_element_suffix
 
 This option can be used to generate normal HTML output. By default, it is ' />', which is xHTML, change to '>' for normal HTML.
 
@@ -78,6 +78,21 @@ Controls indent width in the generated markup, defaults to 4
 =item markdown_in_html_blocks
 
 Controls if Markdown is processed when inside HTML blocks. Defaults to 0.
+
+=item trust_list_start_value
+
+If true, ordered lists will use the first number as the starting point for
+numbering.  This will let you pick up where you left off by writing:
+
+  1. foo
+  2. bar
+
+  some paragraph
+
+  3. baz
+  6. quux
+
+(Note that in the above, quux will be numbered 4.)
 
 =back
 
@@ -133,6 +148,8 @@ sub new {
         
     # Is markdown processed in HTML blocks? See t/15inlinehtmldonotturnoffmarkdown.t
     $p{markdown_in_html_blocks} = $p{markdown_in_html_blocks} ? 1 : 0;
+
+    $p{trust_list_start_value} = $p{trust_list_start_value} ? 1 : 0;
     
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
@@ -927,14 +944,16 @@ sub _DoLists {
                 $whole_list
             }{
                 my $list = $1;
-                my $list_type = ($3 =~ m/$marker_ul/) ? "ul" : "ol";
+                my $marker = $3;
+                my $list_type = ($marker =~ m/$marker_ul/) ? "ul" : "ol";
                 # Turn double returns into triple returns, so that we can make a
                 # paragraph for the last item in a list, if necessary:
                 $list =~ s/\n{2,}/\n\n\n/g;
                 my $result = ( $list_type eq 'ul' ) ?
                     $self->_ProcessListItemsUL($list, $marker_ul)
                   : $self->_ProcessListItemsOL($list, $marker_ol);
-                $result = "<$list_type>\n" . $result . "</$list_type>\n";
+
+                $result = $self->_MakeList($list_type, $result, $marker);
                 $result;
             }egmx;
     }
@@ -944,20 +963,32 @@ sub _DoLists {
                 $whole_list
             }{
                 my $list = $1;
-                my $list_type = ($3 =~ m/$marker_ul/) ? "ul" : "ol";
+                my $marker = $3;
+                my $list_type = ($marker =~ m/$marker_ul/) ? "ul" : "ol";
                 # Turn double returns into triple returns, so that we can make a
                 # paragraph for the last item in a list, if necessary:
                 $list =~ s/\n{2,}/\n\n\n/g;
                 my $result = ( $list_type eq 'ul' ) ?
                     $self->_ProcessListItemsUL($list, $marker_ul)
                   : $self->_ProcessListItemsOL($list, $marker_ol);
-                $result = "<$list_type>\n" . $result . "</$list_type>\n";
+                $result = $self->_MakeList($list_type, $result, $marker);
                 $result;
             }egmx;
     }
 
 
     return $text;
+}
+
+sub _MakeList {
+  my ($self, $list_type, $content, $marker) = @_;
+
+  if ($list_type eq 'ol' and $self->{trust_list_start_value}) {
+    my ($num) = $marker =~ /^(\d+)[.]/;
+    return "<ol start='$num'>\n" . $content . "</ol>\n";
+  }
+
+  return "<$list_type>\n" . $content . "</$list_type>\n";
 }
 
 sub _ProcessListItemsOL {

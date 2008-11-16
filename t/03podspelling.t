@@ -47,3 +47,5 @@ STDOUT
 XHTML
 html
 shortversion
+quux
+
