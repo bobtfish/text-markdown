@@ -199,3 +199,9 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
           
 1.0.23 2008-11-02T18:24:30
         - Ship a release with the correct contents so that the tests pass.
+
+1.0.24 2008-11-16T14:33:30
+        - Add trust_list_start_value patch from Ricardo Signes (RT#40814)
+          to enable <li value='X'> output for list numbering.
+          This feature is disabled by default.
+
