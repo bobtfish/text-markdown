@@ -218,7 +218,7 @@ sub _Markdown {
 
     $text = $self->_CleanUpDoc($text);
 
-    # Turn block-level HTML blocks into hash entries
+    # Turn block-level HTML elements into hash entries if we are not supposed to parse the Markdown in them
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     $text = $self->_StripLinkDefinitions($text);
@@ -494,9 +494,6 @@ sub _RunBlockGamut {
 
     # Do headers first, as these populate cross-refs
     $text = $self->_DoHeaders($text);
-
-    # And now, protect our tables
-    $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     # Do Horizontal Rules:
     my $less_than_tab = $self->{tab_width} - 1;
