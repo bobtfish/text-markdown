@@ -61,7 +61,7 @@ This module implements the MultiMarkdown markdown syntax extensions from:
 For more information about (original) Markdown's syntax, see:
 
     http://daringfireball.net/projects/markdown/
-    
+
 This module implements MultiMarkdown, which is an extension to Markdown..
 
 The extension is documented at:
@@ -99,12 +99,12 @@ This option can be used to generate normal HTML output. By default, it is ' />',
 
 =item img_ids
 
-Controls if <img> tags generated have an id attribute. Defaults to true. 
+Controls if <img> tags generated have an id attribute. Defaults to true.
 Turn off for compatibility with the original markdown.
 
 =item heading_ids
 
-Controls if <hX> tags generated have an id attribute. Defaults to true. 
+Controls if <hX> tags generated have an id attribute. Defaults to true.
 Turn off for compatibility with the original markdown.
 
 =item bibliography_title
@@ -133,7 +133,7 @@ If true, this disables the MultiMarkdown bibliography/citation handling.
 
 =back
 
-A number of possible items of metadata can also be supplied as options. 
+A number of possible items of metadata can also be supplied as options.
 Note that if the use_metadata is true then the metadata in the document will overwrite the settings on command line.
 
 Metadata options supported are:
@@ -199,34 +199,34 @@ A simple constructor, see the SYNTAX and OPTIONS sections for more information.
 
 sub new {
     my ($class, %p) = @_;
-    
+
     # Default metadata to 1
     $p{use_metadata} = 1 unless exists $p{use_metadata};
     # Squash value to [01]
     $p{use_metadata} = $p{use_metadata} ? 1 : 0;
-    
+
     $p{base_url} ||= ''; # This is the base url to be used for WikiLinks
-    
+
     $p{tab_width} = 4 unless (defined $p{tab_width} and $p{tab_width} =~ m/^\d+$/);
-    
+
     $p{document_format} ||= '';
-    
+
     $p{empty_element_suffix} ||= ' />'; # Change to ">" for HTML output
-    
+
     #$p{heading_ids} = defined $p{heading_ids} ? $p{heading_ids} : 1;
-    
+
     # For use with WikiWords and [[Wiki Links]]
     # NOTE: You can use \WikiWord to prevent a WikiWord from being treated as a link
     $p{use_wikilinks} = $p{use_wikilinks} ? 1 : 0;
-    
+
     # Is markdown processed in HTML blocks? See t/15inlinehtmldonotturnoffmarkdown.t
     $p{markdown_in_html_blocks} = $p{markdown_in_html_blocks} ? 1 : 0;
-    
+
     $p{heading_ids} = defined $p{heading_ids} ? $p{heading_ids} : 1;
     $p{img_ids}     = defined $p{img_ids}     ? $p{img_ids}     : 1;
-    
+
     $p{bibliography_title} ||= 'Bibliography'; # FIXME - Test and document, can also be in metadata!
-    
+
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
     return $self;
@@ -257,14 +257,14 @@ sub markdown {
     $options ||= {};
 
     %$self = (%{ $self->{params} }, %$options, params => $self->{params});
-    
+
     $self->_CleanUpRunData($options);
-    
+
     return $self->_Markdown($text);
 }
 
 sub _CleanUpRunData {
-    my ($self, $options) = @_;    
+    my ($self, $options) = @_;
     # Clear the global hashes. If we don't clear these, you get conflicts
     # from other articles when generating a page which contains more than
     # one article (e.g. an index page that shows the N most recent
@@ -277,7 +277,7 @@ sub _CleanUpRunData {
     $self->{_citation_counter} = 0;
     $self->{_metadata} = {};
     $self->{_attributes}  = {}; # Used for extra attributes on links / images.
-    
+
     $self->SUPER::_CleanUpRunData($options);
 }
 
@@ -290,9 +290,9 @@ sub _Markdown {
 #
 # Can't think of any good way to make this inherit from the Markdown version as ordering is so important, so I've left it.
     my ($self, $text) = @_;
-    
+
     $text = $self->_CleanUpDoc($text);
-    
+
     # MMD only. Strip out MetaData
     $text = $self->_ParseMetaData($text) if ($self->{use_metadata} || $self->{strip_metadata});
 
@@ -300,16 +300,16 @@ sub _Markdown {
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     $text = $self->_StripLinkDefinitions($text);
-    
+
     # MMD only
     $text = $self->_StripMarkdownReferences($text);
 
     $text = $self->_RunBlockGamut($text);
-    
+
     # MMD Only
     $text = $self->_DoMarkdownCitations($text) unless $self->{disable_bibliography};
     $text = $self->_DoFootnotes($text) unless $self->{disable_footnotes};
-    
+
     $text = $self->_UnescapeSpecialChars($text);
 
     # MMD Only
@@ -318,17 +318,17 @@ sub _Markdown {
     $text = $self->_FixFootnoteParagraphs($text) unless $self->{disable_footnotes};
     $text .= $self->_PrintFootnotes() unless $self->{disable_footnotes};
     $text .= $self->_PrintMarkdownBibliography() unless $self->{disable_bibliography};
-        
+
     $text = $self->_ConvertCopyright($text);
 
     # MMD Only
     if (lc($self->{document_format}) =~ /^complete\s*$/) {
         return $self->_xhtmlMetaData() . "<body>\n" . $text . "\n</body>\n</html>";
-    } 
+    }
     else {
         return $self->_textMetaData() . $text . "\n";
     }
-    
+
 }
 
 #
@@ -340,17 +340,17 @@ sub _RunSpanGamut {
     my ($self, $text) = @_;
 
     $text = $self->SUPER::_RunSpanGamut($text);
-    
+
     # Process WikiWords
     if ($self->_UseWikiLinks()) {
         $text = $self->_DoWikiLinks($text);
-        
+
         # And then reprocess anchors and images
         # FIXME - This is needed exactly why?
         $text = $self->_DoImages($text);
         $text = $self->_DoAnchors($text);
     }
-    
+
     return $text;
 }
 
@@ -360,9 +360,9 @@ sub _DoHeaders {
     my ($self, $text) = @_;
 
     local $self->{use_wikilinks} = 0;
-    
+
     $text = $self->SUPER::_DoHeaders($text);
-    
+
     # Do tables to populate the table id's for cross-refs
     # (but after headers as the tables can contain cross-refs to other things, so we want the header cross-refs)
     $text = $self->_DoTables($text);
@@ -373,16 +373,16 @@ sub _DoHeaders {
 # part of the MultiMarkdown behaviour off with the heading_ids flag.
 sub _GenerateHeader {
     my ($self, $level, $id) = @_;
-    
+
     my $label = $self->{heading_ids} ? $self->_Header2Label($id) : '';
     my $header = $self->_RunSpanGamut($id);
-    
+
     if ($label ne '') {
         $self->{_crossrefs}{$label} = "#$label";
         $self->{_titles}{$label} = $header;
         $label = qq{ id="$label"};
     }
-    
+
     return "<h$level$label>$header</h$level>\n\n";
 }
 
@@ -393,7 +393,7 @@ sub _EncodeCode {
     if ($self->_UseWikiLinks()) {
         $text =~ s/([A-Z]+[a-z\x80-\xff]+[A-Z][A-Za-z\x80-\xff]*)/\\$1/gx;
     }
-    
+
     return $self->SUPER::_EncodeCode($text);
 }
 
@@ -408,41 +408,41 @@ sub _StripLinkDefinitions {
 # hash references.
 #
     my ($self, $text) = @_;
-    
+
     $text = $self->_StripFootnoteDefinitions($text) unless $self->{disable_footnotes};
-    
+
     my $less_than_tab = $self->{tab_width} - 1;
 
     # Link defs are in the form: ^[id]: url "optional title"
     # FIXME - document attributes here.
     while ($text =~ s{
-	                	# Pattern altered for MultiMarkdown
-                		# in order to not match citations or footnotes
-                		^[ ]{0,$less_than_tab}\[([^#^].*)\]:	# id = $1
-                		  [ \t]*
-                		  \n?				# maybe *one* newline
-                		  [ \t]*
-                		<?(\S+?)>?			# url = $2
-                		  [ \t]*
-                		  \n?				# maybe one newline
-                		  [ \t]*
-                		(?:
-                			(?<=\s)			# lookbehind for whitespace
-                			["(]
-                			(.+?)			# title = $3
-                			[")]
-                			[ \t]*
-                		)?	# title is optional
-		
-                		# MultiMarkdown addition for attribute support
-                		\n?
-                		(				# Attributes = $4
-                			(?<=\s)			# lookbehind for whitespace
-                			(([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
-                		)?
-                		[ \t]*
-                		# /addition
-                		(?:\n+|\Z)
+                        # Pattern altered for MultiMarkdown
+                        # in order to not match citations or footnotes
+                        ^[ ]{0,$less_than_tab}\[([^#^].*)\]:    # id = $1
+                          [ \t]*
+                          \n?                # maybe *one* newline
+                          [ \t]*
+                        <?(\S+?)>?            # url = $2
+                          [ \t]*
+                          \n?                # maybe one newline
+                          [ \t]*
+                        (?:
+                            (?<=\s)            # lookbehind for whitespace
+                            ["(]
+                            (.+?)            # title = $3
+                            [")]
+                            [ \t]*
+                        )?    # title is optional
+
+                        # MultiMarkdown addition for attribute support
+                        \n?
+                        (                # Attributes = $4
+                            (?<=\s)            # lookbehind for whitespace
+                            (([ \t]*\n)?[ \t]*((\S+=\S+)|(\S+=".*?")))*
+                        )?
+                        [ \t]*
+                        # /addition
+                        (?:\n+|\Z)
                     }
                     {}mx) {
         $self->{_urls}{lc $1} = $self->_EncodeAmpsAndAngles( $2 );    # Link IDs are case-insensitive
@@ -450,7 +450,7 @@ sub _StripLinkDefinitions {
             $self->{_titles}{lc $1} = $3;
             $self->{_titles}{lc $1} =~ s/"/&quot;/g;
         }
-        
+
         # MultiMarkdown addition "
         if ($4) {
             $self->{_attributes}{lc $1} = $4;
@@ -488,15 +488,15 @@ sub _GenerateAnchor {
 sub _GenerateImage {
     # FIXME - Fugly, change to named params?
     my ($self, $whole_match, $alt_text, $link_id, $url, $title, $attributes) = @_;
-    
+
     if (defined $alt_text && length $alt_text) {
         my $label = $self->_Header2Label($alt_text);
         $self->{_crossrefs}{$label} = "#$label";
         $attributes .= $self->{img_ids} ? qq{ id="$label"} : '';
     }
-    
+
     $attributes .= $self->_DoAttributes($link_id) if defined $link_id;
-    
+
     $self->SUPER::_GenerateImage($whole_match, $alt_text, $link_id, $url, $title, $attributes);
 }
 
@@ -506,12 +506,12 @@ sub _GenerateImage {
 #
 
 # FIXME - This is really really ugly!
-sub _ParseMetaData { 
+sub _ParseMetaData {
     my ($self, $text) = @_;
     my $clean_text = "";
-    
+
     my ($inMetaData, $currentKey) = (1, '');
-    
+
     foreach my $line ( split /\n/, $text ) {
         $line =~ /^\s*$/ and $inMetaData = 0 and $clean_text .= $line and next;
         if ($inMetaData) {
@@ -530,7 +530,7 @@ sub _ParseMetaData {
                     $self->{bibliography_title} = $self->{_metadata}{$currentKey};
                     $self->{bibliography_title} =~ s/\s*$//;
                 }
-            } 
+            }
             else {
                 if ($currentKey eq "") {
                     # No metadata present
@@ -542,15 +542,15 @@ sub _ParseMetaData {
                     $self->{_metadata}{$currentKey} .= "\n$1";
                 }
             }
-        } 
+        }
         else {
             $clean_text .= "$line\n";
         }
     }
-    
+
     # Recheck for leading blank lines
     $clean_text =~ s/^\n+//s;
-        
+
     return $clean_text;
 }
 
@@ -585,7 +585,7 @@ sub _GenerateImageCrossRefs {
         }
 
         $alt_text =~ s/"/&quot;/g;
-        
+
         if (defined $self->{_urls}{$link_id}) {
             my $label = $self->_Header2Label($alt_text);
             $self->{_crossrefs}{$label} = "#$label";
@@ -632,30 +632,30 @@ sub _GenerateImageCrossRefs {
 sub _StripFootnoteDefinitions {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
-    
+
     while ($text =~ s{
-	  \n\[\^([^\n]+?)\]\:[ \t]*# id = $1
-	  \n?
-	  (.*?)\n{1,2}		# end at new paragraph
-	  ((?=\n[ ]{0,$less_than_tab}\S)|\Z)	# Lookahead for non-space at line-start, or end of doc
+      \n\[\^([^\n]+?)\]\:[ \t]*# id = $1
+      \n?
+      (.*?)\n{1,2}        # end at new paragraph
+      ((?=\n[ ]{0,$less_than_tab}\S)|\Z)    # Lookahead for non-space at line-start, or end of doc
     }
     {\n}sx)
     {
         my $id = $1;
         my $footnote = "$2\n";
         $footnote =~ s/^[ ]{0,$self->{tab_width}}//gm;
-    
+
         $self->{_footnotes}{$self->_Id2Footnote($id)} = $footnote;
     }
-    
+
     return $text;
 }
 
 sub _DoFootnotes {
     my ($self, $text) = @_;
-    
+
     return '' unless length $text;
-    
+
     # First, run routines that get skipped in footnotes
     foreach my $label (sort keys %{ $self->{_footnotes} }) {
         my $footnote = $self->_RunBlockGamut($self->{_footnotes}{$label});
@@ -663,20 +663,20 @@ sub _DoFootnotes {
         $footnote = $self->_DoMarkdownCitations($footnote);
         $self->{_footnotes}{$label} = $footnote;
     }
-    
+
     my $footnote_counter = 0;
-        
+
     $text =~ s{
         \[\^(.*?)\]     # id = $1
     }{
         my $result = '';
         my $id = $self->_Id2Footnote($1);
-        
+
         if (defined $self->{_footnotes}{$id} ) {
             $footnote_counter++;
             if ($self->{_footnotes}{$id} =~ /^glossary:/i) {
                 $result = qq{<a href="#fn:$id" id="fnref:$id" class="footnote glossary">$footnote_counter</a>};
-            } 
+            }
             else {
                 $result = qq{<a href="#fn:$id" id="fnref:$id" class="footnote">$footnote_counter</a>};
             }
@@ -684,15 +684,15 @@ sub _DoFootnotes {
         }
         $result;
     }xsge;
-    
+
     return $text;
 }
 
 sub _FixFootnoteParagraphs {
     my ($self, $text) = @_;
-    
+
     $text =~ s/^\<p\>\<\/footnote\>/<\/footnote>/gm;
-    
+
     return $text;
 }
 
@@ -700,18 +700,18 @@ sub _PrintFootnotes {
     my ($self) = @_;
     my $footnote_counter = 0;
     my $result;
-    
+
     foreach my $id (@{ $self->{_used_footnotes} }) {
         $footnote_counter++;
         my $footnote = $self->{_footnotes}{$id};
         my $footnote_closing_tag = '';
- 
+
         $footnote =~ s/(\<\/(p(re)?|ol|ul)\>)$//;
         $footnote_closing_tag = $1;
-        
+
         if ($footnote =~ s/^glossary:\s*//i) {
             # Add some formatting for glossary entries
- 
+
             $footnote =~ s{
                 ^(.*?)              # $1 = term
                 \s*
@@ -719,16 +719,16 @@ sub _PrintFootnotes {
                 \n
             }{
                 my $glossary = qq{<span class="glossary name">$1</span>};
-                
+
                 if ($2) {
                     $glossary.= qq{<span class="glossary sort" style="display:none">$2</span>};
                 };
-                
-                $glossary . q{:<p>}; 
+
+                $glossary . q{:<p>};
             }egsx;
- 
+
             $result .= qq{<li id="fn:$id">$footnote<a href="#fnref:$id" class="reversefootnote">&#160;&#8617;</a>$footnote_closing_tag</li>\n\n};
-        } 
+        }
         else {
             $result .= qq{<li id="fn:$id">$footnote<a href="#fnref:$id" class="reversefootnote">&#160;&#8617;</a>$footnote_closing_tag</li>\n\n};
         }
@@ -736,11 +736,11 @@ sub _PrintFootnotes {
 
     if ($footnote_counter > 0) {
         $result = qq[\n\n<div class="footnotes">\n<hr$self->{empty_element_suffix}\n<ol>\n\n] . $result . "</ol>\n</div>";
-    } 
+    }
     else {
         $result = "";
-    }   
-    
+    }
+
     return $result;
 }
 
@@ -771,38 +771,38 @@ sub _xhtmlMetaData {
     $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n};
 
     $result.= "<html>\n\t<head>\n";
-    
+
     foreach my $key (sort keys %{$self->{_metadata}} ) {
         if (lc($key) eq "title") {
             $result.= "\t\t<title>$self->{_metadata}{$key}</title>\n";
-        } 
+        }
         elsif (lc($key) eq "css") {
             $result.= qq[\t\t<link type="text/css" rel="stylesheet" href="$self->{_metadata}{$key}"$self->{empty_element_suffix}\n];
-        } 
+        }
         else {
             $result.= qq[\t\t<meta name="$key" content="$self->{_metadata}{$key}"$self->{empty_element_suffix}\n];
         }
     }
     $result.= "\t</head>\n";
-    
+
     return $result;
 }
 
 sub _textMetaData {
     my ($self) = @_;
     my $result = "";
-    
+
     return $result if $self->{strip_metadata};
 
     foreach my $key (sort keys %{$self->{_metadata}} ) {
         $result .= "$key: $self->{_metadata}{$key}\n";
     }
     $result =~ s/\s*\n/<br$self->{empty_element_suffix}\n/g;
-    
+
     if ($result ne "") {
         $result.= "\n";
     }
-    
+
     return $result;
 }
 
@@ -817,7 +817,7 @@ sub _UseWikiLinks {
 
 sub _CreateWikiLink {
     my ($self, $title) = @_;
-    
+
     my $id = $title;
         $id =~ s/ /_/g;
         $id =~ s/__+/_/g;
@@ -825,16 +825,16 @@ sub _CreateWikiLink {
         $id =~ s/_$//;
 
     $title =~ s/_/ /g;
-    
+
     return "[$title](" . $self->{base_url} . "$id)";
 }
 
 sub _DoWikiLinks {
-    
+
     my ($self, $text) = @_;
     my $WikiWord = '[A-Z]+[a-z\x80-\xff]+[A-Z][A-Za-z\x80-\xff]*';
     my $FreeLinkPattern = "([-,.()' _0-9A-Za-z\x80-\xff]+)";
-    
+
     if ($self->_UseWikiLinks()) {
         # FreeLinks
         $text =~ s{
@@ -846,32 +846,32 @@ sub _DoWikiLinks {
             }{
                 $1 ."\\" . $2
             }xsge;
-            
+
             $self->_CreateWikiLink($label)
         }xsge;
-    
+
         # WikiWords
         $text =~ s{
             ([\s])($WikiWord)
         }{
             $1 . $self->_CreateWikiLink($2)
         }xsge;
-        
+
         # Catch WikiWords at beginning of text
         $text =~ s{^($WikiWord)
         }{
             $self->_CreateWikiLink($1)
         }xse;
     }
-    
-    
+
+
     return $text;
 }
 
 sub _UnescapeWikiWords {
     my ($self, $text) = @_;
     my $WikiWord = '[A-Z]+[a-z\x80-\xff]+[A-Z][A-Za-z\x80-\xff]*';
-    
+
     # Unescape escaped WikiWords
     $text =~ s/(?<=\B)\\($WikiWord)/$1/g;
 
@@ -880,43 +880,43 @@ sub _UnescapeWikiWords {
 
 sub _DoTables {
     my ($self, $text) = @_;
-    
+
     return $text if $self->{disable_tables};
-    
+
     my $less_than_tab = $self->{tab_width} - 1;
 
     # Algorithm inspired by PHP Markdown Extra's
     # <http://www.michelf.com/projects/php-markdown/>
-        
+
     # Reusable regexp's to match table
-    
+
     my $line_start = qr{
         [ ]{0,$less_than_tab}
     }mx;
-    
+
     my $table_row = qr{
         [^\n]*?\|[^\n]*?\n
     }mx;
-        
+
     my $first_row = qr{
         $line_start
         \S+.*?\|.*?\n
     }mx;
-    
+
     my $table_rows = qr{
         (\n?$table_row)
     }mx;
-    
+
     my $table_caption = qr{
         $line_start
         \[.*?\][ \t]*\n
     }mx;
-    
+
     my $table_divider = qr{
         $line_start
-        [\|\-\:\.][ \-\|\:\.]* \| [ \-\|\:\.]* 
+        [\|\-\:\.][ \-\|\:\.]* \| [ \-\|\:\.]*
     }mx;
-    
+
     my $whole_table = qr{
         ($table_caption)?       # Optional caption
         ($first_row             # First line must start at beginning
@@ -925,10 +925,10 @@ sub _DoTables {
         $table_rows+            # Body Rows
         ($table_caption)?       # Optional caption
     }mx;
-    
-    
+
+
     # Find whole tables, then break them up and process them
-    
+
     $text =~ s{
         ^($whole_table)         # Whole table in $1
         (\n|\Z)                 # End of file or 2 blank lines
@@ -937,45 +937,45 @@ sub _DoTables {
         my $result = "<table>\n";
         my @alignments;
         my $use_row_header = 0;
-        
+
         # Add Caption, if present
-        
+
         if ($table =~ s/^$line_start\[\s*(.*?)\s*\](\[\s*(.*?)\s*\])?[ \t]*$//m) {
             if (defined $3) {
                 # add caption id to cross-ref list
                 my $table_id = $self->_Header2Label($3);
                 $result .= qq{<caption id="$table_id">} . $self->_RunSpanGamut($1). "</caption>\n";
-                
+
                 $self->{_crossrefs}{$table_id} = "#$table_id";
                 $self->{_titles}{$table_id} = "$1";
-            } 
+            }
             else {
                 $result .= "<caption>" . $self->_RunSpanGamut($1). "</caption>\n";
             }
         }
-                
+
         # If a second "caption" is present, treat it as a summary
         # However, this is not valid in XHTML 1.0 Strict
         # But maybe in future
-        
+
         # A summary might be longer than one line
         if ($table =~ s/\n$line_start\[\s*(.*?)\s*\][ \t]*\n/\n/s) {
             # $result .= "<summary>" . $self->_RunSpanGamut($1) . "</summary>\n";
         }
-        
+
         # Now, divide table into header, alignment, and body
 
         # First, add leading \n in case there is no header
-        
+
         $table = "\n" . $table;
-        
+
         # Need to be greedy
-        
+
         $table =~ s/\n($table_divider)\n(($table_rows)+)//s;
 
         my $alignment_string = $1;
         my $body = $2;
-        
+
         # Process column alignment
         while ($alignment_string =~ /\|?\s*(.+?)\s*(\||\Z)/gs) {
             my $cell = $self->_RunSpanGamut($1);
@@ -983,22 +983,22 @@ sub _DoTables {
                 if ($cell =~ /^\:/) {
                     $result .= qq[<col align="center"$self->{empty_element_suffix}\n];
                     push(@alignments,"center");
-                } 
+                }
                 else {
                     $result .= qq[<col align="right"$self->{empty_element_suffix}\n];
                     push(@alignments,"right");
                 }
-            } 
+            }
             else {
                 if ($cell =~ /^\:/) {
                     $result .= qq[<col align="left"$self->{empty_element_suffix}\n];
                     push(@alignments,"left");
-                } 
+                }
                 else {
                     if (($cell =~ /^\./) || ($cell =~ /\.$/)) {
                         $result .= qq[<col align="char"$self->{empty_element_suffix}\n];
                         push(@alignments,"char");
-                    } 
+                    }
                     else {
                         $result .= "<col$self->{empty_element_suffix}\n";
                         push(@alignments,"");
@@ -1006,15 +1006,15 @@ sub _DoTables {
                 }
             }
         }
-        
+
         # Process headers
         $table =~ s/^\n+//s;
-        
+
         $result .= "<thead>\n";
-        
+
         # Strip blank lines
         $table =~ s/\n[ \t]*\n/\n/g;
-        
+
         foreach my $line (split(/\n/, $table)) {
             # process each line (row) in table
             $result .= "<tr>\n";
@@ -1031,7 +1031,7 @@ sub _DoTables {
                 if ( $count == 0) {
                     if ($cell =~ /^\s*$/) {
                         $use_row_header = 1;
-                    } 
+                    }
                     else {
                         $use_row_header = 0;
                     }
@@ -1040,9 +1040,9 @@ sub _DoTables {
             }
             $result .= "</tr>\n";
         }
-        
+
         # Process body
-        
+
         $result .= "</thead>\n<tbody>\n";
 
         foreach my $line (split(/\n/, $body)) {
@@ -1068,7 +1068,7 @@ sub _DoTables {
                 }
                 if ($alignments[$count] !~ /^\s*$/) {
                     $result .= "\t<$cell_type$colspan align=\"$alignments[$count]\">$cell</$cell_type>\n";
-                } 
+                }
                 else {
                     $result .= "\t<$cell_type$colspan>$cell</$cell_type>\n";
                 }
@@ -1080,28 +1080,28 @@ sub _DoTables {
         $result .= "</tbody>\n</table>\n";
         $result
     }egmx;
-    
+
     my $table_body = qr{
         (                               # wrap whole match in $2
-            
+
             (.*?\|.*?)\n                    # wrap headers in $3
-            
+
             [ ]{0,$less_than_tab}
             ($table_divider)    # alignment in $4
-            
+
             (                           # wrap cells in $5
                 $table_rows
             )
         )
     }mx;
-    
+
     return $text;
 }
 
 sub _DoAttributes {
     my ($self, $id) = @_;
     my $result = "";
-    
+
     if (defined $self->{_attributes}{$id}) {
         while ($self->{_attributes}{$id} =~ s/(\S+)="(.*?)"//) {
             $result .= qq{ $1="$2"};
@@ -1110,7 +1110,7 @@ sub _DoAttributes {
             $result .= qq{ $1="$2"};
         }
     }
-    
+
     return $result;
 }
 
@@ -1130,22 +1130,22 @@ sub _StripMarkdownReferences {
         my $reference = "$2\n";
 
         $reference =~ s/^[ ]{0,$self->{tab_width}}//gm;
-        
+
         $reference = $self->_RunBlockGamut($reference);
 
         # strip leading and trailing <p> tags (they will be added later)
         $reference =~ s/^\<p\>//s;
         $reference =~ s/\<\/p\>\s*$//s;
-        
+
         $self->{_references}{$id} = $reference;
     }
-    
+
     return $text;
 }
 
 sub _DoMarkdownCitations {
     my ($self, $text) = @_;
-    
+
     $text =~ s{
         \[([^\[]*?)\]       # citation text = $1
         [ ]?            # one optional space
@@ -1156,29 +1156,29 @@ sub _DoMarkdownCitations {
         my $anchor_text = $1;
         my $id = $2;
         my $count;
-        
+
         if (defined $self->{_references}{$id} ) {
             my $citation_counter=0;
-            
+
             # See if citation has been used before
             foreach my $old_id (@{ $self->{_used_references} }) {
                 $citation_counter++;
                 $count = $citation_counter if ($old_id eq $id);
             }
-    
+
             if (! defined $count) {
                 $count = ++$self->{_citation_counter};
                 push (@{ $self->{_used_references} }, $id);
             }
-            
+
             $result = qq[<span class="markdowncitation"> (<a href="#$id">$count</a>];
-            
+
             if ($anchor_text ne "") {
                 $result .= qq[, <span class="locator">$anchor_text</span>];
             }
-            
+
             $result .= ")</span>";
-        } 
+        }
         else {
             # No reference exists
             $result = qq[<span class="externalcitation"> (<a id="$id">$id</a>];
@@ -1186,16 +1186,16 @@ sub _DoMarkdownCitations {
             if ($anchor_text ne "") {
                 $result .= qq[, <span class="locator">$anchor_text</span>];
             }
-            
+
             $result .= ")</span>";
         }
-        
+
         if ($self->_Header2Label($anchor_text) eq "notcited"){
             $result = qq[<span class="notcited" id="$id"/>];
         }
         $result;
     }xsge;
-    
+
     return $text;
 }
 
@@ -1203,7 +1203,7 @@ sub _PrintMarkdownBibliography {
     my ($self) = @_;
     my $citation_counter = 0;
     my $result;
-    
+
     foreach my $id (@{ $self->{_used_references} }) {
         $citation_counter++;
         $result .= qq|<div id="$id"><p>[$citation_counter] <span class="item">$self->{_references}{$id}</span></p></div>\n\n|;
@@ -1212,11 +1212,11 @@ sub _PrintMarkdownBibliography {
 
     if ($citation_counter > 0) {
         $result = qq[\n\n<div class="bibliography">\n<hr$self->{empty_element_suffix}\n<p>$self->{bibliography_title}</p>\n\n] . $result;
-    } 
+    }
     else {
         $result = "";
-    }   
-    
+    }
+
     return $result;
 }
 
@@ -1229,7 +1229,7 @@ __END__
 To file bug reports or feature requests please send email to:
 
     bug-Text-Markdown@rt.cpan.org
-    
+
 Please include with your report: (1) the example input; (2) the output
 you expected; (3) the output Markdown actually produced.
 
@@ -1250,34 +1250,36 @@ See the Changes file for detailed release notes for this version.
 
     CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
     Riedel) originally by Darren Kulp (http://kulp.ch/)
-    
+
     This module is maintained by: Tomas Doran http://www.bobtfish.net/
 
 =head1 THIS DISTRIBUTION
 
-Please note that this distribution is a fork of Fletcher Penny's MultiMarkdown project, 
+Please note that this distribution is a fork of Fletcher Penny's MultiMarkdown project,
 and it *is not* in any way blessed by him.
 
-Whilst this code aims to be compatible with the original MultiMarkdown (and incorporates 
-and passes the MultiMarkdown test suite) whilst fixing a number of bugs in the original - 
+Whilst this code aims to be compatible with the original MultiMarkdown (and incorporates
+and passes the MultiMarkdown test suite) whilst fixing a number of bugs in the original -
 there may be differences between the behaviour of this module and MultiMarkdown. If you find
-any differences where you believe Text::MultiMarkdown behaves contrary to the MultiMarkdown spec, 
+any differences where you believe Text::MultiMarkdown behaves contrary to the MultiMarkdown spec,
 please report them as bugs.
 
-Text::Markdown *does not* extend the markdown dialect in any way from that which is documented at
-daringfireball. If you want additional features, you should look at L<Text::MultiMarkdown>.
+=head1 SOURCE CODE
+
+You can find the source code repository for L<Text::Markdown> and L<Text::MultiMarkdown>
+on GitHub at <http://github.com/bobtfish/text-markdown>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Original Code Copyright (c) 2003-2004 John Gruber   
-<http://daringfireball.net/>   
+Original Code Copyright (c) 2003-2004 John Gruber
+<http://daringfireball.net/>
 All rights reserved.
 
-MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney   
-<http://fletcher.freeshell.org/>   
+MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney
+<http://fletcher.freeshell.org/>
 All rights reserved.
 
-Text::MultiMarkdown changes Copyright (c) 2006-2008 Darren Kulp
+Text::MultiMarkdown changes Copyright (c) 2006-2009 Darren Kulp
 <http://kulp.ch> and Tomas Doran <http://www.bobtfish.net>
 
 Redistribution and use in source and binary forms, with or without

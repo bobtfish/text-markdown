@@ -58,10 +58,10 @@ This module implements the 'original' Markdown markdown syntax from:
 
 =head1 OPTIONS
 
-Text::Markdown supports a number of options to it's processor which control the behaviour of the output document.
+Text::Markdown supports a number of options to its processor which control the behaviour of the output document.
 
-These options can be supplied to the constructor, on in a hash with the individual calls to the markdown method.
-See the synopsis for examples of both of the above styles.
+These options can be supplied to the constructor, or in a hash within individual calls to the markdown() method.
+See the synopsis for examples of both styles.
 
 The options for the processor are:
 
@@ -69,15 +69,20 @@ The options for the processor are:
 
 =item empty_element_suffix
 
-This option can be used to generate normal HTML output. By default, it is ' />', which is xHTML, change to '>' for normal HTML.
+This option controls the end of empty element tags:
+
+    '/>' for XHTML (default)
+    '>' for HTML
 
 =item tab_width
 
-Controls indent width in the generated markup, defaults to 4
+Controls indent width in the generated markup. Defaults to 4.
 
 =item markdown_in_html_blocks
 
-Controls if Markdown is processed when inside HTML blocks. Defaults to 0.
+Controls if Markdown is processed when inside HTML blocks. Defaults to 0 in
+order to not inadvertently parse as Markdown chunks of HTML that the user may
+have pasted in their document (e.g. web counters in a wiki page).
 
 =item trust_list_start_value
 
@@ -102,11 +107,11 @@ numbering.  This will let you pick up where you left off by writing:
 
 # Regex to match balanced [brackets]. See Friedl's
 # "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
-our ($g_nested_brackets, $g_nested_parens); 
+our ($g_nested_brackets, $g_nested_parens);
 $g_nested_brackets = qr{
     (?>                                 # Atomic matching
        [^\[\]]+                         # Anything other than brackets
-     | 
+     |
        \[
          (??{ $g_nested_brackets })     # Recursive set of nested brackets
        \]
@@ -114,13 +119,13 @@ $g_nested_brackets = qr{
 }x;
 # Doesn't allow for whitespace, because we're using it to match URLs:
 $g_nested_parens = qr{
-	(?> 								# Atomic matching
-	   [^()\s]+							# Anything other than parens or whitespace
-	 | 
-	   \(
-		 (??{ $g_nested_parens })		# Recursive set of nested brackets
-	   \)
-	)*
+    (?>                                 # Atomic matching
+       [^()\s]+                            # Anything other than parens or whitespace
+     |
+       \(
+         (??{ $g_nested_parens })        # Recursive set of nested brackets
+       \)
+    )*
 }x;
 
 # Table of hash values for escaped characters:
@@ -139,18 +144,18 @@ A simple constructor, see the SYNTAX and OPTIONS sections for more information.
 
 sub new {
     my ($class, %p) = @_;
-    
-    $p{base_url} ||= ''; # This is the base url to be used for WikiLinks
-    
+
+    $p{base_url} ||= ''; # This is the base URL to be used for WikiLinks
+
     $p{tab_width} = 4 unless (defined $p{tab_width} and $p{tab_width} =~ m/^\d+$/);
-    
+
     $p{empty_element_suffix} ||= ' />'; # Change to ">" for HTML output
-        
+
     # Is markdown processed in HTML blocks? See t/15inlinehtmldonotturnoffmarkdown.t
     $p{markdown_in_html_blocks} = $p{markdown_in_html_blocks} ? 1 : 0;
 
     $p{trust_list_start_value} = $p{trust_list_start_value} ? 1 : 0;
-    
+
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
     return $self;
@@ -166,7 +171,7 @@ for details on use.
 sub markdown {
     my ( $self, $text, $options ) = @_;
 
-    # Detect functional mode, and create an instance for this run..
+    # Detect functional mode, and create an instance for this run
     unless (ref $self) {
         if ( $self ne __PACKAGE__ ) {
             my $ob = __PACKAGE__->new();
@@ -183,7 +188,7 @@ sub markdown {
     %$self = (%{ $self->{params} }, %$options, params => $self->{params});
 
     $self->_CleanUpRunData($options);
-    
+
     return $self->_Markdown($text);
 }
 
@@ -192,7 +197,7 @@ sub _CleanUpRunData {
     # Clear the global hashes. If we don't clear these, you get conflicts
     # from other articles when generating a page which contains more than
     # one article (e.g. an index page that shows the N most recent
-    # articles):
+    # articles).
     $self->{_urls}        = $options->{urls} ? $options->{urls} : {}; # FIXME - document passing this option (tested in 05options.t).
     $self->{_titles}      = {};
     $self->{_html_blocks} = {};
@@ -212,16 +217,16 @@ sub _Markdown {
     my ($self, $text, $options) = @_;
 
     $text = $self->_CleanUpDoc($text);
-    
+
     # Turn block-level HTML blocks into hash entries
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
     $text = $self->_StripLinkDefinitions($text);
-    
+
     $text = $self->_RunBlockGamut($text);
-    
+
     $text = $self->_UnescapeSpecialChars($text);
-        
+
     $text = $self->_ConvertCopyright($text);
 
     return $text . "\n";
@@ -238,13 +243,13 @@ for an example of this hashref being passed back into the markdown method to cre
 
 sub urls {
     my ( $self ) = @_;
-    
+
     return $self->{_urls};
 }
 
 sub _CleanUpDoc {
     my ($self, $text) = @_;
-    
+
     # Standardize line endings:
     $text =~ s{\r\n}{\n}g;  # DOS to Unix
     $text =~ s{\r}{\n}g;    # Mac to Unix
@@ -260,7 +265,7 @@ sub _CleanUpDoc {
     # match consecutive blank lines with /\n+/ instead of something
     # contorted like /[ \t]*\n+/ .
     $text =~ s/^[ \t]+$//mg;
-    
+
     return $text;
 }
 
@@ -296,19 +301,19 @@ sub _StripLinkDefinitions {
             $self->{_titles}{lc $1} = $3;
             $self->{_titles}{lc $1} =~ s/"/&quot;/g;
         }
-        
+
     }
 
     return $text;
 }
 
 sub _md5_utf8 {
-   # Internal function used to safely MD5sum chunks of the input, which might be Unicode in Perl's internal representation.
-   my $input = shift;
-   return unless defined $input;
-   if (Encode::is_utf8 $input) {
-       return md5_hex(Encode::encode('utf8', $input));
-    } 
+    # Internal function used to safely MD5sum chunks of the input, which might be Unicode in Perl's internal representation.
+    my $input = shift;
+    return unless defined $input;
+    if (Encode::is_utf8 $input) {
+        return md5_hex(Encode::encode('utf8', $input));
+    }
     else {
         return md5_hex($input);
     }
@@ -318,165 +323,166 @@ sub _HashHTMLBlocks {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
 
-	# Hashify HTML blocks:
-	# We only want to do this for block-level HTML tags, such as headers,
-	# lists, and tables. That's because we still want to wrap <p>s around
-	# "paragraphs" that are wrapped in non-block-level tags, such as anchors,
-	# phrase emphasis, and spans. The list of tags we're looking for is
-	# hard-coded:
-	my $block_tags = qr{
-		  (?:
-			p         |  div     |  h[1-6]  |  blockquote  |  pre       |  table  |
-			dl        |  ol      |  ul      |  script      |  noscript  |  form   |
-			fieldset  |  iframe  |  math    |  ins         |  del
-		  )
-		}x;
+    # Hashify HTML blocks:
+    # We only want to do this for block-level HTML tags, such as headers,
+    # lists, and tables. That's because we still want to wrap <p>s around
+    # "paragraphs" that are wrapped in non-block-level tags, such as anchors,
+    # phrase emphasis, and spans. The list of tags we're looking for is
+    # hard-coded:
+    my $block_tags = qr{
+          (?:
+            p         |  div     |  h[1-6]  |  blockquote  |  pre       |  table  |
+            dl        |  ol      |  ul      |  script      |  noscript  |  form   |
+            fieldset  |  iframe  |  math    |  ins         |  del
+          )
+        }x;
 
-	my $tag_attrs = qr{
-						(?:				# Match one attr name/value pair
-							\s+				# There needs to be at least some whitespace
-											# before each attribute name.
-							[\w.:_-]+		# Attribute name
-							\s*=\s*
-							(?:
-								".+?"		# "Attribute value"
-							 |
-								'.+?'		# 'Attribute value'
-							)
-						)*				# Zero or more
-					}x;
+    my $tag_attrs = qr{
+                        (?:                 # Match one attr name/value pair
+                            \s+             # There needs to be at least some whitespace
+                                            # before each attribute name.
+                            [\w.:_-]+       # Attribute name
+                            \s*=\s*
+                            (?:
+                                ".+?"       # "Attribute value"
+                             |
+                                '.+?'       # 'Attribute value'
+                            )
+                        )*                  # Zero or more
+                    }x;
 
-	my $empty_tag = qr{< \w+ $tag_attrs \s* />}oxms;
-	my $open_tag =  qr{< $block_tags $tag_attrs \s* >}oxms;
-	my $close_tag = undef;	# let Text::Balanced handle this
+    my $empty_tag = qr{< \w+ $tag_attrs \s* />}oxms;
+    my $open_tag =  qr{< $block_tags $tag_attrs \s* >}oxms;
+    my $close_tag = undef;    # let Text::Balanced handle this
 
-	use Text::Balanced qw(gen_extract_tagged);
-	my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
+    use Text::Balanced qw(gen_extract_tagged);
+    my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
 
-	my @chunks;
-	while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
-		my $cur_line = $1;
-		if (defined $2) {
-			# current line could be start of code block
+    my @chunks;
+    # parse each line...
+    while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
+        my $cur_line = $1;
+        if (defined $2) {
+            # current line could be start of code block
 
-			my ($tag, $remainder) = $extract_block->($cur_line . $text);
-			if ($tag) {
-				my $key = _md5_utf8($tag);
-				$self->{_html_blocks}{$key} = $tag;
-				push @chunks, "\n\n" . $key . "\n\n";
-				$text = $remainder;
-			}
-			else {
-				# No tag match, so toss $cur_line into @chunks
-				push @chunks, $cur_line;
-			}
-		}
-		else {
-			# current line could NOT be start of code block
-			push @chunks, $cur_line;
-		}
+            my ($tag, $remainder) = $extract_block->($cur_line . $text);
+            if ($tag) {
+                my $key = _md5_utf8($tag);
+                $self->{_html_blocks}{$key} = $tag;
+                push @chunks, "\n\n" . $key . "\n\n";
+                $text = $remainder;
+            }
+            else {
+                # No tag match, so toss $cur_line into @chunks
+                push @chunks, $cur_line;
+            }
+        }
+        else {
+            # current line could NOT be start of code block
+            push @chunks, $cur_line;
+        }
 
-	}
-	push @chunks, $text; # Whatever is left.
+    }
+    push @chunks, $text; # Whatever is left.
 
-	$text = join '', @chunks;
+    $text = join '', @chunks;
 
-	# Special case just for <hr />. It was easier to make a special case than
-	# to make the other regex more complicated.	
-	$text = $self->_HashHR($text);
-	
+    # Special case just for <hr />. It was easier to make a special case than
+    # to make the other regex more complicated.
+    $text = $self->_HashHR($text);
+
     $text = $self->_HashHTMLComments($text);
 
     $text = $self->_HashPHPASPBlocks($text);
 
-	return $text;
+    return $text;
 }
 
 sub _HashHR {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
-    
-	$text =~ s{
-				(?:
-					(?<=\n\n)		# Starting after a blank line
-					|				# or
-					\A\n?			# the beginning of the doc
-				)
-				(						# save in $1
-					[ ]{0,$less_than_tab}
-					<(hr)				# start tag = $2
-					\b					# word break
-					([^<>])*?			# 
-					/?>					# the matching end tag
-					[ \t]*
-					(?=\n{2,}|\Z)		# followed by a blank line or end of document
-				)
-	}{
-		my $key = _md5_utf8($1);
-		$self->{_html_blocks}{$key} = $1;
-		"\n\n" . $key . "\n\n";
-	}egx;
-			
-	return $text;
+
+    $text =~ s{
+                (?:
+                    (?<=\n\n)        # Starting after a blank line
+                    |                # or
+                    \A\n?            # the beginning of the doc
+                )
+                (                        # save in $1
+                    [ ]{0,$less_than_tab}
+                    <(hr)                # start tag = $2
+                    \b                    # word break
+                    ([^<>])*?            #
+                    /?>                    # the matching end tag
+                    [ \t]*
+                    (?=\n{2,}|\Z)        # followed by a blank line or end of document
+                )
+    }{
+        my $key = _md5_utf8($1);
+        $self->{_html_blocks}{$key} = $1;
+        "\n\n" . $key . "\n\n";
+    }egx;
+
+    return $text;
 }
 
 sub _HashHTMLComments {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
-    
+
     # Special case for standalone HTML comments:
-	$text =~ s{
-				(?:
-					(?<=\n\n)		# Starting after a blank line
-					|				# or
-					\A\n?			# the beginning of the doc
-				)
-				(						# save in $1
-					[ ]{0,$less_than_tab}
-					(?s:
-						<!
-						(--.*?--\s*)+
-						>
-					)
-					[ \t]*
-					(?=\n{2,}|\Z)		# followed by a blank line or end of document
-				)
-	}{
-		my $key = _md5_utf8($1);
-		$self->{_html_blocks}{$key} = $1;
-		"\n\n" . $key . "\n\n";
-	}egx;
-	
-	return $text;
+    $text =~ s{
+                (?:
+                    (?<=\n\n)        # Starting after a blank line
+                    |                # or
+                    \A\n?            # the beginning of the doc
+                )
+                (                        # save in $1
+                    [ ]{0,$less_than_tab}
+                    (?s:
+                        <!
+                        (--.*?--\s*)+
+                        >
+                    )
+                    [ \t]*
+                    (?=\n{2,}|\Z)        # followed by a blank line or end of document
+                )
+    }{
+        my $key = _md5_utf8($1);
+        $self->{_html_blocks}{$key} = $1;
+        "\n\n" . $key . "\n\n";
+    }egx;
+
+    return $text;
 }
 
 sub _HashPHPASPBlocks {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
-    
+
     # PHP and ASP-style processor instructions (<?…?> and <%…%>)
-	$text =~ s{
-				(?:
-					(?<=\n\n)		# Starting after a blank line
-					|				# or
-					\A\n?			# the beginning of the doc
-				)
-				(						# save in $1
-					[ ]{0,$less_than_tab}
-					(?s:
-						<([?%])			# $2
-						.*?
-						\2>
-					)
-					[ \t]*
-					(?=\n{2,}|\Z)		# followed by a blank line or end of document
-				)
-			}{
-				my $key = _md5_utf8($1);
-				$self->{_html_blocks}{$key} = $1;
-				"\n\n" . $key . "\n\n";
-			}egx;
-	return $text;
+    $text =~ s{
+                (?:
+                    (?<=\n\n)        # Starting after a blank line
+                    |                # or
+                    \A\n?            # the beginning of the doc
+                )
+                (                        # save in $1
+                    [ ]{0,$less_than_tab}
+                    (?s:
+                        <([?%])            # $2
+                        .*?
+                        \2>
+                    )
+                    [ \t]*
+                    (?=\n{2,}|\Z)        # followed by a blank line or end of document
+                )
+            }{
+                my $key = _md5_utf8($1);
+                $self->{_html_blocks}{$key} = $1;
+                "\n\n" . $key . "\n\n";
+            }egx;
+    return $text;
 }
 
 sub _RunBlockGamut {
@@ -488,7 +494,7 @@ sub _RunBlockGamut {
 
     # Do headers first, as these populate cross-refs
     $text = $self->_DoHeaders($text);
-    
+
     # And now, protect our tables
     $text = $self->_HashHTMLBlocks($text) unless $self->{markdown_in_html_blocks};
 
@@ -523,7 +529,7 @@ sub _RunSpanGamut {
     my ($self, $text) = @_;
 
     $text = $self->_DoCodeSpans($text);
-	$text = $self->_EscapeSpecialCharsWithinTagAttributes($text);
+    $text = $self->_EscapeSpecialCharsWithinTagAttributes($text);
     $text = $self->_EscapeSpecialChars($text);
 
     # Process anchor and image tags. Images must come first,
@@ -583,20 +589,20 @@ sub _EscapeSpecialCharsWithinTagAttributes {
 # value; this is likely overkill, but it should prevent us from colliding
 # with the escape values by accident.
 #
-	my ($self, $text) = @_;
-	my $tokens ||= $self->_TokenizeHTML($text);
-	$text = '';   # rebuild $text from the tokens
+    my ($self, $text) = @_;
+    my $tokens ||= $self->_TokenizeHTML($text);
+    $text = '';   # rebuild $text from the tokens
 
-	foreach my $cur_token (@$tokens) {
-		if ($cur_token->[0] eq "tag") {
-			$cur_token->[1] =~  s! \\ !$g_escape_table{'\\'}!gox;
-			$cur_token->[1] =~  s{ (?<=.)</?code>(?=.)  }{$g_escape_table{'`'}}gox;
-			$cur_token->[1] =~  s! \* !$g_escape_table{'*'}!gox;
-			$cur_token->[1] =~  s! _  !$g_escape_table{'_'}!gox;
-		}
-		$text .= $cur_token->[1];
-	}
-	return $text;
+    foreach my $cur_token (@$tokens) {
+        if ($cur_token->[0] eq "tag") {
+            $cur_token->[1] =~  s! \\ !$g_escape_table{'\\'}!gox;
+            $cur_token->[1] =~  s{ (?<=.)</?code>(?=.)  }{$g_escape_table{'`'}}gox;
+            $cur_token->[1] =~  s! \* !$g_escape_table{'*'}!gox;
+            $cur_token->[1] =~  s! _  !$g_escape_table{'_'}!gox;
+        }
+        $text .= $cur_token->[1];
+    }
+    return $text;
 }
 
 sub _DoAnchors {
@@ -629,9 +635,9 @@ sub _DoAnchors {
         if ($link_id eq "") {
             $link_id = lc $link_text;   # for shortcut links like [this][].
         }
-        
+
         $link_id =~ s{[ ]*\n}{ }g; # turn embedded newlines into spaces
-        
+
         $self->_GenerateAnchor($whole_match, $link_text, $link_id);
     }xsge;
 
@@ -651,7 +657,7 @@ sub _DoAnchors {
               (['"])    # quote char = $5
               (.*?)     # Title = $6
               \5        # matching quote
-              [ \t]*	# ignore any spaces/tabs between closing quote and )
+              [ \t]*    # ignore any spaces/tabs between closing quote and )
             )?          # title is optional
           \)
         )
@@ -661,29 +667,29 @@ sub _DoAnchors {
         my $link_text   = $2;
         my $url         = $3;
         my $title       = $6;
-        
+
         $self->_GenerateAnchor($whole_match, $link_text, undef, $url, $title);
     }xsge;
-    
+
     #
-	# Last, handle reference-style shortcuts: [link text]
-	# These must come last in case you've also got [link test][1]
-	# or [link test](/foo)
-	#
-	$text =~ s{
-		(					# wrap whole match in $1
-		  \[
-		    ([^\[\]]+)		# link text = $2; can't contain '[' or ']'
-		  \]
-		)
-	}{
-		my $result;
-		my $whole_match = $1;
-		my $link_text   = $2;
-		(my $link_id = lc $2) =~ s{[ ]*\n}{ }g; # lower-case and turn embedded newlines into spaces
+    # Last, handle reference-style shortcuts: [link text]
+    # These must come last in case you've also got [link test][1]
+    # or [link test](/foo)
+    #
+    $text =~ s{
+        (                    # wrap whole match in $1
+          \[
+            ([^\[\]]+)        # link text = $2; can't contain '[' or ']'
+          \]
+        )
+    }{
+        my $result;
+        my $whole_match = $1;
+        my $link_text   = $2;
+        (my $link_id = lc $2) =~ s{[ ]*\n}{ }g; # lower-case and turn embedded newlines into spaces
 
         $self->_GenerateAnchor($whole_match, $link_text, $link_id);
-	}xsge;
+    }xsge;
 
     return $text;
 }
@@ -691,36 +697,36 @@ sub _DoAnchors {
 sub _GenerateAnchor {
     # FIXME - Fugly, change to named params?
     my ($self, $whole_match, $link_text, $link_id, $url, $title, $attributes) = @_;
-    
+
     my $result;
-    
+
     $attributes = '' unless defined $attributes;
-    
+
     if ( !defined $url && defined $self->{_urls}{$link_id}) {
         $url = $self->{_urls}{$link_id};
     }
-    
+
     if (!defined $url) {
         return $whole_match;
     }
-        
+
     $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
     $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
-    $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
-        
+    $url =~ s{^<(.*)>$}{$1};                    # Remove <>'s surrounding URL, if present
+
     $result = qq{<a href="$url"};
-        
+
     if ( !defined $title && defined $link_id && defined $self->{_titles}{$link_id} ) {
         $title = $self->{_titles}{$link_id};
     }
-    
+
     if ( defined $title ) {
         $title =~ s/"/&quot;/g;
         $title =~ s! \* !$g_escape_table{'*'}!gox;
         $title =~ s!  _ !$g_escape_table{'_'}!gox;
         $result .=  qq{ title="$title"};
     }
-    
+
     $result .= "$attributes>$link_text</a>";
 
     return $result;
@@ -754,11 +760,11 @@ sub _DoImages {
         my $whole_match = $1;
         my $alt_text    = $2;
         my $link_id     = lc $3;
-        
+
         if ($link_id eq '') {
             $link_id = lc $alt_text;     # for shortcut links like ![this][].
         }
-        
+
         $self->_GenerateImage($whole_match, $alt_text, $link_id);
     }xsge;
 
@@ -802,29 +808,29 @@ sub _DoImages {
 sub _GenerateImage {
     # FIXME - Fugly, change to named params?
     my ($self, $whole_match, $alt_text, $link_id, $url, $title, $attributes) = @_;
-    
+
     my $result;
-    
+
     $attributes = '' unless defined $attributes;
-    
+
     $alt_text ||= '';
     $alt_text =~ s/"/&quot;/g;
     # FIXME - how about >
-    
+
     if ( !defined $url && defined $self->{_urls}{$link_id}) {
         $url = $self->{_urls}{$link_id};
     }
-    
+
     # If there's no such link ID, leave intact:
-    return $whole_match unless defined $url; 
-    
+    return $whole_match unless defined $url;
+
     $url =~ s! \* !$g_escape_table{'*'}!ogx;     # We've got to encode these to avoid
     $url =~ s!  _ !$g_escape_table{'_'}!ogx;     # conflicting with italics/bold.
-    $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
-    
+    $url =~ s{^<(.*)>$}{$1};                    # Remove <>'s surrounding URL, if present
+
     if (!defined $title && length $link_id && defined $self->{_titles}{$link_id} && length $self->{_titles}{$link_id}) {
         $title = $self->{_titles}{$link_id};
-    }    
+    }
 
     $result = qq{<img src="$url" alt="$alt_text"};
     if (defined $title && length $title) {
@@ -840,11 +846,11 @@ sub _GenerateImage {
 
 sub _DoHeaders {
     my ($self, $text) = @_;
-    
+
     # Setext-style headers:
     #     Header 1
     #     ========
-    #  
+    #
     #     Header 2
     #     --------
     #
@@ -1124,78 +1130,78 @@ sub _ProcessListItemsUL {
 sub _DoCodeBlocks {
 #
 #   Process Markdown `<pre><code>` blocks.
-#   
+#
 
     my ($self, $text) = @_;
 
- 	$text =~ s{
-		(?:\n\n|\A)
-		(	            # $1 = the code block -- one or more lines, starting with a space/tab
-		  (?:
-		    (?:[ ]{$self->{tab_width}} | \t)  # Lines must start with a tab or a tab-width of spaces
-		    .*\n+
-		  )+
-		)
-		((?=^[ ]{0,$self->{tab_width}}\S)|\Z)	# Lookahead for non-space at line-start, or end of doc
-	}{
-    	my $codeblock = $1;
-    	my $result; # return value
+     $text =~ s{
+        (?:\n\n|\A)
+        (                # $1 = the code block -- one or more lines, starting with a space/tab
+          (?:
+            (?:[ ]{$self->{tab_width}} | \t)  # Lines must start with a tab or a tab-width of spaces
+            .*\n+
+          )+
+        )
+        ((?=^[ ]{0,$self->{tab_width}}\S)|\Z)    # Lookahead for non-space at line-start, or end of doc
+    }{
+        my $codeblock = $1;
+        my $result; # return value
 
-    	$codeblock = $self->_EncodeCode($self->_Outdent($codeblock));
-    	$codeblock = $self->_Detab($codeblock);
-    	$codeblock =~ s/\A\n+//; # trim leading newlines
-    	$codeblock =~ s/\n+\z//; # trim trailing newlines
+        $codeblock = $self->_EncodeCode($self->_Outdent($codeblock));
+        $codeblock = $self->_Detab($codeblock);
+        $codeblock =~ s/\A\n+//; # trim leading newlines
+        $codeblock =~ s/\n+\z//; # trim trailing newlines
 
-    	$result = "\n\n<pre><code>" . $codeblock . "\n</code></pre>\n\n";
+        $result = "\n\n<pre><code>" . $codeblock . "\n</code></pre>\n\n";
 
-    	$result;
-	}egmx;
+        $result;
+    }egmx;
 
-	return $text;
+    return $text;
 }
 
 sub _DoCodeSpans {
 #
 #   *   Backtick quotes are used for <code></code> spans.
-# 
+#
 #   *   You can use multiple backticks as the delimiters if you want to
 #       include literal backticks in the code span. So, this input:
-#     
+#
 #         Just type ``foo `bar` baz`` at the prompt.
-#     
+#
 #       Will translate to:
-#     
+#
 #         <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
-#     
+#
 #       There's no arbitrary limit to the number of backticks you
 #       can use as delimters. If you need three consecutive backticks
 #       in your code, use four for delimiters, etc.
 #
 #   *   You can use spaces to get literal backticks at the edges:
-#     
+#
 #         ... type `` `bar` `` ...
-#     
+#
 #       Turns to:
-#     
+#
 #         ... type <code>`bar`</code> ...
 #
 
     my ($self, $text) = @_;
 
-	$text =~ s@
-			(?<!\\)		# Character before opening ` can't be a backslash
-			(`+)		# $1 = Opening run of `
-			(.+?)		# $2 = The code block
-			(?<!`)
-			\1			# Matching closer
-			(?!`)
-		@
- 			my $c = "$2";
- 			$c =~ s/^[ \t]*//g; # leading whitespace
- 			$c =~ s/[ \t]*$//g; # trailing whitespace
- 			$c = $self->_EncodeCode($c);
-			"<code>$c</code>";
-		@egsx;
+    $text =~ s@
+            (?<!\\)        # Character before opening ` can't be a backslash
+            (`+)        # $1 = Opening run of `
+            (.+?)        # $2 = The code block
+            (?<!`)
+            \1            # Matching closer
+            (?!`)
+        @
+             my $c = "$2";
+             $c =~ s/^[ \t]*//g; # leading whitespace
+             $c =~ s/[ \t]*$//g; # trailing whitespace
+             $c = $self->_EncodeCode($c);
+            "<code>$c</code>";
+        @egsx;
 
     return $text;
 }
@@ -1208,7 +1214,7 @@ sub _EncodeCode {
 #
     my $self = shift;
     local $_ = shift;
-    
+
     # Encode all ampersands; HTML entities are not
     # entities within a Markdown code span.
     s/&/&amp;/g;
@@ -1218,7 +1224,7 @@ sub _EncodeCode {
     {
         no warnings 'once';
         if (defined($blosxom::version)) {
-            s/\$/&#036;/g;  
+            s/\$/&#036;/g;
         }
     }
 
@@ -1349,7 +1355,7 @@ sub _EncodeAmpsAndAngles {
 
     # Encode naked <'s
     $text =~ s{<(?![a-z/?\$!])}{&lt;}gi;
-    
+
     # And >'s - added by Fletcher Penney
 #   $text =~ s{>(?![a-z/?\$!])}{&gt;}gi;
 #   Causes problems...
@@ -1451,7 +1457,7 @@ sub _EncodeEmailAddress {
         if ( $char eq '@' ) {
             # this *must* be encoded. I insist.
             $char = $encode[int rand 1]->($char);
-        } 
+        }
         elsif ( $char ne ':' ) {
             # leave ':' alone (to spot mailto: later)
             my $r = rand;
@@ -1541,10 +1547,10 @@ sub _Detab {
     my ($self, $text) = @_;
 
     # FIXME - Better anchor/regex would be quicker.
-    
+
     # Original:
     #$text =~ s{(.*?)\t}{$1.(' ' x ($self->{tab_width} - length($1) % $self->{tab_width}))}ge;
-    
+
     # Much swifter, but pretty hateful:
     do {} while ($text =~ s{^(.*?)\t}{$1.(' ' x ($self->{tab_width} - length($1) % $self->{tab_width}))}mge);
     return $text;
@@ -1553,9 +1559,9 @@ sub _Detab {
 sub _ConvertCopyright {
     my ($self, $text) = @_;
     # Convert to an XML compatible form of copyright symbol
-    
+
     $text =~ s/&copy;/&#xA9;/gi;
-    
+
     return $text;
 }
 
@@ -1573,7 +1579,7 @@ Those that I have found are listed below:
 
 =item C - <http://www.pell.portland.or.us/~orc/Code/discount>
 
-Discount - Original Markdown, but in C. Fastest implementation available, and passes MDTest. 
+Discount - Original Markdown, but in C. Fastest implementation available, and passes MDTest.
 Adds it's own set of custom features.
 
 =item python - <http://www.freewisdom.org/projects/python-markdown/>
@@ -1586,7 +1592,7 @@ One of the nicest implementations out there. Builds a parse tree internally so v
 
 =item php - <http://michelf.com/projects/php-markdown/>
 
-A direct port of Markdown.pl, also has a separately maintained 'extra' version, 
+A direct port of Markdown.pl, also has a separately maintained 'extra' version,
 which adds a number of features that were borrowed by MultiMarkdown.
 
 =item lua - <http://www.frykholm.se/files/markdown.lua>
@@ -1608,7 +1614,7 @@ Direct(ish) port of Markdown.pl to JavaScript
 To file bug reports or feature requests please send email to:
 
     bug-Text-Markdown@rt.cpan.org
-    
+
 Please include with your report: (1) the example input; (2) the output
 you expected; (3) the output Markdown actually produced.
 
@@ -1629,34 +1635,39 @@ See the Changes file for detailed release notes for this version.
 
     CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
     Riedel) originally by Darren Kulp (http://kulp.ch/)
-    
+
     This module is maintained by: Tomas Doran http://www.bobtfish.net/
 
 =head1 THIS DISTRIBUTION
 
-Please note that this distribution is a fork of John Gruber's original Markdown project, 
+Please note that this distribution is a fork of John Gruber's original Markdown project,
 and it *is not* in any way blessed by him.
 
-Whilst this code aims to be compatible with the original Markdown.pl (and incorporates 
-and passes the Markdown test suite) whilst fixing a number of bugs in the original - 
+Whilst this code aims to be compatible with the original Markdown.pl (and incorporates
+and passes the Markdown test suite) whilst fixing a number of bugs in the original -
 there may be differences between the behaviour of this module and Markdown.pl. If you find
-any differences where you believe Text::Markdown behaves contrary to the Markdown spec, 
+any differences where you believe Text::Markdown behaves contrary to the Markdown spec,
 please report them as bugs.
 
 Text::Markdown *does not* extend the markdown dialect in any way from that which is documented at
 daringfireball. If you want additional features, you should look at L<Text::MultiMarkdown>.
 
+=head1 SOURCE CODE
+
+You can find the source code repository for L<Text::Markdown> and L<Text::MultiMarkdown>
+on GitHub at <http://github.com/bobtfish/text-markdown>.
+
 =head1 COPYRIGHT AND LICENSE
 
-Original Code Copyright (c) 2003-2004 John Gruber   
-<http://daringfireball.net/>   
+Original Code Copyright (c) 2003-2004 John Gruber
+<http://daringfireball.net/>
 All rights reserved.
 
-MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney   
-<http://fletcher.freeshell.org/>   
+MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney
+<http://fletcher.freeshell.org/>
 All rights reserved.
 
-Text::MultiMarkdown changes Copyright (c) 2006-2008 Darren Kulp
+Text::MultiMarkdown changes Copyright (c) 2006-2009 Darren Kulp
 <http://kulp.ch> and Tomas Doran <http://www.bobtfish.net>
 
 Redistribution and use in source and binary forms, with or without
