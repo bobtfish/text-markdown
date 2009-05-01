@@ -16,7 +16,7 @@ requires        'Encode'          => undef;
 build_requires  'Test::More'      => '0.42';
 build_requires  'Test::Exception' => undef;
 build_requires  'List::MoreUtils' => undef;
-build_requires  'File::Slurp'     => undef;
+build_requires  'File::Slurp'     => '9999.08';
 build_requires  'FindBin'         => undef;
 
 # Scripts I install
