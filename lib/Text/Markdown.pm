@@ -347,6 +347,8 @@ sub _HashHTMLBlocks {
                                 ".+?"       # "Attribute value"
                              |
                                 '.+?'       # 'Attribute value'
+                             |
+                                [^\s]+?      # AttributeValue (HTML5)
                             )
                         )*                  # Zero or more
                     }x;
