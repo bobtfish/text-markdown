@@ -55,6 +55,14 @@ HTML tags (like <div> and <table> as well).
 This module implements the 'original' Markdown markdown syntax from:
 
     http://daringfireball.net/projects/markdown/
+    
+Note that L<Text::Markdown> ensures that the output always ends with
+B<one> newline. The fact that multiple newlines are collapsed into one
+makes sense, because this is the behavior of HTML towards whispace. The
+fact that there's always a newline at the end makes sense again, given
+that the output will always be nested in a B<block>-level element (as
+opposed to an inline element). That block element can be a C<< <p> >>
+(most often), or a C<< <table> C>>.
 
 =head1 OPTIONS
 
@@ -100,8 +108,6 @@ numbering.  This will let you pick up where you left off by writing:
 (Note that in the above, quux will be numbered 4.)
 
 =back
-
-=head1 METHODS
 
 =cut
 
