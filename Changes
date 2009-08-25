@@ -208,6 +208,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 1.0.25 2009-08-25T09:31:30
         - Remove MultiMarkdown from the Text::Markdown distribution
         - Change repository and bugtracker metadata to github.
+        - Update File::Slurp dependency, fixing RT#43888.
 
 1.0.26 UNRELEASED
         - Minor POD changes (typos, wrapping)
