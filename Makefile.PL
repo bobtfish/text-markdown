@@ -6,7 +6,9 @@ name            'Text-Markdown';
 author          'Tomas Doran <bobtfish@bobtfish.net>';
 license         'bsd';
 all_from        'lib/Text/Markdown.pm';
-resources repository => 'http://svn.kulp.ch/cpan/text_multimarkdown';
+
+resources bugtracker => 'http://github.com/bobtfish/text-markdown/issues';
+resources repository => 'http://github.com/bobtfish/text-markdown/';
 
 # Specific dependencies
 perl_version    '5.008';
@@ -21,6 +23,5 @@ build_requires  'FindBin'         => undef;
 
 # Scripts I install
 prompt_script('script/Markdown.pl');
-prompt_script('script/MultiMarkdown.pl');
 
 WriteAll;
