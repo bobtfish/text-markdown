@@ -9,4 +9,3 @@ my $m     = Text::Markdown->new;
 my $html1 = $m->markdown($str);
 like( $html1, qr/^$str/ );
 
-warn $html1;
