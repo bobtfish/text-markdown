@@ -213,4 +213,5 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
 1.0.26 UNRELEASED
         - Minor POD changes (typos, wrapping)
         - Added note about and test for output always ending in exactly one newline
+        - Fix RT#48943 + tests (genehack)
 
