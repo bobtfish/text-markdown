@@ -196,7 +196,7 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Add SVN repository to Makefile.PL
         - Remove META.yml from source control so it is regenerated 
           automatically.
-          
+
 1.0.23 2008-11-02T18:24:30
         - Ship a release with the correct contents so that the tests pass.
 
@@ -204,4 +204,13 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Add trust_list_start_value patch from Ricardo Signes (RT#40814)
           to enable <li value='X'> output for list numbering.
           This feature is disabled by default.
+
+1.0.25 2009-08-25T09:31:30
+        - Remove MultiMarkdown from the Text::Markdown distribution
+        - Change repository and bugtracker metadata to github.
+        - Update File::Slurp dependency, fixing RT#43888.
+
+1.0.26 UNRELEASED
+        - Minor POD changes (typos, wrapping)
+        - Added note about and test for output always ending in exactly one newline
 

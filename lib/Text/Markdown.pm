@@ -9,7 +9,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.0.24';
+our $VERSION   = '1.0.25';
 our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
@@ -56,12 +56,22 @@ This module implements the 'original' Markdown markdown syntax from:
 
     http://daringfireball.net/projects/markdown/
 
+Note that L<Text::Markdown> ensures that the output always ends with
+B<one> newline. The fact that multiple newlines are collapsed into one
+makes sense, because this is the behavior of HTML towards whispace. The
+fact that there's always a newline at the end makes sense again, given
+that the output will always be nested in a B<block>-level element (as
+opposed to an inline element). That block element can be a C<< <p> >>
+(most often), or a C<< <table> >>.
+
 =head1 OPTIONS
 
-Text::Markdown supports a number of options to its processor which control the behaviour of the output document.
+Text::Markdown supports a number of options to its processor which control
+the behaviour of the output document.
 
-These options can be supplied to the constructor, or in a hash within individual calls to the markdown() method.
-See the synopsis for examples of both styles.
+These options can be supplied to the constructor, or in a hash within
+individual calls to the markdown() method. See the SYNOPSIS for examples
+of both styles.
 
 The options for the processor are:
 
@@ -100,8 +110,6 @@ numbering.  This will let you pick up where you left off by writing:
 (Note that in the above, quux will be numbered 4.)
 
 =back
-
-=head1 METHODS
 
 =cut
 
@@ -234,10 +242,12 @@ sub _Markdown {
 
 =head2 urls
 
-Returns a reference to a hash with the key being the markdown reference and the value being the URL.
+Returns a reference to a hash with the key being the markdown reference
+and the value being the URL.
 
-Useful for building scripts which preprocess a list of links before the main content. See t/05options.t
-for an example of this hashref being passed back into the markdown method to create links.
+Useful for building scripts which preprocess a list of links before the
+main content. See t/05options.t for an example of this hashref being
+passed back into the markdown method to create links.
 
 =cut
 
@@ -323,7 +333,7 @@ sub _HashHTMLBlocks {
     my ($self, $text) = @_;
     my $less_than_tab = $self->{tab_width} - 1;
 
-    # Hashify HTML blocks:
+    # Hashify HTML blocks (protect from further interpretation by encoding to an md5):
     # We only want to do this for block-level HTML tags, such as headers,
     # lists, and tables. That's because we still want to wrap <p>s around
     # "paragraphs" that are wrapped in non-block-level tags, such as anchors,
@@ -709,8 +719,8 @@ sub _GenerateAnchor {
         return $whole_match;
     }
 
-    $url =~ s! \* !$g_escape_table{'*'}!gox;     # We've got to encode these to avoid
-    $url =~ s!  _ !$g_escape_table{'_'}!gox;     # conflicting with italics/bold.
+    $url =~ s! \* !$g_escape_table{'*'}!gox;    # We've got to encode these to avoid
+    $url =~ s!  _ !$g_escape_table{'_'}!gox;    # conflicting with italics/bold.
     $url =~ s{^<(.*)>$}{$1};                    # Remove <>'s surrounding URL, if present
 
     $result = qq{<a href="$url"};
@@ -1579,7 +1589,7 @@ Those that I have found are listed below:
 =item C - <http://www.pell.portland.or.us/~orc/Code/discount>
 
 Discount - Original Markdown, but in C. Fastest implementation available, and passes MDTest.
-Adds it's own set of custom features.
+Adds its own set of custom features.
 
 =item python - <http://www.freewisdom.org/projects/python-markdown/>
 

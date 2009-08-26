@@ -1,8 +1,0 @@
-Test bare block & <  > <!-- Test & < sd > --> Test
-
-<p>Test HTML block & < > <!-- Test & < sd > --> Test</p>
-
-A larger bare block <!-- With a multi-line
-HTML comment inside it Containing & and < -->
-
-footer
