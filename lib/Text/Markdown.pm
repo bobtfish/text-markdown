@@ -371,7 +371,7 @@ sub _HashHTMLBlocks {
     my $extract_block = gen_extract_tagged($open_tag, $close_tag, undef, { ignore => [$empty_tag] });
 
     my @chunks;
-    # parse each line...
+    # parse each line, looking for block-level HTML tags
     while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
         my $cur_line = $1;
         if (defined $2) {
@@ -395,7 +395,7 @@ sub _HashHTMLBlocks {
         }
 
     }
-    push @chunks, $text; # Whatever is left.
+    push @chunks, $text;  # whatever is left
 
     $text = join '', @chunks;
 
@@ -1138,7 +1138,11 @@ sub _ProcessListItemsUL {
 
 sub _DoCodeBlocks {
 #
-#   Process Markdown `<pre><code>` blocks.
+# Process Markdown code blocks (indented with 4 spaces or 1 tab):
+# * outdent the spaces/tab
+# * encode <, >, & into HTML entities
+# * escape Markdown special characters into MD5 hashes
+# * trim leading and trailing newlines
 #
 
     my ($self, $text) = @_;
@@ -1147,19 +1151,19 @@ sub _DoCodeBlocks {
         (?:\n\n|\A)
         (                # $1 = the code block -- one or more lines, starting with a space/tab
           (?:
-            (?:[ ]{$self->{tab_width}} | \t)  # Lines must start with a tab or a tab-width of spaces
+            (?:[ ]{$self->{tab_width}} | \t)   # Lines must start with a tab or a tab-width of spaces
             .*\n+
           )+
         )
         ((?=^[ ]{0,$self->{tab_width}}\S)|\Z)    # Lookahead for non-space at line-start, or end of doc
     }{
         my $codeblock = $1;
-        my $result; # return value
+        my $result;  # return value
 
         $codeblock = $self->_EncodeCode($self->_Outdent($codeblock));
         $codeblock = $self->_Detab($codeblock);
-        $codeblock =~ s/\A\n+//; # trim leading newlines
-        $codeblock =~ s/\n+\z//; # trim trailing newlines
+        $codeblock =~ s/\A\n+//;  # trim leading newlines
+        $codeblock =~ s/\n+\z//;  # trim trailing newlines
 
         $result = "\n\n<pre><code>" . $codeblock . "\n</code></pre>\n\n";
 
