@@ -399,14 +399,6 @@ sub _HashHTMLBlocks {
 
     $text = join '', @chunks;
 
-    # Special case just for <hr />. It was easier to make a special case than
-    # to make the other regex more complicated.
-    $text = $self->_HashHR($text);
-
-    $text = $self->_HashHTMLComments($text);
-
-    $text = $self->_HashPHPASPBlocks($text);
-
     return $text;
 }
 
@@ -524,6 +516,14 @@ sub _RunBlockGamut {
     # we're escaping the markup we've just created, so that we don't wrap
     # <p> tags around block-level tags.
     $text = $self->_HashHTMLBlocks($text);
+
+    # Special case just for <hr />. It was easier to make a special case than
+    # to make the other regex more complicated.
+    $text = $self->_HashHR($text);
+
+    $text = $self->_HashHTMLComments($text);
+
+    $text = $self->_HashPHPASPBlocks($text);
 
     $text = $self->_FormParagraphs($text);
 
