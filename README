@@ -38,8 +38,30 @@ SYNTAX
 
         http://daringfireball.net/projects/markdown/
 
+    Note that Text::Markdown ensures that the output always ends with
+    *one* newline. The fact that multiple newlines are collapsed into one
+    makes sense, because this is the behavior of HTML towards whispace. The
+    fact that there's always a newline at the end makes sense again, given
+    that the output will always be nested in a block-level element (as
+    opposed to an inline element). That block element can be a <p> (most
+    often), or a <table>.
+    
+    Markdown is *not* interpreted in HTML block-level elements, in order for
+    chunks of pasted HTML (e.g. JavaScript widgets, web counters) to not be
+    magically (mis)interpreted. For selective processing of Markdown in some,
+    but not other, HTML block elements, add a "markdown" attribute to the block
+    element and set its value to "1", "on" or "yes":
+    
+        <div markdown="1" class="navbar">
+        * Home
+        * About
+        * Contact
+        <div>
+    
+    The extra "markdown" attribute will be stripped when generating the output.
+    
 OPTIONS
-    Text::Markdown supports a number of options to it's processor which
+    Text::Markdown supports a number of options to its processor which
     control the behaviour of the output document.
 
     These options can be supplied to the constructor, on in a hash with the
@@ -55,11 +77,6 @@ OPTIONS
     tab_width
         Controls indent width in the generated markup, defaults to 4
 
-    markdown_in_html_blocks
-        Controls if Markdown is processed when inside HTML blocks. Defaults
-        to 0.
-
-METHODS
 METHODS
   new
     A simple constructor, see the SYNTAX and OPTIONS sections for more
@@ -124,15 +141,17 @@ VERSION HISTORY
 AUTHOR
         John Gruber
         http://daringfireball.net/
-
+    
         PHP port and other contributions by Michel Fortin
         http://michelf.com/
-
+    
         MultiMarkdown changes by Fletcher Penney
         http://fletcher.freeshell.org/
-
+    
         CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
         Riedel) originally by Darren Kulp (http://kulp.ch/)
+        
+        Support for markdown="1" by Dan Dascalescu (http://dandascalescu.com)
     
         This module is maintained by: Tomas Doran http://www.bobtfish.net/
 
