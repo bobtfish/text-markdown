@@ -1,36 +1,177 @@
-This file documents the revision history for Perl extension Text::MultiMarkdown.
+This file documents the revision history for Perl extension Text::Markdown.
 
-1.0.0   2006-08-22T00:00:00
-        - first release
+1.0.26 UNRELEASED
+        - Minor POD changes (typos, wrapping)
+        - Added note about and test for output always ending in exactly one newline (dandv)
+        - Fix RT#48943 + tests (genehack)
+        + Support for optionally interpreting markdown in HTML block elements
+          using the markdown="1" attribute (GitHub issue #1; dandv)
 
-1.0.1   2006-10-20T00:00:00
-        - include patch from Uwe Voelker to allow setting of options in
-          markdown(); also added a test case from Uwe. Thanks, Uwe!
-          Also updated changelog references in POD somewhat.
+1.0.25 2009-08-25T09:31:30
+        - Remove MultiMarkdown from the Text::Markdown distribution
+        - Change repository and bugtracker metadata to github.
+        - Update File::Slurp dependency, fixing RT#43888.
 
-1.0.2   2007-11-24T14:00:00
-        - move to Module::Install and clean various things up, mostly to make
-          CPANTS happy.
+1.0.24 2008-11-16T14:33:30
+        - Add trust_list_start_value patch from Ricardo Signes (RT#40814)
+          to enable <li value='X'> output for list numbering.
+          This feature is disabled by default.
 
-1.0.3   2007-11-24T20:22:00
-        - way to keep me accountable, CPANTESTERS! Maybe I shouldn't have
-          Test::Pod::Coverage enabled unless it actually checks out. Added some
-          fairly useless stubbed METHODS to POD and moved POD around a bit.
+1.0.23 2008-11-02T18:24:30
+        - Ship a release with the correct contents so that the tests pass.
+
+1.0.22 2008-10-23T18:24:44
+        - RT#37909 - Fix + in email addresses.
+        - RT#40303 - Fix use in Mason by adding "use re 'eval'" to both files.
+        - Add SVN repository to Makefile.PL
+        - Remove META.yml from source control so it is regenerated 
+          automatically.
+
+1.0.21 2008-07-24T08:33:00
+        - Fix hard tabs in Changelog
+        - Add unit test for core dumps issue from RT#36203
+        - Fix POD spelling.
+        - Fix warning from RT#34856.
+        - Add test for another tab width issue (related to <hr> generation)
+          from RT#37769. Fix this issue.
+        - More test additions and more splitting the test suites into MDTest 
+          modules.
+
+1.0.20 2008-07-11T23:30:00
+        - Update README.txt
+        - Allow scripts to be used on multiple input files at once (processing 
+          in command line order)
+        - Update footnote behavior of Text::MutltiMarkdown to be consistent 
+          with the latest version of MultiMarkdown
+        - Added tests for the new footnote functionality.
+        - Added tests for all the MDTest corner cases brought up on the list. 
+          Noted why / how I differ from original Markdown.
+        - Moved all the document tests to MDTest format. I have made MDTest 
+          test suites for Text::Markdown and Text::MultiMarkdown, containing 
+          **only** the bug fixes and behavior changes I've made, I've imported 
+          the Markdown test suite from MDTest1.1, and the MultiMarkdown test
+          suite.
+        - RT#36537 doc patch to add POD to the scripts from Debian's Gunnar 
+          Wolf.
+        - Mutilate the list processing somewhat to reduce the compilation
+          of recursive regexes, and so stop perl (<5.10) crapping itself
+          on lots of input. This isn't the full fix - really shouldn't be
+          using recursive regexes at all. RT#37297
+
+1.0.19 2008-04-22T18:34:00
+        - Remove auto_install from Makefile.PL, this is a deprecated feature 
+          and it shouldn't be being used at all.
+
+1.0.18 2008-04-20T18:54:50
+        - Clean up local stuff for settings.
+        - Do a little cleanup of intialisation (more needed)
+        - Remove copy pasted regexes from Text::MultiMarkdown
+        - Fix bug with line breaks in links - http://bugs.debian.org/459885,
+          thanks to patches and test input / output provided by Adeodato Simó.
+          (See t/37anchormultilinebugs.t)
+        - Incorperated MDTest1.1's tests, and made most of the Text-Markdown
+          and Text-MultiMarkdown tests in MDTest format.
+        - Add and document an accessor for the parsed markdown URLs.
+        - Fix html4tags option in Markdown.pl and MultiMarkdown.pl
+
+1.0.17 2008-03-17T01:54:00  
+        - Add Markdown.pl and MultiMarkdown.pl, which work the same way as the 
+          original Markdown.pl. These scripts *are not* installed by default, 
+          but you will be prompted to install them when you run Makefile.PL
+           
+        - Make _DeTab significantly quicker. Text::Balanced is still the main
+          performance sore point however. :(
+        
+        - Re-organise the module code so that Text::Markdown is a standalone 
+          module which does not require Text::MultiMarkdown.     
+          Text::MultiMarkdown now inherits from Text::Markdown and adds the
+          additional MultiMarkdown functionality. This is a *large* change to
+          the module's internals, but is much more in the spirit of the 
+          original Markdown project (and should silence most complaints about 
+          how the code works, and possible even stop John Gruber hating my 
+          guts).
           
-1.0.4   2008-01-02T02:03:50
-        - Refactor so that the processor instance has the same set of        
-          persistent options as on the ->markdown method itself.
-        - Change all functions to be instance methods, moved a chunk of the 
-          global data to the instance. The rest will follow shortly.
-        - The test suite now tests a reasonable set of the Markdown and 
-          MultiMarkdown syntaxes.
-        - All known options and metadata keys have been documented.
+          If you were using Text::Markdown previously, but relying on an 
+          implicit MultiMarkdown feature, this *could be a breaking change*.
         
-1.0.5   2008-01-04T18:07:57
-        - Add Markdown and MultiMarkdown test suites.
-        - Fix a big bug introduced in 1.0.4 in citations
-        - Fix footnotes (and other small things) to match the test suite
+          Detailed description of any possible user visible changes below:
+          
+          - Text::Markdown will no longer supports the additional attribute 
+            specification for images and links feature, which was not in 
+            original Markdown, but were previously supported after
+            the code merge of Text::Markdown and Text::MultiMarkdown.
+ 
+            If you are relying on this features, it is recommended that you 
+            use Text::MultiMarkdown (configured as you prefer), as this is 
+            not a supported feature in the original Markdown.
+ 
+          - Text::MultiMarkdown has changed the order of attributes in image 
+            tags, the id attribute is moved from the first to the last 
+            attribute (barring user supplied attributes). An example of the 
+            expected change is included below:
+ 
+            Old output:  <img id="image" src="http://path.to/image" alt="image" title="Image title" width="40px" height="400px" />
+ 
+            New output: <img src="http://path.to/image" alt="image" title="Image title" id="image" width="40px" height="400px" />
+          
+            This is due to the code re-organisation, moving the id attribute 
+            around shouldn't affect anything that isn't relying on the 
+            attribute ordering (which is meant to be unimportant in HTML), and 
+            allows for simplification of the unified code.
+
+1.0.16 2008-02-25T14:24:00
+        - Fix bugs with tab_width in constructor / as an option.
+        - Fix bugs with tab width in pre/code blocks.
+
+1.0.15 2008-02-23T11:13:07
+        - Start using ShipIt to package the distribution.
+
+1.0.14 2008-02-21T22:41:33
+        - Fix a bug in the packaging of the last version.
+        - Add links to other implementations and some notes about them.
+        - Add a (failing) unit test for some unexpected behavior reported on 
+          the list.
+
+1.0.13 2008-02-19T23:54:33
+        - Due to the UFT8 support this module no longer works on perl <
+          5.8, note this in the Makefile.PL and modules.
+        - I managed to ship a module without Makefile.PL, WTF? Really
+          need to start using ShipIt.
+   
+1.0.12 2008-02-18T22:00:00
+        - Text::Markdown - borgborgborgborgborg.
+        - Added additional POD documentation.
+        - Cleaned up some tests, and some additional test cases.
+        - Options to turn off all the extra features introduced in 
+          MultiMarkdown.
+
+1.0.11 2008-01-24T00:12:00
+        - Fix syntax error in one of the tests. Note to self - just fixing 
+          that warning in the test case, then shipping without retesting, NOT 
+          SMART!
+          
+1.0.10 2008-01-23T15:40:00
+        - Fix bug with links processing in HTML blocks.
         
+1.0.9  2008-01-22T20:28:00
+        - Ship non-broken dist at CPAN (oops, rushing!)
+
+1.0.8  2008-01-22T19:20:00
+        - Do not encode amps or angle brackets in HTML comments + test case. 
+        - Do not emit title attribute in <img> tags unless we have contents 
+          for it. This was a 'feature' of original Markdown where I've decided 
+          to go with what php-markdown does (tests updated).
+        - Added php-markdown tests (most/all of the regular tests pass except 
+          the email obfu one).
+        - Added php-markdown extra tests (all fail).
+        - Added python markdown tests (mostly pass, but marked broken).
+        - Add a way of stopping inline HTML blocks from suppressing markdown    
+          processing. Feature request from #catalyst-dev 
+
+
+1.0.7   2008-01-07T16:31:00
+        - Encode isn't in core in all perls, add it to Makefile.PL
+
 1.0.6   2008-01-06T13:36:00
         - Merge latest Markdown test suite I can find, and make it all pass, 
           pulling in code from Markdown 1.0.2b8. Things fixed:
@@ -46,174 +187,33 @@ This file documents the revision history for Perl extension Text::MultiMarkdown.
         - Fix unicode issues from CPAN.org's RT#27482
         - Remove call to srand, it's not smart to do this more than once.
         
-1.0.7   2008-01-07T16:31:00
-        - Encode isn't in core in all perls, add it to Makefile.PL
-
-1.0.8  2008-01-22T19:20:00
-        - Do not encode amps or angle brackets in HTML comments + test case. 
-        - Do not emit title attribute in <img> tags unless we have contents 
-          for it. This was a 'feature' of original Markdown where I've decided 
-          to go with what php-markdown does (tests updated).
-        - Added php-markdown tests (most/all of the regular tests pass except 
-          the email obfu one).
-        - Added php-markdown extra tests (all fail).
-        - Added python markdown tests (mostly pass, but marked broken).
-        - Add a way of stopping inline HTML blocks from suppressing markdown    
-          processing. Feature request from #catalyst-dev 
-
-1.0.9  2008-01-22T20:28:00
-        - Ship non-broken dist at CPAN (oops, rushing!)
-
-1.0.10 2008-01-23T15:40:00
-        - Fix bug with links processing in HTML blocks.
-
-1.0.11 2008-01-24T00:12:00
-        - Fix syntax error in one of the tests. Note to self - just fixing 
-          that warning in the test case, then shipping without retesting, NOT 
-          SMART!
-          
-1.0.12 2008-02-18T22:00:00
-        - Text::Markdown - borgborgborgborgborg.
-        - Added additional POD documentation.
-        - Cleaned up some tests, and some additional test cases.
-        - Options to turn off all the extra features introduced in 
-          MultiMarkdown.
+1.0.5   2008-01-04T18:07:57
+        - Add Markdown and MultiMarkdown test suites.
+        - Fix a big bug introduced in 1.0.4 in citations
+        - Fix footnotes (and other small things) to match the test suite
         
-1.0.13 2008-02-19T23:54:33
-       - Due to the UFT8 support this module no longer works on perl <
-         5.8, note this in the Makefile.PL and modules.
-       - I managed to ship a module without Makefile.PL, WTF? Really
-         need to start using ShipIt.
-
-1.0.14 2008-02-21T22:41:33
-       - Fix a bug in the packaging of the last version.
-       - Add links to other implementations and some notes about them.
-       - Add a (failing) unit test for some unexpected behavior reported on 
-         the list.
-
-1.0.15 2008-02-23T11:13:07
-       - Start using ShipIt to package the distribution.
-
-1.0.16 2008-02-25T14:24:00
-       - Fix bugs with tab_width in constructor / as an option.
-       - Fix bugs with tab width in pre/code blocks.
-       
-1.0.17 2008-03-17T01:54:00  
-       - Add Markdown.pl and MultiMarkdown.pl, which work the same way as the 
-         original Markdown.pl. These scripts *are not* installed by default, 
-         but you will be prompted to install them when you run Makefile.PL
+1.0.4   2008-01-02T02:03:50
+        - Refactor so that the processor instance has the same set of        
+          persistent options as on the ->markdown method itself.
+        - Change all functions to be instance methods, moved a chunk of the 
+          global data to the instance. The rest will follow shortly.
+        - The test suite now tests a reasonable set of the Markdown and 
+          MultiMarkdown syntaxes.
+        - All known options and metadata keys have been documented.
+        
+1.0.3   2007-11-24T20:22:00
+        - way to keep me accountable, CPANTESTERS! Maybe I shouldn't have
+          Test::Pod::Coverage enabled unless it actually checks out. Added some
+          fairly useless stubbed METHODS to POD and moved POD around a bit.
           
-       - Make _DeTab significantly quicker. Text::Balanced is still the main
-         performance sore point however. :(
-       
-       - Re-organise the module code so that Text::Markdown is a standalone 
-         module which does not require Text::MultiMarkdown.     
-         Text::MultiMarkdown now inherits from Text::Markdown and adds the
-         additional MultiMarkdown functionality. This is a *large* change to
-         the module's internals, but is much more in the spirit of the 
-         original Markdown project (and should silence most complaints about 
-         how the code works, and possible even stop John Gruber hating my 
-         guts).
-         
-         If you were using Text::Markdown previously, but relying on an 
-         implicit MultiMarkdown feature, this *could be a breaking change*.
-       
-         Detailed description of any possible user visible changes below:
-         
-         - Text::Markdown will no longer supports the additional attribute 
-           specification for images and links feature, which was not in 
-           original Markdown, but were previously supported after
-           the code merge of Text::Markdown and Text::MultiMarkdown.
+1.0.2   2007-11-24T14:00:00
+        - move to Module::Install and clean various things up, mostly to make
+          CPANTS happy.
 
-           If you are relying on this features, it is recommended that you 
-           use Text::MultiMarkdown (configured as you prefer), as this is 
-           not a supported feature in the original Markdown.
+1.0.1   2006-10-20T00:00:00
+        - include patch from Uwe Voelker to allow setting of options in
+          markdown(); also added a test case from Uwe. Thanks, Uwe!
+          Also updated changelog references in POD somewhat.
 
-         - Text::MultiMarkdown has changed the order of attributes in image 
-           tags, the id attribute is moved from the first to the last 
-           attribute (barring user supplied attributes). An example of the 
-           expected change is included below:
-
-           Old output:  <img id="image" src="http://path.to/image" alt="image" title="Image title" width="40px" height="400px" />
-
-           New output: <img src="http://path.to/image" alt="image" title="Image title" id="image" width="40px" height="400px" />
-         
-           This is due to the code re-organisation, moving the id attribute 
-           around shouldn't affect anything that isn't relying on the 
-           attribute ordering (which is meant to be unimportant in HTML), and 
-           allows for simplification of the unified code.
-
-1.0.18 2008-04-20T18:54:50
-        - Clean up local stuff for settings.
-        - Do a little cleanup of intialisation (more needed)
-        - Remove copy pasted regexes from Text::MultiMarkdown
-        - Fix bug with line breaks in links - http://bugs.debian.org/459885,
-          thanks to patches and test input / output provided by Adeodato Simó.
-          (See t/37anchormultilinebugs.t)
-        - Incorperated MDTest1.1's tests, and made most of the Text-Markdown
-          and Text-MultiMarkdown tests in MDTest format.
-        - Add and document an accessor for the parsed markdown URLs.
-        - Fix html4tags option in Markdown.pl and MultiMarkdown.pl
-
-1.0.19 2008-04-22T18:34:00
-        - Remove auto_install from Makefile.PL, this is a deprecated feature 
-          and it shouldn't be being used at all.
-
-1.0.20 2008-07-11T23:30:00
-        - Update README.txt
-        - Allow scripts to be used on multiple input files at once (processing 
-          in command line order)
-        - Update footnote behavior of Text::MutliMarkdown to be consistent 
-          with the latest version of MultiMarkdown
-        - Added tests for the new footnote functionality.
-        - Added tests for all the MDTest corner cases brought up on the list. 
-          Noted why / how I differ from original Markdown.
-        - Moved all the document tests to MDTest format. I have made MDTest 
-          test suites for Text::Markdown and Text::MultiMarkdown, containing 
-          **only** the bug fixes and behavior changes I've made, I've imported 
-          the Markdown test suite from MDTest1.1, and the MultiMarkdown test
-          suite.
-        - RT#36537 doc patch to add POD to the scripts from Debian's Gunnar 
-          Wolf.
-        - Mutilate the list processing somewhat to reduce the compilation
-          of recursive regexes, and so stop perl (<5.10) crapping itself
-          on lots of input. This isn't the full fix - really shouldn't be
-          usng recursive regexes at all. RT#37297
-
-1.0.21 2008-07-24T08:33:00
-        - Fix hard tabs in Changelog
-        - Add unit test for core dumps issue from RT#36203
-        - Fix POD spelling.
-        - Fix warning from RT#34856.
-        - Add test for another tab width issue (related to <hr> generation)
-          from RT#37769. Fix this issue.
-        - More test additions and more splitting the test suites into MDTest 
-          modules.
-
-1.0.22 2008-10-23T18:24:44
-        - RT#37909 - Fix + in email addresses.
-        - RT#40303 - Fix use in Mason by adding "use re 'eval'" to both files.
-        - Add SVN repository to Makefile.PL
-        - Remove META.yml from source control so it is regenerated 
-          automatically.
-
-1.0.23 2008-11-02T18:24:30
-        - Ship a release with the correct contents so that the tests pass.
-
-1.0.24 2008-11-16T14:33:30
-        - Add trust_list_start_value patch from Ricardo Signes (RT#40814)
-          to enable <li value='X'> output for list numbering.
-          This feature is disabled by default.
-
-1.0.25 2009-08-25T09:31:30
-        - Remove MultiMarkdown from the Text::Markdown distribution
-        - Change repository and bugtracker metadata to github.
-        - Update File::Slurp dependency, fixing RT#43888.
-
-1.0.26 UNRELEASED
-        - Minor POD changes (typos, wrapping)
-        - Added note about and test for output always ending in exactly one newline (dandv)
-        - Fix RT#48943 + tests (genehack)
-        + Support for optionally interpreting markdown in HTML block elements
-          using the markdown="1" attribute (GitHub issue #1; dandv)
-
+1.0.0   2006-08-22T00:00:00
+        - first release
