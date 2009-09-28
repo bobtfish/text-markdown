@@ -394,7 +394,7 @@ sub _HashHTMLBlocks {
                         $tag = $prefix . $opening_tag . "\n"
                           . $self->_RunBlockGamut($text_in_tag, {wrap_in_p_tags => $wrap_in_p_tags})
                           . "\n" . $closing_tag
-                        ;  # TODO need to call $self->_HashHR($tag);, $self->_HashHTMLComments($tag);, $self->_HashPHPASPBlocks($tag);?
+                        ;
                     } else {
                         # just remove the markdown="0" attribute
                         $tag = $prefix . $opening_tag . $text_in_tag . $closing_tag;
