@@ -1,6 +1,6 @@
 Todo pre 1.0.23:
     . Tests for $footnote =~ s/^glossary:\s*//i
-	. Tests for $footnote_closing_tag
+    . Tests for $footnote_closing_tag
     . Add an option to Text::Markdown to have original brand markdown style 
       emphasis within words support.
     . Re-merge Movable Type and Bloxom compatibility to the scripts, and add 
