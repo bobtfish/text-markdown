@@ -38,44 +38,62 @@ SYNTAX
 
         http://daringfireball.net/projects/markdown/
 
-    Note that Text::Markdown ensures that the output always ends with
-    *one* newline. The fact that multiple newlines are collapsed into one
-    makes sense, because this is the behavior of HTML towards whispace. The
-    fact that there's always a newline at the end makes sense again, given
-    that the output will always be nested in a block-level element (as
-    opposed to an inline element). That block element can be a <p> (most
-    often), or a <table>.
-    
-    Markdown is *not* interpreted in HTML block-level elements, in order for
+    Note that Text::Markdown ensures that the output always ends with one
+    newline. The fact that multiple newlines are collapsed into one makes
+    sense, because this is the behavior of HTML towards whispace. The fact
+    that there's always a newline at the end makes sense again, given that
+    the output will always be nested in a block-level element (as opposed to
+    an inline element). That block element can be a "<p>" (most often), or a
+    "<table>".
+
+    Markdown is not interpreted in HTML block-level elements, in order for
     chunks of pasted HTML (e.g. JavaScript widgets, web counters) to not be
-    magically (mis)interpreted. For selective processing of Markdown in some,
-    but not other, HTML block elements, add a "markdown" attribute to the block
-    element and set its value to "1", "on" or "yes":
-    
+    magically (mis)interpreted. For selective processing of Markdown in
+    some, but not other, HTML block elements, add a "markdown" attribute to
+    the block element and set its value to 1, "on" or "yes":
+
         <div markdown="1" class="navbar">
         * Home
         * About
         * Contact
         <div>
-    
-    The extra "markdown" attribute will be stripped when generating the output.
-    
+
+    The extra "markdown" attribute will be stripped when generating the
+    output.
+
 OPTIONS
     Text::Markdown supports a number of options to its processor which
     control the behaviour of the output document.
 
-    These options can be supplied to the constructor, on in a hash with the
-    individual calls to the markdown method. See the synopsis for examples
-    of both of the above styles.
+    These options can be supplied to the constructor, or in a hash within
+    individual calls to the "markdown" method. See the SYNOPSIS for examples
+    of both styles.
 
     The options for the processor are:
 
-    empty element suffix
-        This option can be used to generate normal HTML output. By default,
-        it is ' />', which is xHTML, change to '>' for normal HTML.
+    empty_element_suffix
+        This option controls the end of empty element tags:
+
+            '/>' for XHTML (default)
+            '>' for HTML
 
     tab_width
-        Controls indent width in the generated markup, defaults to 4
+        Controls indent width in the generated markup. Defaults to 4.
+
+    trust_list_start_value
+        If true, ordered lists will use the first number as the starting
+        point for numbering. This will let you pick up where you left off by
+        writing:
+
+          1. foo
+          2. bar
+
+          some paragraph
+
+          3. baz
+          6. quux
+
+        (Note that in the above, quux will be numbered 4.)
 
 METHODS
   new
@@ -102,7 +120,7 @@ OTHER IMPLEMENTATIONS
 
     C - <http://www.pell.portland.or.us/~orc/Code/discount>
         Discount - Original Markdown, but in C. Fastest implementation
-        available, and passes MDTest. Adds it's own set of custom features.
+        available, and passes MDTest. Adds its own set of custom features.
 
     python - <http://www.freewisdom.org/projects/python-markdown/>
         Python Markdown which is mostly compatible with the original, with
@@ -131,7 +149,7 @@ BUGS
     To file bug reports or feature requests please send email to:
 
         bug-Text-Markdown@rt.cpan.org
-    
+
     Please include with your report: (1) the example input; (2) the output
     you expected; (3) the output Markdown actually produced.
 
@@ -141,18 +159,18 @@ VERSION HISTORY
 AUTHOR
         John Gruber
         http://daringfireball.net/
-    
+
         PHP port and other contributions by Michel Fortin
         http://michelf.com/
-    
+
         MultiMarkdown changes by Fletcher Penney
         http://fletcher.freeshell.org/
-    
+
         CPAN Module Text::MultiMarkdown (based on Text::Markdown by Sebastian
         Riedel) originally by Darren Kulp (http://kulp.ch/)
-        
-        Support for markdown="1" by Dan Dascalescu (http://dandascalescu.com)
     
+        Support for markdown="1" by Dan Dascalescu (http://dandascalescu.com)
+
         This module is maintained by: Tomas Doran http://www.bobtfish.net/
 
 THIS DISTRIBUTION
@@ -170,6 +188,11 @@ THIS DISTRIBUTION
     that which is documented at daringfireball. If you want additional
     features, you should look at Text::MultiMarkdown.
 
+SOURCE CODE
+    You can find the source code repository for Text::Markdown and
+    Text::MultiMarkdown on GitHub at
+    <http://github.com/bobtfish/text-markdown>.
+
 COPYRIGHT AND LICENSE
     Original Code Copyright (c) 2003-2004 John Gruber
     <http://daringfireball.net/> All rights reserved.
@@ -177,7 +200,7 @@ COPYRIGHT AND LICENSE
     MultiMarkdown changes Copyright (c) 2005-2006 Fletcher T. Penney
     <http://fletcher.freeshell.org/> All rights reserved.
 
-    Text::MultiMarkdown changes Copyright (c) 2006-2008 Darren Kulp
+    Text::MultiMarkdown changes Copyright (c) 2006-2009 Darren Kulp
     <http://kulp.ch> and Tomas Doran <http://www.bobtfish.net>
 
     Redistribution and use in source and binary forms, with or without

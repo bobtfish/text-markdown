@@ -21,6 +21,16 @@ build_requires  'List::MoreUtils' => undef;
 build_requires  'File::Slurp'     => '9999.08';
 build_requires  'FindBin'         => undef;
 
+if ($Module::Install::AUTHOR) {
+    system("pod2text lib/Text/Markdown.pm > README")
+        and die $!;
+    require Module::Install::CheckConflicts;
+}
+
+check_conflicts(
+    'Text::MultiMarkdown' => '1.0.27',
+);
+
 # Scripts I install
 prompt_script('script/Markdown.pl');
 
