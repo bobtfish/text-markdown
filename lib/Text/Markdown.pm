@@ -9,7 +9,8 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.0.26';
+our $VERSION   = '1.000027'; # 1.0.27
+$VERSION = eval $VERSION;
 our @EXPORT_OK = qw(markdown);
 
 =head1 NAME
