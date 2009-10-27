@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Text::Markdown.
 
+1.0.28 2009-10-27T14:28:12
+        - Fix MANIFEST.skip to avoid extraneous crap in the distribution.
+
 1.0.27 2009-10-25T19:13:47
         - Change to perl style version numbers (from 3 part versions) to
           avoid depndency confusion with Text::MultiMarkdown
