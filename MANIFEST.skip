@@ -1,4 +1,4 @@
-Text-Multimarkdown.*
+Text-Markdown.*
 \.git
 blib/
 \.DS_Store$
@@ -8,5 +8,5 @@ MANIFEST\.skip$
 MANIFEST\.bak$
 Makefile\.old$
 \.shipit$
-Text-MultiMarkdown\.tmproj$
+Text-Markdown\.tmproj$
 
