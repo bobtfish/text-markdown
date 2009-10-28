@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension Text::Markdown.
 
+1.0.29 2009-10-28T15:19:26
+        - Note Test::Differences is needed for tests to run (RT#50918)
+        - Change build_requires to test_requires in Makefile.PL where
+          appropriate.
+
 1.0.28 2009-10-27T14:28:12
         - Fix MANIFEST.skip to avoid extraneous crap in the distribution.
 

@@ -15,11 +15,12 @@ perl_version    '5.008';
 requires        'Digest::MD5'     => undef;
 requires        'Text::Balanced'  => undef;
 requires        'Encode'          => undef;
-build_requires  'Test::More'      => '0.42';
-build_requires  'Test::Exception' => undef;
-build_requires  'List::MoreUtils' => undef;
-build_requires  'File::Slurp'     => '9999.08';
-build_requires  'FindBin'         => undef;
+test_requires  'Test::More'      => '0.42';
+test_requires  'Test::Exception' => undef;
+test_requires  'List::MoreUtils' => undef;
+test_requires  'File::Slurp'     => '9999.08';
+test_requires 'Test::Differences' => undef;
+test_requires  'FindBin'         => undef;
 
 if ($Module::Install::AUTHOR) {
     system("pod2text lib/Text/Markdown.pm > README")
