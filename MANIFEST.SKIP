@@ -1,4 +1,4 @@
-Text-Markdown.*\.tar\.gz
+^Text-Markdown
 \.git
 blib/
 \.DS_Store$
