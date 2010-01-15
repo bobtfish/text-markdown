@@ -4,7 +4,6 @@ use Test::More;
 use FindBin qw($Bin);
 
 use List::MoreUtils qw(uniq);
-use File::Slurp qw(slurp);
 use Encode;
 
 our $TIDY = 0;
@@ -47,16 +46,16 @@ sub tidy {
 ### being run when this file is required by other tests
 
 unless (caller) {
-	my $docsdir = "$Bin/Text-Markdown.mdtest";
-	my @files = get_files($docsdir);
+    my $docsdir = "$Bin/Text-Markdown.mdtest";
+    my @files = get_files($docsdir);
 
-	plan tests => scalar(@files) + 1;
+    plan tests => scalar(@files) + 1;
 
-	use_ok('Text::Markdown');
+    use_ok('Text::Markdown');
 
-	my $m = Text::Markdown->new();
+    my $m = Text::Markdown->new();
 
-	run_tests($m, $docsdir, @files);
+    run_tests($m, $docsdir, @files);
 }
 
 sub get_files {
@@ -67,6 +66,13 @@ sub get_files {
     closedir($DH);
     return @files;
 }
+
+sub slurp {
+    my ($filename) = @_;
+    open my $file, '<', $filename or die "Couldn't open $filename: $!";
+    local $/ = undef;
+    return <$file>;
+}    
 
 sub run_tests {
     my ($m, $docsdir, @files) = @_;

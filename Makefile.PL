@@ -18,7 +18,6 @@ requires        'Encode'          => undef;
 test_requires  'Test::More'      => '0.42';
 test_requires  'Test::Exception' => undef;
 test_requires  'List::MoreUtils' => undef;
-test_requires  'File::Slurp'     => '9999.08';
 test_requires 'Test::Differences' => undef;
 test_requires  'FindBin'         => undef;
 
