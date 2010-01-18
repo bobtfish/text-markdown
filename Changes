@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Text::Markdown.
 
-        - Removed File::Slurp dependency (v. 9999.13 fails tests on Strawberry 5.10.1) (dandv)
+1.0.30 2010-01-18T12:19:49
+        - Removed File::Slurp dependency (v. 9999.13 fails tests on
+          Strawberry 5.10.1) (dandv)
 
 1.0.29 2009-10-28T15:19:26
         - Note Test::Differences is needed for tests to run (RT#50918)
