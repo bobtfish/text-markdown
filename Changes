@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Text::Markdown.
 
+1.0.31 2010-03-20T23:06:04
+        - Fix installation of the Markdown.pl script.
+
 1.0.30 2010-01-18T12:19:49
         - Removed File::Slurp dependency (v. 9999.13 fails tests on
           Strawberry 5.10.1) (dandv)
