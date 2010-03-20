@@ -31,7 +31,7 @@ check_conflicts(
     'Text::MultiMarkdown' => '1.0.27',
 );
 
-# Scripts I install
-prompt_script('script/Markdown.pl');
+install_script 'script/Markdown.pl';
 
 WriteAll;
+
