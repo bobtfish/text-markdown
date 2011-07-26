@@ -151,6 +151,16 @@ foreach my $char (split //, '\\`*_{}[]()>#+-.!') {
     $g_escape_table{$char} = md5_hex($char);
 }
 
+# Table of hash values for html escaped characters:
+our %html_escape = (
+    '&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '"' => '&quot;',
+    "'" => '&#39;', # IE8 doesn't support &apos; in title
+);
+our $html_metachars = sprintf '[%s]', join '', map { quotemeta } keys %html_escape;
+
 =head1 METHODS
 
 =head2 new
@@ -169,6 +179,8 @@ sub new {
     $p{empty_element_suffix} ||= ' />'; # Change to ">" for HTML output
 
     $p{trust_list_start_value} = $p{trust_list_start_value} ? 1 : 0;
+
+    $p{secure} = $p{secure} ? 1 : 0; # HTML encoding and URL check
 
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
@@ -202,6 +214,10 @@ sub markdown {
     %$self = (%{ $self->{params} }, %$options, params => $self->{params});
 
     $self->_CleanUpRunData($options);
+
+    if ($self->{secure}) {
+        $text =~ s/($html_metachars)/$html_escape{$1}/xmsgeo;
+    }
 
     return $self->_Markdown($text);
 }
@@ -741,6 +757,20 @@ sub _GenerateAnchor {
         return $whole_match;
     }
 
+    if ($self->{secure}) {
+        # hash or relative url
+        if ($url=~ /^((?:[\w\-.!~*|;\/?=+\$,%#]|&amp;){0,100})$/) {
+            $url = $1;
+        }
+        # absolute url (ftp or http or https)
+        elsif ($url=~ m<^((?:ftp|https?)://[\w\-\.]{1,100}(?:\:\d{1,5})?
+                           (?:/(?:[\w\-.!~*|;/?=+\$,%#]|&amp;){0,100})?)$>x) {
+            $url = $1;
+        } else {
+            $url = '';
+        }
+    }
+
     $url =~ s! \* !$g_escape_table{'*'}!gox;    # We've got to encode these to avoid
     $url =~ s!  _ !$g_escape_table{'_'}!gox;    # conflicting with italics/bold.
     $url =~ s{^<(.*)>$}{$1};                    # Remove <>'s surrounding URL, if present
@@ -1250,6 +1280,9 @@ sub _EncodeCode {
     my $self = shift;
     local $_ = shift;
 
+    # Has already encode. 
+    return $_ if $self->{secure};
+
     # Encode all ampersands; HTML entities are not
     # entities within a Markdown code span.
     s/&/&amp;/g;
@@ -1444,18 +1477,21 @@ sub _EncodeBackslashEscapes {
 sub _DoAutoLinks {
     my ($self, $text) = @_;
 
-    $text =~ s{<((https?|ftp):[^'">\s]+)>}{<a href="$1">$1</a>}gi;
+    my $start = $self->{secure} ? '&lt;' : '<';
+    my $end = $self->{secure} ? '&gt;' : '>';
+
+    $text =~ s{$start((https?|ftp):[^'">\s]+)$end}{<a href="$1">$1</a>}gi;
 
     # Email addresses: <address@domain.foo>
     $text =~ s{
-        <
+        $start
         (?:mailto:)?
         (
             [-.\w\+]+
             \@
             [-a-z0-9]+(\.[-a-z0-9]+)*\.[a-z]+
         )
-        >
+        $end
     }{
         $self->_EncodeEmailAddress( $self->_UnescapeSpecialChars($1) );
     }egix;
