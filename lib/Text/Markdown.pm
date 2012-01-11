@@ -235,8 +235,6 @@ sub _Markdown {
     # Turn block-level HTML elements into hash entries, and interpret markdown in them if they have a 'markdown="1"' attribute
     $text = $self->_HashHTMLBlocks($text, {interpret_markdown_on_attribute => 1});
 
-    $text = $self->_StripLinkDefinitions($text);
-
     $text = $self->_RunBlockGamut($text, {wrap_in_p_tags => 1});
 
     $text = $self->_UnescapeSpecialChars($text);
@@ -380,6 +378,7 @@ sub _HashHTMLBlocks {
 
     my @chunks;
     # parse each line, looking for block-level HTML tags
+    my %interpret_markdowns;
     while ($text =~ s{^(([ ]{0,$less_than_tab}<)?.*\n)}{}m) {
         my $cur_line = $1;
         if (defined $2) {
@@ -390,12 +389,21 @@ sub _HashHTMLBlocks {
                 if ($options->{interpret_markdown_on_attribute} and $opening_tag =~ s/$markdown_attr//i) {
                     my $markdown = $2;
                     if ($markdown =~ /^(1|on|yes)$/) {
+                        $text_in_tag = $self->_StripLinkDefinitions($text_in_tag);
+
                         # interpret markdown and reconstruct $tag to include the interpreted $text_in_tag
                         my $wrap_in_p_tags = $opening_tag =~ /^<(div|iframe)/;
                         $tag = $prefix . $opening_tag . "\n"
                           . $self->_RunBlockGamut($text_in_tag, {wrap_in_p_tags => $wrap_in_p_tags})
                           . "\n" . $closing_tag
                         ;
+                        $interpret_markdowns{ _md5_utf8($tag) } = {
+                            prefix         => $prefix,
+                            opening_tag    => $opening_tag,
+                            text_in_tag    => $text_in_tag,
+                            wrap_in_p_tags => $wrap_in_p_tags,
+                            closing_tag    => $closing_tag,
+                        }
                     } else {
                         # just remove the markdown="0" attribute
                         $tag = $prefix . $opening_tag . $text_in_tag . $closing_tag;
@@ -420,6 +428,18 @@ sub _HashHTMLBlocks {
     push @chunks, $text;  # whatever is left
 
     $text = join '', @chunks;
+
+    $text = $self->_StripLinkDefinitions($text);
+    for my $key ( keys %interpret_markdowns ) {
+        my $val = $interpret_markdowns{$key};
+        my $tag
+            = $val->{prefix} . $val->{opening_tag} . "\n"
+            . $self->_RunBlockGamut($val->{text_in_tag}, {wrap_in_p_tags => $val->{wrap_in_p_tags}})
+            . "\n" . $val->{closing_tag}
+            ;
+
+        $self->{_html_blocks}{$key} = $tag;
+    }
 
     return $text;
 }

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Test::Differences;
 use FindBin '$Bin';
 use lib "$Bin/../lib";
@@ -408,4 +408,43 @@ eq_or_diff $html, <<'EOF', $test;
 </code></pre>
 
 <p>Above was code</p>
+EOF
+
+
+#-------------------------------------------------------------------------------
+$test = "without markdown on - cannot generate link";
+$html = $m->markdown(<<"EOF");
+<div style="margin-top: 50px; margin-left: 400px;">
+
+[Text::Markdown][cpan-text-markdown] is really cool!
+
+</div>
+
+[cpan-text-markdown]:    https://metacpan.org/module/Text::Markdown
+
+EOF
+eq_or_diff $html, <<'EOF', $test;
+<div style="margin-top: 50px; margin-left: 400px;">
+
+[Text::Markdown][cpan-text-markdown] is really cool!
+
+</div>
+EOF
+
+
+#-------------------------------------------------------------------------------
+$test = "markdown on - generat link";
+$html = $m->markdown(<<"EOF");
+<div markdown="1" style="margin-top: 50px; margin-left: 400px;">
+
+[Text::Markdown][cpan-text-markdown] is really cool!
+
+</div>
+
+[cpan-text-markdown]:    https://metacpan.org/module/Text::Markdown
+EOF
+eq_or_diff $html, <<'EOF', $test;
+<div style="margin-top: 50px; margin-left: 400px;">
+<p><a href="https://metacpan.org/module/Text::Markdown">Text::Markdown</a> is really cool!</p>
+</div>
 EOF
