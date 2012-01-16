@@ -19,6 +19,7 @@ test_requires  'Test::More'      => '0.42';
 test_requires  'Test::Exception' => undef;
 test_requires  'List::MoreUtils' => undef;
 test_requires 'Test::Differences' => undef;
+test_requires 'Test::NoWarnings' => undef;
 test_requires  'FindBin'         => undef;
 
 if ($Module::Install::AUTHOR) {

@@ -266,6 +266,9 @@ sub urls {
 sub _CleanUpDoc {
     my ($self, $text) = @_;
 
+    # An empty file can end up getting passed as undef.
+    return "\n\n" unless defined $text;
+
     # Standardize line endings:
     $text =~ s{\r\n}{\n}g;  # DOS to Unix
     $text =~ s{\r}{\n}g;    # Mac to Unix
