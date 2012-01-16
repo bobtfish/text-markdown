@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-#use Test::More tests => 21;
-use Test::More 'no_plan';
+use Test::More tests => 3;
 use Text::Markdown;
 use Test::NoWarnings;
 
