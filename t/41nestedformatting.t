@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests=>25;
 
 use_ok( 'Text::Markdown' );
 
 my $m     = Text::Markdown->new();
-my $html1 = $m->markdown(<<"EOF");
+my $md = <<"EOF";
 *Em*phasis
 
 _Em_phasis
@@ -69,9 +69,9 @@ my $want = <<'EOF';
 
 <p><strong><em>Em</em>phasis</strong></p>
 
-<p><strong><em>Em</em></strong><em>phasis</em></p>
+<p><em><strong>Em</strong>phasis</em></p>
 
-<p><strong><em>Em</em></strong><em>phasis</em></p>
+<p><em><strong>Em</strong>phasis</em></p>
 
 <p><strong><em>Em</em>phasis</strong></p>
 
@@ -93,9 +93,9 @@ my $want = <<'EOF';
 
 <p>de<strong><em>em</em>phasise</strong></p>
 
-<p>de<strong><em>em</em></strong><em>phasise</em></p>
+<p>de<em><strong>em</strong>phasise</em></p>
 
-<p>de<strong><em>em</em></strong><em>phasise</em></p>
+<p>de<em><strong>em</strong>phasise</em></p>
 
 <p>de<strong><em>em</em>phasise</strong></p>
 
@@ -107,4 +107,11 @@ my $want = <<'EOF';
 
 EOF
 
-is($html1, $want, "Emphasis within a word works");
+my @html = split "\n\n", $want;
+my @md = split "\n\n", $md;
+
+for my $i (0..$#md){ 
+	my $got = $m->markdown ($md[$i]);
+	chomp $got;
+	is($got, $html[$i], "Emphasis within a word works: $md[$i]");
+}

@@ -1283,26 +1283,23 @@ sub _EncodeCode {
 sub _DoItalicsAndBold {
     my ($self, $text) = @_;
 
-    # Handle at beginning of lines:
-    $text =~ s{ ^(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
-        {<strong>$2</strong>}gsx;
-
-    $text =~ s{ ^(\*|_) (?=\S) (.+?) (?<=\S) \1 }
-        {<em>$2</em>}gsx;
 
     # <strong> must go first:
-    $text =~ s{ (?<=\W) (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
+    $text =~ s{ (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
         {<strong>$2</strong>}gsx;
 
-    $text =~ s{ (?<=\W) (\*|_) (?=\S) (.+?) (?<=\S) \1 }
+    $text =~ s{ (\*|_) (?=\S) (.+?) (?<=\S) \1 }
         {<em>$2</em>}gsx;
 
     # And now, a second pass to catch nested strong and emphasis special cases
-    $text =~ s{ (?<=\W) (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
+    $text =~ s{ (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
         {<strong>$2</strong>}gsx;
 
-    $text =~ s{ (?<=\W) (\*|_) (?=\S) (.+?) (?<=\S) \1 }
+    $text =~ s{ (\*|_) (?=\S) (.+?) (?<=\S) \1 }
         {<em>$2</em>}gsx;
+		
+	$text =~ s{ <strong><em>([^<]+)</strong>([^<]+)</em> }
+        {<em><strong>$1</strong>$2</em>}gsx;
 
     return $text;
 }
