@@ -4,7 +4,7 @@ use Test::More tests => 25;
 
 use_ok( 'Text::Markdown' );
 
-my $m  = Text::Markdown->new();
+my $m  = Text::Markdown->new( emphasis_within_words => 1 );
 my $md = <<"EOF";
 *Em*phasis
 

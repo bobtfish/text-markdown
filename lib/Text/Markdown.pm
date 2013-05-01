@@ -118,6 +118,12 @@ numbering.  This will let you pick up where you left off by writing:
 
 (Note that in the above, quux will be numbered 4.)
 
+=item emphasis_within_words
+
+If true, allows emphasis to begin within words, so C<em**pha**tic> becomes C<< em<strong>pha</strong>tic >>.
+
+The default is false to allow you to write C<long_variable_names>, arguably the more common case.
+
 =back
 
 =cut
@@ -169,6 +175,8 @@ sub new {
     $p{empty_element_suffix} ||= ' />'; # Change to ">" for HTML output
 
     $p{trust_list_start_value} = $p{trust_list_start_value} ? 1 : 0;
+    
+	$p{emphasis_within_words} = $p{emphasis_within_words} ? 1 : 0;
 
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
@@ -1283,22 +1291,45 @@ sub _EncodeCode {
 sub _DoItalicsAndBold {
     my ($self, $text) = @_;
 
+    if ($self->{params}->{emphasis_within_words}) {
+        # <strong> must go first:
+        $text =~ s{ (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
+            {<strong>$2</strong>}gsx;
 
-    # <strong> must go first:
-    $text =~ s{ (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
-        {<strong>$2</strong>}gsx;
+        $text =~ s{ (\*|_) (?=\S) (.+?) (?<=\S) \1 }
+            {<em>$2</em>}gsx;
 
-    $text =~ s{ (\*|_) (?=\S) (.+?) (?<=\S) \1 }
-        {<em>$2</em>}gsx;
+        # And now, a second pass to catch nested strong and emphasis special cases
+        $text =~ s{ (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
+            {<strong>$2</strong>}gsx;
 
-    # And now, a second pass to catch nested strong and emphasis special cases
-    $text =~ s{ (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
-        {<strong>$2</strong>}gsx;
+        $text =~ s{ (\*|_) (?=\S) (.+?) (?<=\S) \1 }
+            {<em>$2</em>}gsx;
+    }
+    else {
+        # Handle at beginning of lines:
+        $text =~ s{ ^(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
+            {<strong>$2</strong>}gsx;
 
-    $text =~ s{ (\*|_) (?=\S) (.+?) (?<=\S) \1 }
-        {<em>$2</em>}gsx;
-		
-	$text =~ s{ <strong><em>([^<]+)</strong>([^<]+)</em> }
+        $text =~ s{ ^(\*|_) (?=\S) (.+?) (?<=\S) \1 }
+            {<em>$2</em>}gsx;
+
+        # <strong> must go first:
+        $text =~ s{ (?<=\W) (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
+            {<strong>$2</strong>}gsx;
+
+        $text =~ s{ (?<=\W) (\*|_) (?=\S) (.+?) (?<=\S) \1 }
+            {<em>$2</em>}gsx;
+
+        # And now, a second pass to catch nested strong and emphasis special cases
+        $text =~ s{ (?<=\W) (\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1 }
+            {<strong>$2</strong>}gsx;
+
+        $text =~ s{ (?<=\W) (\*|_) (?=\S) (.+?) (?<=\S) \1 }
+            {<em>$2</em>}gsx;
+
+    }
+    $text =~ s{ <strong><em>([^<]+)</strong>([^<]+)</em> }
         {<em><strong>$1</strong>$2</em>}gsx;
 
     return $text;
