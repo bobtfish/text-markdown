@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests=>25;
+use Test::More tests => 25;
 
 use_ok( 'Text::Markdown' );
 
-my $m     = Text::Markdown->new();
+my $m  = Text::Markdown->new();
 my $md = <<"EOF";
 *Em*phasis
 
@@ -111,7 +111,7 @@ my @html = split "\n\n", $want;
 my @md = split "\n\n", $md;
 
 for my $i (0..$#md){ 
-	my $got = $m->markdown ($md[$i]);
-	chomp $got;
-	is($got, $html[$i], "Emphasis within a word works: $md[$i]");
+    my $got = $m->markdown ($md[$i]);
+    chomp $got;
+    is($got, $html[$i], "Emphasis within a word works: $md[$i]");
 }
