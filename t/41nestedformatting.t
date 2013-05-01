@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 31;
 
 use_ok( 'Text::Markdown' );
 
@@ -54,6 +54,18 @@ de_**em**phasise_
 
 de*__em__phasise*
 
+Escape\*
+
+\*Escape
+
+Es\*cape
+
+Escape\_
+
+\_Escape
+
+Es\_cape
+
 EOF
 
 my $want = <<'EOF';
@@ -104,6 +116,18 @@ my $want = <<'EOF';
 <p>de<em><strong>em</strong>phasise</em></p>
 
 <p>de<em><strong>em</strong>phasise</em></p>
+
+<p>Escape*</p>
+
+<p>*Escape</p>
+
+<p>Es*cape</p>
+
+<p>Escape_</p>
+
+<p>_Escape</p>
+
+<p>Es_cape</p>
 
 EOF
 
