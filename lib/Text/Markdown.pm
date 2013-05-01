@@ -176,7 +176,7 @@ sub new {
 
     $p{trust_list_start_value} = $p{trust_list_start_value} ? 1 : 0;
     
-	$p{emphasis_within_words} = $p{emphasis_within_words} ? 1 : 0;
+    $p{emphasis_within_words} = $p{emphasis_within_words} ? 1 : 0;
 
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
@@ -1327,10 +1327,15 @@ sub _DoItalicsAndBold {
 
         $text =~ s{ (?<=\W) (\*|_) (?=\S) (.+?) (?<=\S) \1 }
             {<em>$2</em>}gsx;
-
     }
+    
+    # fix cases where improperly nested tags have been created
+    
     $text =~ s{ <strong><em>([^<]+)</strong>([^<]+)</em> }
         {<em><strong>$1</strong>$2</em>}gsx;
+    
+    $text =~ s{ <em>([^<]+)<strong>([^<]+)</em></strong> }
+        {<em>$1<strong>$2</strong></em>}gsx;
 
     return $text;
 }

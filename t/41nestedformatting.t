@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 31;
+use Test::More tests => 43;
 
 use_ok( 'Text::Markdown' );
 
@@ -53,6 +53,30 @@ de**_em_phasise**
 de_**em**phasise_
 
 de*__em__phasise*
+
+com*plete*
+
+com_plete_
+
+com**plete**
+
+com__plete__
+
+*com**plete***
+
+_com__plete___
+
+**com*plete***
+
+__com_plete___
+
+__com*plete*__
+
+**com_plete_**
+
+_com**plete**_
+
+*com__plete__*
 
 Escape\*
 
@@ -116,6 +140,30 @@ my $want = <<'EOF';
 <p>de<em><strong>em</strong>phasise</em></p>
 
 <p>de<em><strong>em</strong>phasise</em></p>
+
+<p>com<em>plete</em></p>
+
+<p>com<em>plete</em></p>
+
+<p>com<strong>plete</strong></p>
+
+<p>com<strong>plete</strong></p>
+
+<p><em>com<strong>plete</strong></em></p>
+
+<p><em>com<strong>plete</strong></em></p>
+
+<p><strong>com<em>plete</em></strong></p>
+
+<p><strong>com<em>plete</em></strong></p>
+
+<p><strong>com<em>plete</em></strong></p>
+
+<p><strong>com<em>plete</em></strong></p>
+
+<p><em>com<strong>plete</strong></em></p>
+
+<p><em>com<strong>plete</strong></em></p>
 
 <p>Escape*</p>
 
