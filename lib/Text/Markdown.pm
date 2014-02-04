@@ -9,7 +9,7 @@ use Encode      qw();
 use Carp        qw(croak);
 use base        'Exporter';
 
-our $VERSION   = '1.000031'; # 1.0.31
+our $VERSION   = '1.000032'; # 1.0.31
 $VERSION = eval $VERSION;
 our @EXPORT_OK = qw(markdown);
 
@@ -151,6 +151,16 @@ foreach my $char (split //, '\\`*_{}[]()>#+-.!') {
     $g_escape_table{$char} = md5_hex($char);
 }
 
+# 
+our %html_escape = (
+    '&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '"' => '&quot;',
+    "'" => '&#39;', # IE8 doesn't support &apos; in title
+);
+our $html_metachars = sprintf '[%s]', join '', map { quotemeta } keys %html_escape;
+
 =head1 METHODS
 
 =head2 new
@@ -169,6 +179,8 @@ sub new {
     $p{empty_element_suffix} ||= ' />'; # Change to ">" for HTML output
 
     $p{trust_list_start_value} = $p{trust_list_start_value} ? 1 : 0;
+
+    $p{escape_html} = $p{escape_html} ? 1 : 0;
 
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
@@ -202,6 +214,10 @@ sub markdown {
     %$self = (%{ $self->{params} }, %$options, params => $self->{params});
 
     $self->_CleanUpRunData($options);
+
+    if ($self->{escape_html}) {
+        $text =~ s/($html_metachars)/$html_escape{$1}/xmsgeo;
+    }
 
     return $self->_Markdown($text);
 }
@@ -1249,6 +1265,9 @@ sub _EncodeCode {
 #
     my $self = shift;
     local $_ = shift;
+
+    # Has already encode. 
+    return $_ if $self->{escape_html};
 
     # Encode all ampersands; HTML entities are not
     # entities within a Markdown code span.
