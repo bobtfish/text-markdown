@@ -59,7 +59,7 @@ This module implements the 'original' Markdown markdown syntax from:
 
 Note that L<Text::Markdown> ensures that the output always ends with
 B<one> newline. The fact that multiple newlines are collapsed into one
-makes sense, because this is the behavior of HTML towards whispace. The
+makes sense, because this is the behavior of HTML towards whitespace. The
 fact that there's always a newline at the end makes sense again, given
 that the output will always be nested in a B<block>-level element (as
 opposed to an inline element). That block element can be a C<< <p> >>
@@ -935,7 +935,7 @@ sub _DoLists {
     my $marker_ol  = qr/\d+[.]/;
     my $marker_any = qr/(?:$marker_ul|$marker_ol)/;
 
-    # Re-usable pattern to match any entirel ul or ol list:
+    # Re-usable pattern to match any entire ul or ol list:
     my $whole_list = qr{
         (                               # $1 = whole list
           (                             # $2
@@ -1415,7 +1415,7 @@ sub _EncodeAmpsAndAngles {
 sub _EncodeBackslashEscapes {
 #
 #   Parameter:  String.
-#   Returns:    The string, with after processing the following backslash
+#   Returns:    The string, after processing the following backslash
 #               escape sequences.
 #
     my $self = shift;
