@@ -1369,15 +1369,22 @@ sub _FormParagraphs {
     }
 
     #
-    # Unhashify HTML blocks
+    # Unhashify HTML blocks.  Handles nested hashification, ie. block inside comment.
     #
-    foreach (@grafs) {
-        if (defined( $self->{_html_blocks}{$_} )) {
-            $_ = $self->{_html_blocks}{$_};
+    my @unhashified;
+    while (scalar @grafs) {
+        my $graf = shift @grafs;
+        if (defined( $self->{_html_blocks}{$graf} )) {
+            $graf = $self->{_html_blocks}{$graf};
+            my @subgrafs = split(/\n{2,}/, $graf);
+            unshift @grafs, @subgrafs;
+        }
+        else {
+            push @unhashified, $graf;
         }
     }
 
-    return join "\n\n", @grafs;
+    return join "\n\n", @unhashified;
 }
 
 sub _EncodeAmpsAndAngles {
