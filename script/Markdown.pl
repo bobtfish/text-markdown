@@ -77,7 +77,7 @@ The manpage was written by Gunnar Wolf <gwolf@debian.org> for its use
 in Debian systems, but can be freely used elsewhere.
 
 For full licensing information, please refer to
-L<Text::Markdown.pm>'s full documentation.
+L<Text::Markdown> full documentation.
 
 =head1 SEE ALSO
 
@@ -124,7 +124,7 @@ else {
 
 sub main {
     my (@fns) = @_;
-    
+
     my $f;
     if (scalar @fns) {
         foreach my $fn (@fns) {
@@ -140,7 +140,7 @@ sub main {
         local $/;               # Slurp the whole file
         $f = <>;
     }
-    
+
     return $m->markdown($f);
 }
 
