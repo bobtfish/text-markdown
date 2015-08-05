@@ -1160,7 +1160,7 @@ sub _ProcessListItemsUL {
 
 sub _DoCodeBlocks {
 #
-# Process Markdown code blocks (indented with 4 spaces or 1 tab):
+# Process Markdown code blocks (indented with 4 spaces or 1 tab, or wrapped in 3 or more backticks [```]):
 # * outdent the spaces/tab
 # * encode <, >, & into HTML entities
 # * escape Markdown special characters into MD5 hashes
@@ -1168,8 +1168,34 @@ sub _DoCodeBlocks {
 #
 
     my ($self, $text) = @_;
+    
+    # handle backticks
+    $text =~ s@
+        (?:\n|\A)       # backtick fence must be preceded by newline or beginning of string
+        (`{3,})         # $1 = Opening run of `
+        (.+?)           # $2 = The code block
+        (?<!`)
+        \1              # Matching closer
+        (?!`)
+    @
+        my $codeblock = $2;
+        my $result; # return value
 
-     $text =~ s{
+        $codeblock = $self->_EncodeCode($codeblock); # no outdent necessary
+        $codeblock = $self->_Detab($codeblock);
+        $codeblock =~ s/\A\n+//;  # trim leading newlines
+        $codeblock =~ s/\n+\z//;  # trim trailing newlines
+
+        $result = "\n\n<pre><code>" . $codeblock . "\n</code></pre>\n\n";
+
+        $result;
+    @egsx;
+    
+    # hash found codeblocks so they do not get reprocessed by the second step
+    $text = $self->_HashHTMLBlocks($text);
+
+    # handle tabs/spaces
+    $text =~ s{
         (?:\n\n|\A)
         (                # $1 = the code block -- one or more lines, starting with a space/tab
           (?:
@@ -1224,9 +1250,9 @@ sub _DoCodeSpans {
     my ($self, $text) = @_;
 
     $text =~ s@
-            (?<!\\)        # Character before opening ` can't be a backslash
-            (`+)        # $1 = Opening run of `
-            (.+?)        # $2 = The code block
+            (?<!\\)       # Character before opening ` can't be a backslash
+            (`+)          # $1 = Opening run of `
+            (.+?)         # $2 = The code block
             (?<!`)
             \1            # Matching closer
             (?!`)
@@ -1235,7 +1261,7 @@ sub _DoCodeSpans {
              $c =~ s/^[ \t]*//g; # leading whitespace
              $c =~ s/[ \t]*$//g; # trailing whitespace
              $c = $self->_EncodeCode($c);
-            "<code>$c</code>";
+             "<code>$c</code>";
         @egsx;
 
     return $text;
