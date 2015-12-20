@@ -17,6 +17,11 @@ And then
 	cpanm --installdeps . 
 	perl Makefile.PL
 
+Of course, all this is solved if you just download it from CPAN using,
+for instance,
+
+	cpanm Text::Markdown
+	
 Markdown
 ========
 
