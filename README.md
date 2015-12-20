@@ -10,7 +10,12 @@ more information.
 This module uses `Module::Install`. Run this before starting to work
 and install other dependencies
 
-	cpanm Module::Install Module::Install::CheckConflicts 
+	cpanm Module::Install Module::Install::CheckConflicts
+
+And then
+
+	cpanm --installdeps . 
+	perl Makefile.PL
 
 Markdown
 ========

@@ -9,5 +9,4 @@ perl:
   - "5.20"
 before_install:
   - cpanm Module::Install Module::Install::CheckConflicts
-  - cpanm --quiet --installdeps --notest .
-script: "perl Makefile.PL && make disttest"
+script: "perl Makefile.PL && make test"
