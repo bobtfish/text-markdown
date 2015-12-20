@@ -1,0 +1,10 @@
+branches:
+  except:
+    - gh-pages
+language: perl
+perl:
+  - "5.8"
+  - "5.16"
+  - "5.18"
+  - "5.20"
+script: "perl Makefile.PL && make disttest"
