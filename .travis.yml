@@ -1,0 +1,12 @@
+branches:
+  except:
+    - gh-pages
+language: perl
+perl:
+  - "5.8"
+  - "5.16"
+  - "5.18"
+  - "5.20"
+before_install:
+  - cpanm Module::Install Module::Install::CheckConflicts
+script: "perl Makefile.PL && make test"

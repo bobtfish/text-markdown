@@ -40,7 +40,7 @@ SYNTAX
 
     Note that Text::Markdown ensures that the output always ends with one
     newline. The fact that multiple newlines are collapsed into one makes
-    sense, because this is the behavior of HTML towards whispace. The fact
+    sense, because this is the behavior of HTML towards whitespace. The fact
     that there's always a newline at the end makes sense again, given that
     the output will always be nested in a block-level element (as opposed to
     an inline element). That block element can be a "<p>" (most often), or a

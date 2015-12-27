@@ -2,9 +2,26 @@
 
 This Readme is from the original version of Markdown; not all of the
 information contained herein is applicable to Test::Markdown the CPAN
-module that includes this file. See the module's POD and the README file for
+module that includes this file. See the module's POD file for
 more information.
 
+## Install locally
+
+This module uses `Module::Install`. Run this before starting to work
+and install other dependencies
+
+	cpanm Module::Install Module::Install::CheckConflicts
+
+And then
+
+	cpanm --installdeps . 
+	perl Makefile.PL
+
+Of course, all this is solved if you just download it from CPAN using,
+for instance,
+
+	cpanm Text::Markdown
+	
 Markdown
 ========
 
