@@ -92,6 +92,11 @@ The options for the processor are:
 
 =over
 
+=item break_at_newlines
+
+Converts newlines to linebreaks within block-level tags. This feature was
+adapted from Github Flavored Markdown.
+
 =item empty_element_suffix
 
 This option controls the end of empty element tags:
@@ -169,6 +174,8 @@ sub new {
     $p{empty_element_suffix} ||= ' />'; # Change to ">" for HTML output
 
     $p{trust_list_start_value} = $p{trust_list_start_value} ? 1 : 0;
+
+    $p{break_at_newlines} ||= defined $p{break_at_newlines} ? $p{break_newlines} : 0;
 
     my $self = { params => \%p };
     bless $self, ref($class) || $class;
@@ -579,7 +586,12 @@ sub _RunSpanGamut {
 
     # FIXME - Is hard coding space here sane, or does this want to be related to tab width?
     # Do hard breaks:
-    $text =~ s/ {2,}\n/ <br$self->{empty_element_suffix}\n/g;
+    if ($self->{break_at_newlines}) {
+        $text =~ s/\n/ <br$self->{empty_element_suffix}\n/g;
+    }
+    else {
+        $text =~ s/ {2,}\n/ <br$self->{empty_element_suffix}\n/g;
+    }
 
     return $text;
 }
