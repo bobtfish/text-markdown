@@ -15,6 +15,7 @@ perl_version    '5.008';
 requires        'Digest::MD5'     => undef;
 requires        'Text::Balanced'  => undef;
 requires        'Encode'          => undef;
+requires        'Scalar::Util'    => undef;
 test_requires  'Test::More'      => '0.42';
 test_requires  'Test::Exception' => undef;
 test_requires  'List::MoreUtils' => undef;

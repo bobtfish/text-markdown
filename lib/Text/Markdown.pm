@@ -7,6 +7,7 @@ use re 'eval';
 use Digest::MD5 qw(md5_hex);
 use Encode      qw();
 use Carp        qw(croak);
+use Scalar::Util qw(blessed);
 use base        'Exporter';
 
 our $VERSION   = '1.000031'; # 1.0.31
@@ -186,7 +187,7 @@ sub markdown {
     my ( $self, $text, $options ) = @_;
 
     # Detect functional mode, and create an instance for this run
-    unless (ref $self) {
+    unless (blessed($self) && $self->isa('Text::Markdown')) {
         if ( $self ne __PACKAGE__ ) {
             my $ob = __PACKAGE__->new();
                                 # $self is text, $text is options
