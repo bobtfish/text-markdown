@@ -1,4 +1,5 @@
 # Load the Module::Install bundled in ./inc/
+BEGIN { push @INC, '.'; }
 use inc::Module::Install;
 
 # Define metadata
